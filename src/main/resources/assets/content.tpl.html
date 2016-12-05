@@ -1,5 +1,134 @@
 <div class="example-container" >
-	<h3>Requesting paths registered with FrontendAPI</h3>
+	
+	
+	<h2>Calendar Integration Control Application</h2>
+	
+	<h3>Device Control Center</h3>
+	
+		
+<div class="align_divs">1. Smart Mirror</div>
+<div class="align_divs"><div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked>
+    <label class="onoffswitch-label" for="mirror_checker">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+    </label>
+</div></div>
+<div style="clear:both"></div>
+
+
+<!-- Choose desired functionalities of the mirror -->	
+<div id = "mirror_functionalities" ng-controller="MirrorCheckboxController">
+	<section id="mirror_id" class ="mirror">
+		<div class="container" ng-repeat="setting in settings">
+	 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
+	 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+		</div>
+	</section>
+</div>
+
+
+
+<!-- ON/OFF flipswitch for the smart TV -->	
+ <div class="align_divs">2. Smart TV</div>
+<div class="align_divs"><div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="tv_checker" checked>
+    <label class="onoffswitch-label" for="tv_checker">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+    </label>
+</div></div>
+<div style="clear:both"></div>
+
+
+
+<!-- Choose desired functionalities of the smart TV -->	
+<div id = "tv_functionalities" ng-controller="TVCheckboxController">
+	<section id="tv_id" class ="tv">
+		<div class="container" ng-repeat="setting in settings">
+	 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
+	 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+		</div>
+	</section>
+</div>
+
+
+<!-- ON/OFF flipswitch for the sonos box -->	
+ <div class="align_divs">3. Sonos Box</div>
+<div class="align_divs"><div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sonos_checker" checked>
+    <label class="onoffswitch-label" for="sonos_checker">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+    </label>
+</div></div>
+<div style="clear:both"></div>
+
+
+
+	<!-- music file upload -->
+	<div id ="files">
+	<p> Choose the song(s) you want to have as a reminder: </p>
+	<p>
+	<input type="file" name="files[]" multiple />
+	</p>
+	<p>Selected Files:</p>
+	<output id="list"></output>
+	</div>
+	<script>
+	
+	function musicupload(evt) {
+			var files = evt.target.files; // FileList object
+			//Declare Array Objekts called "output" to save properties
+			var output = [];
+			//loop, that adds name, type and data size of chosen file to the array in every iteration
+			for (var i = 0, f; f = files[i]; i++) {
+				output.push('<li><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
+					f.size, ' bytes</li>');
+			}
+			//Auf das Ausgabefeld zugreifen, unsortierte Liste erstellen und das oben erstellte Array auslesen lassen
+			document.getElementById('list')
+				.innerHTML = '<ul>' + output.join('') + '</ul>';
+		}
+		//Falls neue Eingabe, neuer Aufruf der Auswahlfunktion
+	document.getElementById('files')
+		.addEventListener('change', musicupload, false);
+	</script>
+
+
+
+
+
+	
+	<!-- Save state of checkboxes for the next session
+	<script type="text/javascript">
+	var i, checkboxes = document.querySelectorAll('input[type=checkbox]');
+
+	function save() {
+	    for (i = 0; i < checkboxes.length; i++) {
+	        localStorage.setItem(checkboxes[i].id, checkboxes[i].checked); 
+	    }
+	}
+
+	function load_() {
+	    for (i = 0; i < checkboxes.length; i++) {
+	        checkboxes[i].checked = localStorage.getItem(checkboxes[i].id) === 'true' ? true:false;
+	    }
+	} 
+	</script>	
+	 -->
+	 
+	 
+	
+	<button ng-click="saveSetting()">SAVE</button>
+	<button ng-click="loadSetting()">LOAD</button> 
+
+	
+	
+	
+	
+
+	<h3>Requesting paths registered with FrontendAPI test</h3>
 	<div class="example-row" ng-controller="ExampleController1">
 		
 		<div class="example-title">Rooms</div>
@@ -34,5 +163,41 @@
 		<div class="example-responsive-content">
 			<pre ng-bind="subscriptionLogs"></pre>
 		</div>
-	</div>
+	</div>	
+
+		
+		
+<!-- Blend device-functionality-DIV if the device flipswitch is active -->
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+$("#mirror_checker").change(function() {
+    if ( $(this).is(':checked') ) {
+        $(".mirror").show();
+    } else {
+        $(".mirror").hide();
+    }  
+});
+
+
+$("#tv_checker").change(function() {
+    if ( $(this).is(':checked') ) {
+        $(".tv").show();
+    } else {
+        $(".tv").hide();
+    }  
+});
+
+$("#sonos_checker").change(function() {
+    if ( $(this).is(':checked') ) {
+        $("#files").show();
+    } else {
+        $("#files").hide();
+    }  
+});
+</script>	
+
+	
+	
 </div>
+
+

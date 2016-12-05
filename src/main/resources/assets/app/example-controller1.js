@@ -1,6 +1,7 @@
 (function() {
 	'use strict';
 	
+	// definition of a module
 	var exampleApp = angular.module('exampleApp');
 	
 	/**
@@ -9,7 +10,7 @@
 	exampleApp.controller('ExampleController1', [ '$scope', '$http', function($scope, $http) {
 		$scope.rooms = [];
 		$scope.devices = [];
-		
+
 		// the App had registered 'rooms' path, request it with the angular service $http.
 		$http.get('rooms').then(function onSuccess(response) {
 			console.debug("fetchig rooms was successfull");
@@ -28,4 +29,5 @@
     		console.error("can't get devices");
     	});
      } ]);
+
 })();

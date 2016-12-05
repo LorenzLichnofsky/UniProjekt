@@ -1,6 +1,8 @@
 (function() {
 	'use strict';
 	
+	
+	
 	// depends on ngSanitize
 	var exampleApp = angular.module('exampleApp', [ 'ngSanitize']);
 	
