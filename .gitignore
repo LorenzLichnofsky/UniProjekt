@@ -8,7 +8,6 @@ version.properties
 *.iml
 .idea
 *.pid
-src/main/resources/assets/client_secret.json
 
 # ignore Eclipse files, use "git add -f" if you want to add these files.
 #.classpath
@@ -16,11 +15,14 @@ src/main/resources/assets/client_secret.json
 .settings
 bin/
 target/
+src/main/resources/assets/client_secret.json
 /example-app.jardesc
 
 # front end resources
 node/
 node_modules/
 bower_components/
+
 /.classpath
 /.project
+
