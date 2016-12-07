@@ -15,12 +15,14 @@ version.properties
 .settings
 bin/
 target/
+src/main/resources/assets/client_secret.json
 /example-app.jardesc
 
 # front end resources
 node/
 node_modules/
 bower_components/
-src/main/generated-resources/assets/css/*.css
+
 /.classpath
 /.project
+/pom.xml
