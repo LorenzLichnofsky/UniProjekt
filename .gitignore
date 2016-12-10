@@ -2,6 +2,7 @@
 logs
 *.log
 *.iml
+
 target
 version.properties
 .DS_Store
@@ -15,7 +16,7 @@ version.properties
 .settings
 bin/
 target/
-src/main/resources/assets/client_secret.json
+src/main/resources/client_secret.json
 /example-app.jardesc
 
 # front end resources
