@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+<head>
+  <title>Titel der Seite</title>
+	<!-- Bootstrap Core CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="center"></div>
+
+
+  <script type="text/javascript" src="./js/jquery-2.2.1.min.js"></script>
+  <script type="text/javascript" src="/bus/ModelAPICommunicationObject.js"></script>
+  <script type="text/javascript" src="/bus/ModelAPI.js"></script>
+  <script type="text/javascript" src="/bus/ModelAPIWebsocketClientFactory.js"></script>
+  <script type="text/javascript" src="/bus/bus-client-bootstrap.js"></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <!-- <script src="js/bootstrap.min.js"></script> -->
+  <!-- Custom JavaScript -->
+  <script src="js/custom.js"></script>
+
+
+<script type="text/javascript">
+  function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+
+switch(window.location.protocol) {
+   case 'file:':
+   initInDebugMode();
+   break;
+   case 'http:':
+   case 'https:':
+   default:
+  var sid = getParameterByName("SID");
+  window["Client"] = {
+    SID: sid, // set session token if required to be embedded rather than set via URL!
+    throwErrorOnBootFailure: true,
+    readyCallback: function() {
+    showWelcomeMessage();
+    },
+    failureCallback: function() {
+    // Do something when client initialization fails
+    }
+  };
+}
+</script>
+</body>
+
+</html>

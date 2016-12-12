@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+<head>
+	<!-- Bootstrap Core CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="center">
+      <figure class="icons">
+
+        <canvas id="partly-cloudy-day" width="200" height="200">
+        </canvas>
+
+        <canvas id="partly-cloudy-night" width="200" height="200">
+        </canvas>
+      </figure>
+  </div>
+
+
+    <script src="./js/skycons.js"></script>
+    <script>
+      var icons = new Skycons({"color": "white"}),
+          list  = [
+            "clear-day", "clear-night", "partly-cloudy-day",
+            "partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind",
+            "fog"
+          ],
+          i;
+
+      for(i = list.length; i--; )
+        icons.set(list[i], list[i]);
+
+      icons.play();
+	  
+		function update() {
+			var d = new Date();
+			if(d.getHours() >= 21 || d.getHours() < 5 ){
+				document.getElementById("partly-cloudy-day").style.display = "none";
+				document.getElementById("partly-cloudy-night").style.display = "block";
+			}
+			else {
+				document.getElementById("partly-cloudy-night").style.display = "none";
+				document.getElementById("partly-cloudy-day").style.display = "block";
+			}
+		}
+		setInterval(update, 600000);
+		update();
+	
+    </script>
+
+  <script type="text/javascript" src="./js/jquery-2.2.1.min.js"></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <!-- <script src="js/bootstrap.min.js"></script> -->
+  <!-- Custom JavaScript -->
+  <script src="js/custom.js"></script>
+
+</body>
+
+</html>
