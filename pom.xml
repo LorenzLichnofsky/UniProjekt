@@ -221,6 +221,11 @@
 			<version>20160810</version>
 		</dependency>
 		<dependency>
+			<groupId>de.hendrikmotza.mirror.api</groupId>
+			<artifactId>iolite-app-mirror-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.5</version>
