@@ -50,6 +50,10 @@ public class MirrorExampleApp extends AbstractIOLITEApp {
 	private static final String VIEW_ID_CLOCK = "DateTimeView";
 	private static final String ICON_URL_CLOCK = "DateTimeView/clock-icon.jpg";
 	private static final String VIEW_URL_CLOCK = "DateTimeView/clock.html";
+	
+	private static final String VIEW_ID_TEST = "TestView";
+	private static final String ICON_URL_TEST = "smart-mirror-white.svg";
+	private static final String VIEW_URL_TEST = "mirror-view.html";
 
 	private static final String VIEW_ID_WELCOME = "WelcomeView";
 	private static final String ICON_URL_WELCOME = "WelcomeView/welcome.png";
@@ -145,6 +149,9 @@ public class MirrorExampleApp extends AbstractIOLITEApp {
 		try {
 			this.mirrorManager = new SimpleMirrorManager(context, APP_ID);
 			this.mirrorManager.createView(VIEW_ID_CLOCK, ICON_URL_CLOCK, VIEW_URL_CLOCK, "Clock", false);
+			
+			this.mirrorManager.createView(VIEW_ID_TEST, ICON_URL_TEST, VIEW_URL_TEST, "Test", false);
+			
 			this.mirrorManager.createView(VIEW_ID_WEATHER, ICON_URL_WEATHER, VIEW_URL_WEATHER, "Weather", false);
 			this.mirrorManager.createView(VIEW_ID_LNDW, ICON_URL_LNDW, VIEW_URL_LNDW, "Lange Nacht der Wissenschaften", false);
 			this.mirrorManager.createView(VIEW_ID_WELCOME, ICON_URL_WELCOME, VIEW_URL_WELCOME, "Greeting");
