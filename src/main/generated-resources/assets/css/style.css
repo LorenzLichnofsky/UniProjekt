@@ -1,3 +1,4 @@
+
 /* Style of Checkboxes */
 <link href="css/magic-check.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
@@ -17,6 +18,18 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   color: #000; /* font - color in the whole application*/
+}
+
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+   span.psw {
+      display: block;
+      float: none;
+   }
+   .cancelbtn {
+      width: 100%;
+   }
 }
 
 
@@ -153,5 +166,40 @@ input[type="checkbox"]:checked + label span.checkbox::after {
     cursor: pointer;
 }
 
+form {
+   border: 3px solid #6C268A ;
+   width: 50%
+}
 
 
+input[type=text], input[type=password] {
+   width: 100%;
+   padding: 12px 20px;
+   margin: 8px 0;
+   display: inline-block;
+   border: 2px solid #ccc;
+   box-sizing: border-box;
+}
+
+button {
+   background-color: #6C268A ;
+   color: white;
+   padding: 14px 20px;
+   margin: 8px 0;
+   border: none;
+   cursor: pointer;
+   width: 50%;
+}
+
+span.psw {
+   float: right;
+   padding-top: 16px;
+}
+
+
+.form_container {
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-top: 20px;
+  width:85%;
+}
