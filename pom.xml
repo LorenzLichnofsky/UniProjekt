@@ -214,17 +214,22 @@
 			<version>0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+  			<groupId>joda-time</groupId>
+ 			<artifactId>joda-time</artifactId>
+  			<version>2.9.6</version>
+		</dependency>
 		<!-- JSON -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20160810</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>de.hendrikmotza.mirror.api</groupId>
 			<artifactId>iolite-app-mirror-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

@@ -10,14 +10,14 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.client.util.DateTime;
+//import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,8 +26,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-//TODO add source 
+import java.util.Calendar;
+
+
+/**Source mainly taken from 
+ * https://developers.google.com/google-apps/calendar/quickstart/java
+ */
+ 
 public class Quickstart {
     /** Application name. */
     private static final String APPLICATION_NAME =
@@ -112,84 +119,109 @@ public class Quickstart {
         com.google.api.services.calendar.Calendar service =
             getCalendarService();
 
-        // List the next 10 events from the primary calendar.
-        DateTime now = new DateTime(System.currentTimeMillis());
-        // create a maxTime today 23:59:59
+        // create the current dateTime
+        com.google.api.client.util.DateTime now = new com.google.api.client.util.DateTime(System.currentTimeMillis());
+        // create a maxTime today 23:59:59 as we just need daily information
         Date day = new Date(System.currentTimeMillis());
         //TODO methods old
         day.setHours(23);
         day.setMinutes(59);
         day.setSeconds(59);
-        DateTime t = new DateTime(day);
+        com.google.api.client.util.DateTime t = new com.google.api.client.util.DateTime(day);
         
         Events events = service.events().list("primary")
-        	.setMaxResults(20)
+        	//.setMaxResults(20)
         	// just upcoming Events
             .setTimeMin(now)
             // just today's Events
-            .setTimeMax(t)
+            //.setTimeMax(t)
             .setOrderBy("startTime")
             .setSingleEvents(true)
             .execute();
         
         List<Event> items = events.getItems();
-     // Retrieve color definitions for calendars and events
-       List<GoogleEvent> allToday = new LinkedList<GoogleEvent>();
-     // Print available event colors
+        List<GoogleEvent> allToday = new LinkedList<GoogleEvent>();     
        
-             for (Event event : items) {
+             for (com.google.api.services.calendar.model.Event event : items) {
             	GoogleEvent today = new GoogleEvent();
-                DateTime start = event.getStart().getDateTime();                              
-                if (start != null) {
-                today.setBegin(start); 	
-                }
-                DateTime end = event.getEnd().getDateTime();                              
-                if (end != null) {
-                today.setEnd(end); 	
-                }
-                String Name = event.getDescription();
+            	
+            	com.google.api.client.util.DateTime start = event.getStart().getDateTime();   
+            	com.google.api.client.util.DateTime end = event.getEnd().getDateTime();
+            	 
+                //Date startDate = start.toDate();
+                // ohne Zeitangabe kein Event
+                if (start != null && end != null) {
+                
+                java.util.Calendar cStart = java.util.Calendar.getInstance();
+                cStart.setTimeInMillis(start.getValue());
+                java.util.Calendar cEnd = java.util.Calendar.getInstance();
+                cEnd.setTimeInMillis(end.getValue());
+               
+                today.setBegin(cStart); 
+                today.setEnd(cEnd); 	
+               
+//                DateTime end = event.getEnd().getDateTime();                              
+//                if (end != null) {
+//                today.setEnd(end); 	
+//                }
+                String Name = event.getSummary();
                 if (Name != null) today.setName(Name);
+                else today.setName("Your Appointment");
+                
                 String color = event.getColorId();
-                String status = "start";
+               
+                String status = "nA";
                 if (color != null ){
                 	switch(color){
                 	case "1": status = "work";
-                			break;
-                	case "2": status = "private";
+                			break;                			
+                	
+                	case "2": status = "uiiiii";
                 	        break;
                 	case "3": status = "task";
                 			break;
-                	case "4": status = "iwie";
+                	case "4": status = "dunkelesorange";
                 			break;
-                	case "5": status = "iwas";
+                	case "5": status = "gelb";
                             break;               	
-                	case "6": status = "iwo";
+                	case "6": status = "orange";
                 			break;
                 	case "7": status = "iwann";
                 		break;
                 	case "8": status = "iwall";
                 		break;
-                	case "9": status = "iwass";
+                	case "9": status = "blau";
                 		break;
-                	case "10":status = "iwamm";
+                	case "10":status = "grün";
                 		break;
-                	case "11": status = "iwajj";
+                	//rot
+                	case "11": status = "red";
                 		break;
                 	default: status = "So geht es nicht";
                 	}	
                 }
-                today.setStatus(status);
-                System.out.println(status);
-                String kind = event.getKind();
-                if (kind != null) today.setKind(kind);
+                //TODO default for null value 
+                if(color== null) status = "weiß";
+                
+                today.setColor(status);
+               
+//                String kind = event.getKind();
+//                if (kind != null) today.setKind(kind);
                 
                 String location = event.getLocation();;
                 if (location != null) today.setLocation(location);
+                else today.setLocation("unkown");
+                
+                String share = event.getVisibility();
+                if (share != null) today.setStatus(share);
+                else today.setStatus("private");
+                
+                //System.out.println(event..getVisibility());
                 
                 allToday.add(today);
                 //event.getCreator();
                 System.out.println(today.toString());
-               
+                }
             }
         
     }
