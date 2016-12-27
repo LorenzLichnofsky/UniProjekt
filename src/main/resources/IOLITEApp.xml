@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:iolite-app-configuration
 	xmlns:ns2="www.iolite.de/iolite-app-configuration"
-	name="Example App"
+	name="Calendar Integration App"
 	className="de.iolite.apps.example.ExampleApp">
 
 	<api-permission name="de.iolite.app.api.frontend.FrontendAPI" type="READ_WRITE"/>

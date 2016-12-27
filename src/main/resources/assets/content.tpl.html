@@ -1,283 +1,310 @@
-<html lang="en">
-  <head>
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="816369265139-0lmlpb4njr826utb58ic5r0g5atkl7li.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-  </head>
-  
-<body>
-
-<div class="example-container" >
+<div>
+	<div>
 	
+		<!----- TAB NAVIGATION BAR ------> 
 	
-	<h2>Calendar Integration Control Application</h2>
+		  <div class="w3-row" style="margin-top: 50px; margin-bottom: 30px;">
+		  	<a href="javascript:void(0)" onclick="openTab(event, 'User');">
+		      <div class="w3-third tablink w3-bottombar w3-hover-light-grey w3-padding w3-border-purple">User Login</div>
+		    </a>
+		    <a href="javascript:void(0)" onclick="openTab(event, 'Devices');">
+		      <div class="w3-third tablink w3-bottombar w3-hover-light-grey w3-padding">Device Functionalities</div>
+		    </a>
 	
-	<h3>Device Control Center</h3>
+		  </div>
+
+
+			  <!----- User-Information TAB ------> 
 	
-	<!-- 
-    <div data-role="page">
- <div data-role="header">
-   <h1>Welcome To My Homepage</h1>
- </div>
+			  <div id="User" class="w3-container city" >
 
- <div data-role="main" class="ui-content">
-   <a href="#myPopup" data-rel="popup" class="ui-btn ui-btn-inline ui-corner-all ui-icon-check ui-btn-icon-left">Show Popup Form</a>
+			  
+					 <!-------  GOOGLE LOGIN ----------->
+					
+					 <div data-role="page">
+						
+						 <div data-role="main" class="ui-content">
+						   <a href="#myPopup" data-rel="popup" class="ui-btn ui-btn-inline ui-corner-all ui-icon-check ui-btn-icon-left">Show Popup Form</a>
+						
+						   <div data-role="popup" id="myPopup" class="ui-content" style="min-width:250px;">
+						     <form method="post" action="demoform.asp">
+						       <div class="form_container">
+						         <label for="usrnm" class="ui-hidden-accessible">Google E-Mail:</label>
+						         <input type="text" name="user" id="usrnm" placeholder="Enter E-Mail Address">
+						         <label for="pswd" class="ui-hidden-accessible">Password:</label>
+						         <input type="password" name="passw" id="pswd" placeholder="Enter Password">
+						         <label for="log">Keep me logged in</label>
+						         <input type="checkbox" name="login" id="log" value="1" data-mini="true">
+						         <button type="submit" data-inline="true">Log in</button>
+						       </div>
+						     </form>
+						   </div>
+						 </div>
 
-   <div data-role="popup" id="myPopup" class="ui-content" style="min-width:250px;">
-     <form method="post" action="demoform.asp">
-       <div>
-         <h3>Login information</h3>
-         <label for="usrnm" class="ui-hidden-accessible">Username:</label>
-         <input type="text" name="user" id="usrnm" placeholder="Username">
-         <label for="pswd" class="ui-hidden-accessible">Password:</label>
-         <input type="password" name="passw" id="pswd" placeholder="Password">
-         <label for="log">Keep me logged in</label>
-         <input type="checkbox" name="login" id="log" value="1" data-mini="true">
-         <input type="submit" data-inline="true" value="Log in">
-       </div>
-     </form>
-   </div>
- </div>
+					</div>
+				
+				    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+		
+			  
+					<!--  Login Window 
+					<form action="action_page.php">
+					     <div class="form_container">
+					       <label>Google E-Mail</label>
+					       <input type="text" placeholder="Enter E-Mail Address" name="email" required>
+					    
+					       <label>Password</label>
+					       <input type="password" placeholder="Enter Password" name="pw" required>
+					       
+					       <input type="checkbox" id = "remember_me" checked="checked"><span class="checkbox">Remember me</span>    
+					       <button type="submit">Login</button>
+					     </div>
+					</form>
+					-->
+		
+			  </div>
 
- <div data-role="footer">
-   <h1>Footer Text</h1>
- </div>
+
+	 		  <!----- Devices TAB ------> 
+	
+			  <div id="Devices" class="w3-container city" style="display:none">
+		
+					<ul id="infoList">
+						
+						<!----- SMART MIRROR ------> 
+					    <li>
+					        <div class="topic">
+					        
+						        <div class="align_divs">Smart Mirror</div>
+									<div class="align_divs"><div class="onoffswitch">
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked>
+									    <label class="onoffswitch-label" for="mirror_checker">
+									        <span class="onoffswitch-inner"></span>
+									        <span class="onoffswitch-switch"></span>
+									    </label>
+									</div></div>
+								<div style="clear:both"></div>
+					        
+					        </div>
+					
+					        <input type="checkbox" id ="mirror_triangle"/>
+					
+					        <div class="checkWrap"></div>   
+					
+					        <div class="mirrortext">
+								<!-- Choose desired functionalities of the mirror -->	
+								<div id = "mirror_functionalities" ng-controller="MirrorCheckboxController">
+									<section id="mirror_id" class ="mirror">
+										<div class="container" ng-repeat="setting in settings">
+									 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
+									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+										</div>
+									</section>
+								</div>
+							</div>
+					
+					    </li>
+					    
+						<!----- SMART TV ------>
+					    <li>
+					
+					        <div class="topic">
+					        
+								<div class="align_divs">Smart TV</div>
+									<div class="align_divs"><div class="onoffswitch">
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="tv_checker" checked>
+									    <label class="onoffswitch-label" for="tv_checker">
+									        <span class="onoffswitch-inner"></span>
+									        <span class="onoffswitch-switch"></span>
+									    </label>
+									</div></div>
+								<div style="clear:both"></div>
+							        
+					        </div>
+					
+					        <input type="checkbox" id = "tv_triangle"/>
+					
+					        <div class="checkWrap"></div>
+					
+					        <div class="tvtext"><!-- Choose desired functionalities of the smart TV -->	
+								<div id = "tv_functionalities" ng-controller="TVCheckboxController">
+									<section id="tv_id" class ="tv">
+										<div class="container" ng-repeat="setting in settings">
+									 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
+									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+										</div>
+									</section>
+								</div>
+							</div>
+					
+					    </li>
+					
+						<!----- SONOS BOX ------>
+					    <li>
+					
+					        <div class="topic">
+					        
+						        <div class="align_divs">Sonos Box</div>
+									<div class="align_divs"><div class="onoffswitch">
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sonos_checker" checked>
+									    <label class="onoffswitch-label" for="sonos_checker">
+									        <span class="onoffswitch-inner"></span>
+									        <span class="onoffswitch-switch"></span>
+									    </label>
+									</div></div>
+								<div style="clear:both"></div>
+					        
+					        </div>
+					
+					        <input type="checkbox" id ="sonos_triangle" />
+					
+					        <div class="checkWrap"></div>   
+					
+					        <div class="sonostext">
+					        
+					        
+						        <!-- Music file upload -->
+
+								<div id ="files">
+								<input type="file" id="input-file" /><output id="list"></output>
+								</div>
+
+					        
+					        </div>
+					
+					    </li>
+					
+					</ul>
+					
+		 	  <!--  Button to save current state of checkboxes for the next session -->
+
+			  
+			
+			  </div>
+			    
+		</div>
 </div>
--->
-    
 
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <script>
-      function onSignIn(googleUser) {
-        // Useful data for your client-side scripts:
-        var profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-        console.log('Full Name: ' + profile.getName());
-        console.log('Given Name: ' + profile.getGivenName());
-        console.log('Family Name: ' + profile.getFamilyName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
-
-        // The ID token you need to pass to your backend:
-        var id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);  
-      };
-    </script>
-
-    
-    
-<form action="action_page.php">
-
-     <div class="form_container">
-       <label>Google E-Mail</label>
-       <input type="text" placeholder="Enter E-Mail Address" name="email" required>
-    
-       <label>Password</label>
-       <input type="password" placeholder="Enter Password" name="pw" required>
-       
-       <input type="checkbox" id = "remember_me" checked="checked"><span class="checkbox">Remember me</span>    
-       <button type="submit">Login</button>
-
-      
-     </div>
-
-</form>
-	
-
-		
-<div class="align_divs">1. Smart Mirror</div>
-<div class="align_divs"><div class="onoffswitch">
-    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked>
-    <label class="onoffswitch-label" for="mirror_checker">
-        <span class="onoffswitch-inner"></span>
-        <span class="onoffswitch-switch"></span>
-    </label>
-</div></div>
-<div style="clear:both"></div>
-
-
-<!-- Choose desired functionalities of the mirror -->	
-<div id = "mirror_functionalities" ng-controller="MirrorCheckboxController">
-	<section id="mirror_id" class ="mirror">
-		<div class="container" ng-repeat="setting in settings">
-	 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
-	 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
-		</div>
-	</section>
-</div>
-
-
-
-<!-- ON/OFF flipswitch for the smart TV -->	
- <div class="align_divs">2. Smart TV</div>
-<div class="align_divs"><div class="onoffswitch">
-    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="tv_checker" checked>
-    <label class="onoffswitch-label" for="tv_checker">
-        <span class="onoffswitch-inner"></span>
-        <span class="onoffswitch-switch"></span>
-    </label>
-</div></div>
-<div style="clear:both"></div>
-
-
-
-<!-- Choose desired functionalities of the smart TV -->	
-<div id = "tv_functionalities" ng-controller="TVCheckboxController">
-	<section id="tv_id" class ="tv">
-		<div class="container" ng-repeat="setting in settings">
-	 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
-	 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
-		</div>
-	</section>
-</div>
-
-
-<!-- ON/OFF flipswitch for the sonos box -->	
- <div class="align_divs">3. Sonos Box</div>
-<div class="align_divs"><div class="onoffswitch">
-    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sonos_checker" checked>
-    <label class="onoffswitch-label" for="sonos_checker">
-        <span class="onoffswitch-inner"></span>
-        <span class="onoffswitch-switch"></span>
-    </label>
-</div></div>
-<div style="clear:both"></div>
-
-
-
-	<!-- music file upload -->
-	<div id ="files">
-	<p> Choose the song(s) you want to have as a reminder: </p>
-	<p>
-	<input type="file" name="files[]" multiple />
-	</p>
-	<p>Selected Files:</p>
-	<output id="list"></output>
-	</div>
-	<script>
-	
-	function musicupload(evt) {
-			var files = evt.target.files; // FileList object
-			//Declare Array Objekts called "output" to save properties
-			var output = [];
-			//loop, that adds name, type and data size of chosen file to the array in every iteration
-			for (var i = 0, f; f = files[i]; i++) {
-				output.push('<li><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
-					f.size, ' bytes</li>');
-			}
-			//Auf das Ausgabefeld zugreifen, unsortierte Liste erstellen und das oben erstellte Array auslesen lassen
-			document.getElementById('list')
-				.innerHTML = '<ul>' + output.join('') + '</ul>';
-		}
-		//Falls neue Eingabe, neuer Aufruf der Auswahlfunktion
-	document.getElementById('files')
-		.addEventListener('change', musicupload, false);
-	</script>
-
-
-
-
-
-	
-	<!-- Save state of checkboxes for the next session
-	<script type="text/javascript">
-	var i, checkboxes = document.querySelectorAll('input[type=checkbox]');
-
-	function save() {
-	    for (i = 0; i < checkboxes.length; i++) {
-	        localStorage.setItem(checkboxes[i].id, checkboxes[i].checked); 
-	    }
-	}
-
-	function load_() {
-	    for (i = 0; i < checkboxes.length; i++) {
-	        checkboxes[i].checked = localStorage.getItem(checkboxes[i].id) === 'true' ? true:false;
-	    }
-	} 
-	</script>	
-	 -->
-	 
-	 
-	
-	<button ng-click="saveSetting()">SAVE</button>
-	<button ng-click="loadSetting()">LOAD</button> 
-
+<!------------      END HTML      ------------->
 	
 	
 	
 	
-
-	<h3>Requesting paths registered with FrontendAPI test</h3>
-	<div class="example-row" ng-controller="ExampleController1">
+<!------------ START JAVA SCRIPT  ------------->
 		
-		<div class="example-title">Rooms</div>
-		<div class="example-responsive-content" ng-repeat="room in rooms">
-			<span ng-bind="room"></span>
-		</div>
-		
-		<div class="example-title">Devices with ON/OFF property</div>
-		<div class="example-responsive-content" ng-repeat="device in devices">
-			<span ng-bind="device.name"></span>
-		</div>
-	</div>
-	
-	<h3>Using ModelAPI JS interface</h3>
-	<div class="example-row" ng-controller="ExampleController2">
-		
-		<div class="example-title">ModelAPI Profiles</div>
-		<div class="example-responsive-content" ng-bind="profileKeys">
-		</div>
-		
-		<div class="example-title">Execute StorageAPI.loadInt action</div>
-		<div class="example-responsive-content">
-			StorageAPI.loadInt("test")= <span ng-bind="testValueLoadedFromStorageAPI"></span>
-		</div>
-		
-		<div class="example-title">Query EnvironmentAPI with path "./locations" </div>
-		<div class="example-responsive-content" ng-repeat="location in roomsQueredWithEnvironmentAPI">
-			<span ng-bind="location.name"></span>
-		</div>
-		
-		<div class="example-title">Subscribe EnvironmentAPI with path "./devices" </div>
-		<div class="example-responsive-content">
-			<pre ng-bind="subscriptionLogs"></pre>
-		</div>
-	</div>	
-
-		
-		
-<!-- Blend device-functionality-DIV if the device flipswitch is active -->
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript">
-$("#mirror_checker").change(function() {
-    if ( $(this).is(':checked') ) {
-        $(".mirror").show();
-    } else {
-        $(".mirror").hide();
-    }  
+
+
+/* If a device is "disabled", the user shouldn't be able to unfold the different functionalities 
+ * If the functionalities for a device are unfolded, but then it will be "disabled", the functionalities will be folded
+ */
+
+$(document).ready(function () {
+	$('#mirror_checker').click(function(){
+		   /* user is not able to unfold mirror functionalities if this device is "disabled" */
+		   $('#mirror_triangle').attr('disabled',!this.checked)
+
+			 var $this = $(this);
+		     if ($this.is(':checked')) {
+		    	/* do nothing */ 
+		     } else {
+		    	 /* uncheck the triangle checkbox*/
+		    	 $( "#mirror_triangle" ).prop( "checked", false );
+		     }
+		});
+});	
+	
+$(document).ready(function () {	
+	$('#tv_checker').click(function(){
+			/* user is not able to unfold tv functionalities if this device is "disabled" */
+		   $('#tv_triangle').attr('disabled',!this.checked)
+		   
+		   	 var $this = $(this);
+		     if ($this.is(':checked')) {
+		    	/* do nothing */ 
+		     } else {
+		    	 /* uncheck the triangle checkbox*/
+		    	 $( "#tv_triangle" ).prop( "checked", false );
+		     }
+		});
+});	
+	
+$(document).ready(function () {	
+	$('#sonos_checker').click(function(){
+		   /* user is not able to unfold sonos functionalities if this device is "disabled" */
+		   $('#sonos_triangle').attr('disabled',!this.checked)
+		   
+		   	 var $this = $(this);
+		     if ($this.is(':checked')) {
+		    	/* do nothing */ 
+		     } else {
+		    	 /* uncheck the triangle checkbox*/
+		    	 $( "#sonos_triangle" ).prop( "checked", false );
+		     }
+		});
 });
+ 
 
 
-$("#tv_checker").change(function() {
-    if ( $(this).is(':checked') ) {
-        $(".tv").show();
-    } else {
-        $(".tv").hide();
-    }  
-});
 
-$("#sonos_checker").change(function() {
-    if ( $(this).is(':checked') ) {
-        $("#files").show();
-    } else {
-        $("#files").hide();
-    }  
+
+/* Navigation TAB - Selection handling*/
+function openTab(evt, tabName) {
+	  var i, x, tablinks;
+	  x = document.getElementsByClassName("city");
+	  for (i = 0; i < x.length; i++) {
+	     x[i].style.display = "none";
+	  }
+	  tablinks = document.getElementsByClassName("tablink");
+	  for (i = 0; i < x.length; i++) {
+	     tablinks[i].className = tablinks[i].className.replace("w3-border-purple","");
+	  }
+	  document.getElementById(tabName).style.display = "block";
+	  evt.currentTarget.firstElementChild.className += " w3-border-purple";
+}
+
+/* Google Login */
+function onSignIn(googleUser) {
+    // Useful data for your client-side scripts:
+    var profile = googleUser.getBasicProfile();
+    console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+    console.log('Full Name: ' + profile.getName());
+    console.log('Given Name: ' + profile.getGivenName());
+    console.log('Family Name: ' + profile.getFamilyName());
+    console.log("Image URL: " + profile.getImageUrl());
+    console.log("Email: " + profile.getEmail());
+
+    // The ID token you need to pass to your backend:
+    var id_token = googleUser.getAuthResponse().id_token;
+    console.log("ID Token: " + id_token);  
+  };
+
+  
+/* Music Upload - ReadOut */ 
+function musicupload(evt) {
+		var files = evt.target.files; // FileList object
+		//Declare Array Objekts called "output" to save properties
+		var output = [];
+		//loop, that adds name of chosen file to the array in every iteration
+		for (var i = 0, f; f = files[i]; i++) {
+			output.push('<li><strong>', f.name, ' </li>');
+		}
+		//access output panel, create unsorted list and readout the array from above
+		document.getElementById('list')
+			.innerHTML = '<ul>' + output.join('') + '</ul>';
+	}
+	//if new input, new call of function
+document.getElementById('files')
+	.addEventListener('change', musicupload, false);  
+	
+	
+/* Music Upload Button - Change Style*/	
+$('#input-file').before('<input type="button" id="button-file" value="Upload File" />');
+$('#input-file').hide();
+$('body').on('click', '#button-file', function() { 
+    $('#input-file').trigger('click');    
 });
 </script>	
 
 	
 	
-</div>
-</body>
-</html>
-

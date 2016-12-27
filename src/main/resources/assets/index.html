@@ -2,20 +2,30 @@
 <html lang="en" ng-app="exampleApp">
 
 <head>
+
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+    <!-- Google Login -->
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="816369265139-0lmlpb4njr826utb58ic5r0g5atkl7li.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <title>Angular Example App</title>
 
 	<!-- our style sheet generated from the LESS files -->
-	<link rel="stylesheet" type="text/css" href="css/example-bootstrap.css">
+	<!-- <link rel="stylesheet" type="text/css" href="css/example-bootstrap.css"> -->
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	
 	
 	<link href="css/magic-check.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+	
+	<!--   Tab import -->
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
     <!-- HTML5 shim must be put in header! -->
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -26,7 +36,7 @@
     <![endif]-->
 
 
-
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
 
 	<!-- all third party dependencies created with Grunt -->
     <script type="text/javascript" src="lib/third-party.js"></script>
