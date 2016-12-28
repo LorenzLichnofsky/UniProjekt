@@ -88,34 +88,5 @@ public class GoogleEvent {
 		this.end = end;
 	}
 	
-	@Override
-	public String toString(){
-	
-	int minutes = this.end.get(Calendar.MINUTE);
-	int minutesStart = this.begin.get(Calendar.MINUTE);
-	String ende = "";
-	String start = "";
-	if (minutes < 10){
-	ende = ":0"+minutes;
-	}
-	else
-	ende = ":"+minutes;	
-	if (minutesStart < 10){
-	start = ":0"+minutes;
-	}
-	else
-	start = ":"+minutes;	
-	String event = " WAS? "+this.Name+"\n WO?: "+this.Location+
-				"\n Status:"+ this.Status + 
-				"\n FARBE: "+this.Color+
-				"\n WANN? "+this.begin.get(Calendar.HOUR_OF_DAY)+start+
-				"\n BIS "+this.end.get(Calendar.HOUR_OF_DAY)+ende+"\n";
-		
-		return event;
-	}
-
-
-	
-	
 
 }
