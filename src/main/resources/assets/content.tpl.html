@@ -1,4 +1,5 @@
 <html lang="en">
+
    <head>
      <meta name="google-signin-scope" content="profile email">
      <meta name="google-signin-client_id" content="816369265139-0lmlpb4njr826utb58ic5r0g5atkl7li.apps.googleusercontent.com">
@@ -26,33 +27,8 @@
 			  <!----- User-Information TAB ------> 
 	
 			  <div id="User" class="w3-container city" >
-
-			  
-					 <!-------  GOOGLE LOGIN ----------->
-					
-					 <div data-role="page">
-						
-						 <div data-role="main" class="ui-content">
-						   <a href="#myPopup" data-rel="popup" class="ui-btn ui-btn-inline ui-corner-all ui-icon-check ui-btn-icon-left">Show Popup Form</a>
-						
-						   <div data-role="popup" id="myPopup" class="ui-content" style="min-width:250px;">
-						     <form method="post" action="demoform.asp">
-						       <div class="form_container">
-						         <label for="usrnm" class="ui-hidden-accessible">Google E-Mail:</label>
-						         <input type="text" name="user" id="usrnm" placeholder="Enter E-Mail Address">
-						         <label for="pswd" class="ui-hidden-accessible">Password:</label>
-						         <input type="password" name="passw" id="pswd" placeholder="Enter Password">
-						         <label for="log">Keep me logged in</label>
-						         <input type="checkbox" name="login" id="log" value="1" data-mini="true">
-						         <button type="submit" data-inline="true">Log in</button>
-						       </div>
-						     </form>
-						   </div>
-						 </div>
-
-					</div>
 				
-				    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+				<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
 		
 			  
 					<!--  Login Window 
@@ -199,7 +175,65 @@
 	
 	
 <!------------ START JAVA SCRIPT  ------------->
-		
+<script type="text/javascript" src="app/Google_Data.js"></script>
+<script type="text/javascript">
+
+function onSignIn(googleUser) {
+	
+	var profile = googleUser.getBasicProfile();
+	var id_token = googleUser.getAuthResponse().id_token;
+	var storage = new function () {
+		/* --------- Private Properties --------- */
+		/* --------- Private Methods --------- */
+
+	function linearize () {
+		var string = "", name, value;
+		for (name in dataContainer) {
+			value = encodeURIComponent(dataContainer[name]);
+			name = encodeURIComponent(name);
+			string += name + "=" + value + "&";
+		}
+		if (string != "") {
+			string = string.substring(0, string.length - 1);
+		}
+		return string;
+	}
+
+	function read () {
+		if (window.name == '' || window.name.indexOf("=") == -1) {
+			return;
+		}
+		var pairs = window.name.split("&");
+		var pair, name, value;
+		for (var i = 0; i < pairs.length; i++) {
+			if (pairs[i] == "") {
+				continue;
+			}
+			pair = pairs[i].split("=");
+			name = decodeURIComponent(pair[0]);
+			value = decodeURIComponent(pair[1]);
+			dataContainer[name] = value;
+		}
+	}
+
+	function write () {
+		window.name = linearize();
+	}
+    var dataContainer = {};
+	this.set = function (name, value) {
+	dataContainer[name] = value;
+	write();
+	};
+	}
+	storage.set("token", id_token);
+	storage.set( "ID", profile.getId());
+	//location.href = "window-name-empfaenger.html";
+}
+
+
+</script>
+
+
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript">
 
@@ -273,7 +307,7 @@ function openTab(evt, tabName) {
 }
 
 /* Google Login */
-function onSignIn(googleUser) {
+function onSignIn2(googleUser) {
     // Useful data for your client-side scripts:
     var profile = googleUser.getBasicProfile();
     console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -316,5 +350,5 @@ $('body').on('click', '#button-file', function() {
 </script>	
 
 </body>
-</html>	
+</html>
 	
