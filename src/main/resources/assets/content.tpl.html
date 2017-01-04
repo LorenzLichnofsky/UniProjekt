@@ -178,7 +178,7 @@
 <script type="text/javascript" src="app/Google_Data.js"></script>
 <script type="text/javascript">
 
-function onSignIn(googleUser) {
+function onSignIn2(googleUser) {
 	
 	var profile = googleUser.getBasicProfile();
 	var id_token = googleUser.getAuthResponse().id_token;
@@ -225,9 +225,12 @@ function onSignIn(googleUser) {
 	write();
 	};
 	}
+	window.sessionStorage.setItem('ID', profile.getId());
+	//src.main.java.de.iolite.apps.example.Quickstart.getid(id_token);
 	storage.set("token", id_token);
+	//return 
 	storage.set( "ID", profile.getId());
-	//location.href = "window-name-empfaenger.html";
+	
 }
 
 
@@ -307,21 +310,37 @@ function openTab(evt, tabName) {
 }
 
 /* Google Login */
-function onSignIn2(googleUser) {
+function onSignIn(googleUser) {
     // Useful data for your client-side scripts:
     var profile = googleUser.getBasicProfile();
     console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+    window.sessionStorage.setItem('ID', profile.getId());
     console.log('Full Name: ' + profile.getName());
+    window.sessionStorage.setItem('Full Name: ', profile.getName());
     console.log('Given Name: ' + profile.getGivenName());
+    window.sessionStorage.setItem('Given Name: ', profile.getGivenName());
     console.log('Family Name: ' + profile.getFamilyName());
+    window.sessionStorage.setItem('Family Name: ', profile.getFamilyName());
     console.log("Image URL: " + profile.getImageUrl());
+    window.sessionStorage.setItem("Image URL: ", profile.getImageUrl());
     console.log("Email: " + profile.getEmail());
-
+    window.sessionStorage.setItem("Email: ", profile.getEmail());
     // The ID token you need to pass to your backend:
     var id_token = googleUser.getAuthResponse().id_token;
     console.log("ID Token: " + id_token);  
+    window.sessionStorage.setItem("ID Token: ", id_token);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('Get', 'http://localhost:35729/example-app/src/main/resources/assets/content.tpl.html');
+    xhr.setRequestHeader('Content-Type', 'txt');
+    xhr.onreadystatechange = function() {
+    xhr.send(id_token);
+    new Quickstart(id_token);
+    };
+    
+    return id_token;
   };
-
+  
   
 /* Music Upload - ReadOut */ 
 function musicupload(evt) {
@@ -349,6 +368,7 @@ $('body').on('click', '#button-file', function() {
 });
 </script>	
 
+<form method="get" action="GoHandler" onsubmit="return onSignIn(googleUser)"></form>
 </body>
 </html>
 	
