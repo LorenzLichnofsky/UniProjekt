@@ -73,7 +73,7 @@ import de.iolite.utilities.time.series.TimeInterval;
  * @author Felix Rodemund
  * @since 1.0
  */
-public final class ExampleApp extends AbstractIOLITEApp {
+public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	private static final class DeviceJSONRequestHandler extends FrontendAPIRequestHandler {
 
@@ -151,7 +151,7 @@ public final class ExampleApp extends AbstractIOLITEApp {
 			}
 
 			final JSONArray jsonDeviceArray = new JSONArray();
-			for (final Device device : ExampleApp.this.deviceAPI.getDevices()) {
+			for (final Device device : CalendarIntegrationAppMain.this.deviceAPI.getDevices()) {
 				if (device.getProperty(propertyType) != null) {
 					// device has the correct property type
 					final JSONObject jsonDeviceObject = new JSONObject();
@@ -204,7 +204,7 @@ public final class ExampleApp extends AbstractIOLITEApp {
 		@Override
 		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
 			final JSONArray locationNames = new JSONArray();
-			for (final Location location : ExampleApp.this.environmentAPI.getLocations()) {
+			for (final Location location : CalendarIntegrationAppMain.this.environmentAPI.getLocations()) {
 				locationNames.put(location.getName());
 			}
 			final JSONObject response = new JSONObject();
@@ -214,7 +214,7 @@ public final class ExampleApp extends AbstractIOLITEApp {
 	}
 
 	@Nonnull
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExampleApp.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIntegrationAppMain.class);
 
 	/* App APIs */
 	private FrontendAPI frontendAPI;
@@ -231,7 +231,7 @@ public final class ExampleApp extends AbstractIOLITEApp {
 	/**
 	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public, parameter-less constructor.
 	 */
-	public ExampleApp() {
+	public CalendarIntegrationAppMain() {
 		// empty
 	}
 

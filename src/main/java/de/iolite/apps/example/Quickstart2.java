@@ -24,7 +24,7 @@ import java.util.List;
  * additional:
  */
 
-public class Quickstart {
+public class Quickstart2 {
 	/** Application name. */
 	private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
 
