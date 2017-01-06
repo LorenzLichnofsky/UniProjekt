@@ -117,7 +117,8 @@ public class Quickstart2 {
 				.setTimeMin(now)
 				// just today's Events
 				// .setTimeMax(t)
-				.setOrderBy("startTime").setSingleEvents(true).execute();
+				.setOrderBy("startTime").setSingleEvents(true)
+				.execute();
 
 		List<Event> items = events.getItems();
 		List<GoogleEvent> allToday = new LinkedList<GoogleEvent>();
