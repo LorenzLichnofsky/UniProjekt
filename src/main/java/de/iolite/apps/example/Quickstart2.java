@@ -93,7 +93,7 @@ public class Quickstart2 {
 	}
 
 	public static void main(String[] args) throws IOException, ParseException,
-			GeneralSecurityException {
+	GeneralSecurityException {
 		// Build a new authorized API client service.
 		// Note: Do not confuse this class with the
 		// com.google.api.services.calendar.model.Calendar class.
@@ -122,6 +122,8 @@ public class Quickstart2 {
 
 		List<Event> items = events.getItems();
 		List<GoogleEvent> allToday = new LinkedList<GoogleEvent>();
+		
+		
 
 		for (com.google.api.services.calendar.model.Event event : items) {
 			GoogleEvent today = new GoogleEvent();
@@ -227,6 +229,7 @@ public class Quickstart2 {
 
 			}
 		}
+	
 	}
 
 }
