@@ -1,4 +1,4 @@
-package de.iolite.apps.example;
+package de.iolite.data;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -215,14 +215,7 @@ public class Quickstart2 {
 				else
 					today.setLocation("unkown");
 
-				String share = event.getVisibility();
-				if (share != null)
-					today.setStatus(share);
-				else
-					today.setStatus("private");
-
-				// System.out.println(event..getVisibility());
-
+				
 				allToday.add(today);
 				// event.getCreator();
 				DailyEvents todayFinal = new DailyEvents(allToday);

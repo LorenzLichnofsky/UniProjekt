@@ -1,24 +1,23 @@
-package de.iolite.apps.example;
+package de.iolite.data;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * by Ariane 
+ * This class contains the attributes for one edit Google Calendar Event 
  */
-
-
-
-
-
 
 public class GoogleEvent {
 	String Name;
 	String Color;
-	String Status;
 	String Location;
 	Calendar begin;
 	Calendar end;
-	
+	List<String> attendee; 
+	List<java.util.Calendar> notifications;	
+
+
 	//GETTER & SETTER 
 	public String getColor() {
 		return Color;
@@ -28,25 +27,24 @@ public class GoogleEvent {
 	public void setColor(String color) {
 		Color = color;
 	}
-	public String getStatus() {
-		return Status;
-	}
-
-
-	public void setStatus(String status) {
-		Status = status;
-	}
-
-
 	
-//	public String getKind() {
-//		return Kind;
-//	}
-//
-//
-//	public void setKind(String kind) {
-//		Kind = kind;
-//	}
+	public List<java.util.Calendar> getNotifications() {
+		return notifications;
+	}
+
+
+	public void setNotifications(List<java.util.Calendar> notifications) {
+		this.notifications = notifications;
+	}
+		
+	public List<String> getAttendee() {
+		return attendee;
+	}
+
+
+	public void setAttendee(List<String> attendee) {
+		this.attendee = attendee;
+	}
 
 
 	public String getName() {
