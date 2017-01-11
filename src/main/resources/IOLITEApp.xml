@@ -2,7 +2,7 @@
 <ns2:iolite-app-configuration
 	xmlns:ns2="www.iolite.de/iolite-app-configuration"
 	name="Calendar Integration App"
-	className="de.iolite.apps.example.ExampleApp">
+	className="de.iolite.apps.example.CalendarIntegrationAppMain">
 
 	<api-permission name="de.iolite.app.api.frontend.FrontendAPI" type="READ_WRITE"/>
 	<api-permission name="de.iolite.app.api.storage.StorageAPI" type="READ_WRITE"/>
