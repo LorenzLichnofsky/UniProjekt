@@ -34,7 +34,7 @@
 				<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
 		
 			  
-					<form action="action_page.php">
+					<form action="action_page.php" id="login">
 					     <div class="form_container">
 					       <label>Google E-Mail</label>
 					       <input type="text" placeholder="Enter E-Mail Address" name="email" required>
@@ -81,10 +81,35 @@
 								<div id = "mirror_functionalities" ng-controller="MirrorCheckboxController">
 									<section id="mirror_id" class ="mirror">
 										<div class="container" ng-repeat="setting in settings">
-									 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
+									 		<input type="checkbox" ng-attr-id="{{ setting.id }}" ng-model="checkedElements[setting.id]">
 									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
 										</div>
+										
 									</section>
+
+									
+									<!--  Event types for personal schedule -->
+									<div ng-hide="showEvents(checkedElements)" id="events">
+									
+										<p class="smaller" style ="padding-left:50px; ">Choose event types to be displayed:</p>
+										
+										<div class = "event container smaller" id="event_padding">
+
+									 		<input type="checkbox" id="green">
+									 		<label for="green"><span class="checkbox_green">Sports</span></label><br/>
+
+									 		<input type="checkbox" id="red">
+									 		<label for ="red"><span class="checkbox_red">University</span></label><br/>
+
+									 		<input type="checkbox" id="yellow">
+									 		<label for= "yellow"><span class="checkbox_yellow">Friends</span></label><br/>
+
+									 		<input type="checkbox" id="blue">
+									 		<label for ="blue"><span class="checkbox_blue">Other</span></label> <br/>
+
+									    </div>
+								    </div>
+								    
 								</div>
 							</div>
 					
@@ -116,7 +141,7 @@
 									<section id="tv_id" class ="tv">
 										<div class="container" ng-repeat="setting in settings">
 									 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
-									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox" ng-attr-id="{{ setting.id }}">{{setting.name}}</span></label>
 										</div>
 									</section>
 								</div>
@@ -162,10 +187,7 @@
 					    </li>
 					
 					</ul>
-					
-		 	  <!--  Button to save current state of checkboxes for the next session -->
 
-			  
 			
 			  </div>
 			    
@@ -244,18 +266,18 @@ function onSignIn2(googleUser) {
 <script type="text/javascript">
 
 
-/* If a device is "disabled", the user shouldn't be able to unfold the different functionalities 
- * If the functionalities for a device are unfolded, but then it will be "disabled", the functionalities will be folded
+/* Event Handling: Hide/Show Checkboxes if User Enables/Disables different devices
  */
 
 $(document).ready(function () {
 	$('#mirror_checker').click(function(){
+		
 		   /* user is not able to unfold mirror functionalities if this device is "disabled" */
-		   $('#mirror_triangle').attr('disabled',!this.checked)
+		   //$('#mirror_triangle').attr('disabled',!this.checked)
 
 			 var $this = $(this);
 		     if ($this.is(':checked')) {
-		    	/* do nothing */ 
+		    	 $( "#mirror_triangle" ).prop( "checked", true );
 		     } else {
 		    	 /* uncheck the triangle checkbox*/
 		    	 $( "#mirror_triangle" ).prop( "checked", false );
@@ -265,12 +287,10 @@ $(document).ready(function () {
 	
 $(document).ready(function () {	
 	$('#tv_checker').click(function(){
-			/* user is not able to unfold tv functionalities if this device is "disabled" */
-		   $('#tv_triangle').attr('disabled',!this.checked)
 		   
 		   	 var $this = $(this);
 		     if ($this.is(':checked')) {
-		    	/* do nothing */ 
+		    	 $( "#tv_triangle" ).prop( "checked", true );
 		     } else {
 		    	 /* uncheck the triangle checkbox*/
 		    	 $( "#tv_triangle" ).prop( "checked", false );
@@ -280,18 +300,26 @@ $(document).ready(function () {
 	
 $(document).ready(function () {	
 	$('#sonos_checker').click(function(){
-		   /* user is not able to unfold sonos functionalities if this device is "disabled" */
-		   $('#sonos_triangle').attr('disabled',!this.checked)
 		   
 		   	 var $this = $(this);
 		     if ($this.is(':checked')) {
-		    	/* do nothing */ 
+		    	 $( "#sonos_triangle" ).prop( "checked", true );
 		     } else {
 		    	 /* uncheck the triangle checkbox*/
 		    	 $( "#sonos_triangle" ).prop( "checked", false );
 		     }
 		});
 });
+
+
+// If user wants to see his personal schedule on the mirror, the desired event types have to be selected
+$('#sonos_checker').change(function(){
+	  if($(this).prop("checked")) {
+	    $('#events').show();
+	  } else {
+	    $('#events').hide();
+	  }
+	});
  
 
 
@@ -369,6 +397,7 @@ $('#input-file').hide();
 $('body').on('click', '#button-file', function() { 
     $('#input-file').trigger('click');    
 });
+
 </script>	
 
 <!--  <form method="get" action="GoHandler" onsubmit="return onSignIn(googleUser)"></form> -->

@@ -3,6 +3,7 @@
 <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 
+/* General Style */
 
 * {
 margin-left: 50px;
@@ -22,21 +23,13 @@ body {
   color: #000; /* font - color in the whole application*/
 }
 
-
-/* Change styles for span and cancel button on extra small screens */
-@media screen and (max-width: 300px) {
-   span.psw {
-      display: block;
-      float: none;
-   }
-   .cancelbtn {
-      width: 100%;
-   }
+.smaller{
+	font-size: 0.8em;
 }
 
 
-
 /* CSS for ENABLING/DISABLING device functionality */
+
 .align_divs { 
 	padding:0px; 
 	text-align:left;
@@ -92,26 +85,34 @@ body {
 }
 
 
-/* Functionality Check Boxes */
-#first {
-  background-color: #4B4D65;
+
+/* Event Types */
+
+#event_padding {
+	padding-left: 85px;
 }
-#mirror_id, #tv_id{
+
+
+
+/* Functionality Check Boxes */
+
+#mirror_id, #tv_id, #event_padding{
   background-color: #FFFFFF;
 }
-.mirror, .tv{
-  padding: 10px;
+.mirror, .tv, .event{
+  padding: 5px;
   padding-left: 50px;
 }
-.mirror input[type="checkbox"], .tv input[type="checkbox"]{
+.mirror input[type="checkbox"], .tv input[type="checkbox"], .event input[type="checkbox"] {
   display: none;
 }
 .container {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 .container label {
   position: relative;
 }
+
 
 /* Base styles for spans */
 .container span::before,
@@ -123,7 +124,8 @@ body {
   margin: auto;
 }
 
-.container span.checkbox::before {
+
+.container span.checkbox::before{
   width: 15px;
   height: 15px;
   background-color: none;
@@ -132,23 +134,120 @@ body {
   border: 1px solid #948E8E;
   transition: border-color .2s;
 }
-.container span.checkbox:hover::before {
-  border: 3px solid #F0FF76;
+.container span.checkbox_red::before{
+  width: 15px;
+  height: 15px;
+  background-color: none;
+  left: -33px;
+  box-sizing: border-box;
+  border: 1px solid #948E8E;
+  transition: border-color .2s;
 }
+.container span.checkbox_green::before{
+  width: 15px;
+  height: 15px;
+  background-color: none;
+  left: -33px;
+  box-sizing: border-box;
+  border: 1px solid #948E8E;
+  transition: border-color .2s;
+}
+.container span.checkbox_yellow::before{
+  width: 15px;
+  height: 15px;
+  background-color: none;
+  left: -33px;
+  box-sizing: border-box;
+  border: 1px solid #948E8E;
+  transition: border-color .2s;
+}
+.container span.checkbox_blue::before{
+  width: 15px;
+  height: 15px;
+  background-color: none;
+  left: -33px;
+  box-sizing: border-box;
+  border: 1px solid #948E8E;
+  transition: border-color .2s;
+}
+
+.container span.checkbox:hover::before {
+  border: 2px solid #6C268A;
+}
+.container span.checkbox_red:hover::before {
+  border: 2px solid #dc2127;
+}
+.container span.checkbox_yellow:hover::before {
+  border: 2px solid #fbd75b;
+}
+.container span.checkbox_blue:hover::before {
+  border: 2px solid #5184ed;
+}
+.container span.checkbox_green:hover::before {
+  border: 2px solid #51b749;
+}
+
 .container span.checkbox::after {
   content: '\f00c';
   font-family: 'FontAwesome';
-  left: -35px;
-  top: 2px;
+  left: -34px;
+  top: -1px;
   color: transparent;
   transition: color .2s;
 }
+.container span.checkbox_red::after {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  left: -32px;
+  top: -1px;
+  color: transparent;
+  transition: color .2s;
+}
+.container span.checkbox_green::after {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  left: -32px;
+  top: -1px;
+  color: transparent;
+  transition: color .2s;
+}
+.container span.checkbox_yellow::after {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  left: -32px;
+  top: -1px;
+  color: transparent;
+  transition: color .2s;
+}
+.container span.checkbox_blue::after {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  left: -32px;
+  top: -1px;
+  color: transparent;
+  transition: color .2s;
+}
+
 input[type="checkbox"]:checked + label span.checkbox::after {
   color: #6C268A;
 }
+input[type="checkbox"]:checked + label span.checkbox_red::after {
+  color: #dc2127;
+}
+input[type="checkbox"]:checked + label span.checkbox_yellow::after {
+  color: #fbd75b;
+}
+input[type="checkbox"]:checked + label span.checkbox_green::after {
+  color: #51b749;
+}
+input[type="checkbox"]:checked + label span.checkbox_blue::after {
+  color: #5184ed;
+}
+
 
 
 /* Button for music upload */
+
 #button-file {
     color: #fff;
     font-weight: bold;
@@ -169,9 +268,10 @@ input[type="checkbox"]:checked + label span.checkbox::after {
 }
 
 
+
 /* User Login Interface */
 
-form {
+#login{
    border: 3px solid #6C268A ;
    width: 35%;
 }
@@ -207,6 +307,7 @@ span.psw {
   margin-left: auto; 
   margin-right: auto;
 }
+
 
 
 
@@ -271,3 +372,5 @@ input[type="checkbox"]:checked ~ .tvtext {
 input[type="checkbox"]:checked ~ .sonostext {
     display: block;
 }
+
+

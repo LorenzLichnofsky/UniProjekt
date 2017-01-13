@@ -5,6 +5,9 @@
 
 	
 	exampleApp.controller('MirrorCheckboxController', ['$scope', function($scope) {
+		
+		$scope.checkedElements = {};
+		
 		$scope.settings = [{
 	        name: 'Weather Forecast',
 	        value: '',
@@ -24,33 +27,13 @@
 	    }];
 		
 		
-		$scope.saveSetting = function() {
-		    $cookies.settings = $scope.settings;
-		    $scope.greeting = 'Hola!';
-		};
-		
-		$scope.loadSetting = function() {
-		     $scope.settings = $cookies.settings;
-		};
+	    // the method to display or hide the event container
+	    $scope.showEvents = function(obj) {
+	      return (!obj['mirror-4']);
+	    };
+
       }]);
-	
-	exampleApp.controller('TVCheckboxController', ['$scope', function($scope) {
-		$scope.settings = [{
-	        name: 'Pop-Up Reminder',
-	        value: '',
-	        id: 'tv-1'
-	    }, {
-	        name: 'Auto Turn-Off',
-	        value: '',
-		    id: 'tv-2'
-	    }, {
-	        name: 'Child Proof-Lock',
-	        value: '',
-		    id: 'tv-3'
-	    }];
-      }]);
-	
-		
+			
 
 })();
 
