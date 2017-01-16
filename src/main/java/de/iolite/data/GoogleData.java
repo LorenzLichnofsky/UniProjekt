@@ -27,16 +27,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This class extracts the DAILY Event Data from one Google Calendar.
  * Instructions and source code source:
  * https://developers.google.com/google-apps/calendar/quickstart/java
+ * 
+ * @author Ariane Ziehn, Alia Siemund
+ * @version 1.0
+ * @see DailyEvents
+ * @see GoogleEvent
  */
 public class GoogleData {
+	
 	/** Application name. */
 	private static final String APPLICATION_NAME = "Calendar APP";
 
 	/** Directory to store user credentials for this application. */
 	private static final java.io.File DATA_STORE_DIR = new java.io.File(
-			System.getProperty("user.home"), ".credentials/calendar");
+			System.getProperty("user.home"), ".credentials/googlecalendar");
 
 	/** Global instance of the {@link FileDataStoreFactory}. */
 	private static FileDataStoreFactory DATA_STORE_FACTORY;
@@ -52,7 +59,7 @@ public class GoogleData {
 	private static final List<String> SCOPES = Arrays
 			.asList(CalendarScopes.CALENDAR_READONLY);
 
-	/** Initialising HTTP_TRANSPORT and DATA_STORE_FACTORY */
+	/** Initializing HTTP_TRANSPORT and DATA_STORE_FACTORY */
 	static {
 		try {
 			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -102,14 +109,14 @@ public class GoogleData {
 
 	/**
 	 * Creates a list of all events taking place today including the information
-	 * from GoogleCalendar
+	 * from GoogleCalendar.
 	 * 
 	 * @return list of today's events
 	 * @throws IOException
-	 *             , ParseException, GeneralSecurityException,
-	 *             URISyntaxException
+	 * @throws ParseException
+	 * @throws GeneralSecurityException
+	 * @throws URISyntaxException
 	 */
-
 	public DailyEvents getData() throws IOException, ParseException,
 			GeneralSecurityException, URISyntaxException {
 
@@ -228,7 +235,7 @@ public class GoogleData {
 
 				// get the people adding the appointment
 				List<EventAttendee> share = event.getAttendees();
-				if (!share.isEmpty()) {
+				if (share != null) {
 					List<String> attendee = new ArrayList<String>();
 					for (EventAttendee person : share) {
 						if (person.getDisplayName() != null)
@@ -236,7 +243,9 @@ public class GoogleData {
 					}// for
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
-				}// if
+				} else {
+					System.out.println("keine Gäste!");
+				} // if
 
 				allToday.add(today);
 
@@ -248,7 +257,7 @@ public class GoogleData {
 
 		return todayFinal;
 
-	}
+	}		
 
 	public static void main(String[] args) throws IOException, ParseException,
 			GeneralSecurityException, URISyntaxException {

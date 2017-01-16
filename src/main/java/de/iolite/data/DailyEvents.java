@@ -4,6 +4,11 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+/** 
+ * This class stores all the DAILY events and their attributes.
+ * @author Ariane Ziehn
+ * 
+ */
 public class DailyEvents {
 
 	List<GoogleEvent> todayEvents = new LinkedList<GoogleEvent>();
