@@ -37,6 +37,7 @@ import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
 import de.iolite.app.api.device.access.DeviceBooleanProperty;
 import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanPropertyObserver;
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
+import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
 import de.iolite.app.api.environment.Location;
 import de.iolite.app.api.frontend.FrontendAPI;
@@ -363,12 +364,23 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		// go through all devices, and print ON/OFF and POWER USAGE property history datas
 		for (final Device device : this.deviceAPI.getDevices()) {
+			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
+				DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
+				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_currentEnvironmentTemperature_ID);
+				if (time != null && temp != null){
+				LOGGER.debug(time.getValue() + "LETS CHECK ");
+				LOGGER.debug(temp.getValue() + "LETS CHECK ");
+				}
+				else LOGGER.debug("wohl null");
+			}		
+			
 			// ON/OFF history data
 			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
 			if (onProperty != null) {
 				// retrieve the on/off history of last hour
 				final long hourMillis = TimeUnit.SECONDS.toMillis(60 * 60);
 				final List<BooleanEntry> onHistory;
+				
 				try {
 					onHistory = onProperty.getValuesSince(System.currentTimeMillis() - hourMillis);
 				}

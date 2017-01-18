@@ -244,7 +244,7 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					System.out.println("keine Gäste!");
+					//System.out.println("keine Gäste!");
 				} // if
 
 				allToday.add(today);
@@ -253,8 +253,11 @@ public class GoogleData {
 		}// for loop each event
 
 		// create final list of today's events usable for devices
-		DailyEvents todayFinal = new DailyEvents(allToday);
-
+		DailyEvents todayFinal = new DailyEvents();
+		if(allToday != null){
+		todayFinal = new DailyEvents(allToday);
+		}
+		
 		return todayFinal;
 
 	}		

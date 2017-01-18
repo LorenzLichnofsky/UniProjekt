@@ -65,16 +65,28 @@ public class DailyEvents {
 						// + newline;
 
 						"\n " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
-						+ " - " + dummy.end.get(Calendar.HOUR_OF_DAY) + ende
-						+
+						+ " - " + dummy.end.get(Calendar.HOUR_OF_DAY) + ende;
+						if(dummy.attendee == null){
+							
+						}
+						else{ //(dummy.attendee != null || dummy.attendee.isEmpty()){
+						
 						//TODO Design... raus nehmen aus String wenn niemand anders dabei?
-						"\n attendee: "
-						+ dummy.attendee.toString()
-						+
-						//TODO mehrere reminder möglich... if Abfrage? 
-						"\n notification: "
-						+ dummy.notifications.get(0).getTime()
-						+ "\n" + newline;
+						event += "\n attendee: ";
+								for(int k= 0; k<dummy.attendee.size(); k++){	
+						event += dummy.attendee.get(k)+",";
+						}
+						}
+						if(dummy.notifications != null || dummy.notifications.isEmpty()){
+							
+							//TODO Design... raus nehmen aus String wenn niemand anders dabei?
+							for(int j= 0; j<dummy.notifications.size(); j++){
+							event += "\n notification: "
+							+ dummy.notifications.get(j).getTime();
+							}
+						}
+						
+						event += "\n" + newline;
 						
 
 			}
