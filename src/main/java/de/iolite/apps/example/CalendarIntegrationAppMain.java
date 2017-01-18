@@ -364,11 +364,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		// go through all devices, and print ON/OFF and POWER USAGE property history datas
 		for (final Device device : this.deviceAPI.getDevices()) {
-			LOGGER.warn("Item");
+			LOGGER.warn("Devices known'{}'", device.getName());
 			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
 				LOGGER.warn("ItemWeatherStation");
 				DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
-				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_currentEnvironmentTemperature_ID);
+				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
 				if(time != null)
 				LOGGER.warn("DIE ZEIT'{}'", time.getValue() );
 				if (temp != null)
