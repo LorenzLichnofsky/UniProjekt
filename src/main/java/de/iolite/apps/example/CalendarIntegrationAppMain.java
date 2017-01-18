@@ -367,11 +367,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
 				DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
 				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_currentEnvironmentTemperature_ID);
-				if (time != null && temp != null){
-				LOGGER.debug(time.getValue() + "LETS CHECK ");
-				LOGGER.debug(temp.getValue() + "LETS CHECK ");
-				}
-				else LOGGER.debug("wohl null");
+				
+				LOGGER.debug("DIE ZEIT'{}'", time.getValue() );
+				LOGGER.debug("DIE TEMPERATUR '{}'", temp.getValue());
+				
 			}		
 			
 			// ON/OFF history data
