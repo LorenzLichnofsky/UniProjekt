@@ -366,12 +366,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		for (final Device device : this.deviceAPI.getDevices()) {
 			LOGGER.warn("Item");
 			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
+				LOGGER.warn("ItemWeatherStation");
 				DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
 				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_currentEnvironmentTemperature_ID);
 				if(time != null)
-				LOGGER.debug("DIE ZEIT'{}'", time.getValue() );
+				LOGGER.warn("DIE ZEIT'{}'", time.getValue() );
 				if (temp != null)
-				LOGGER.debug("DIE TEMPERATUR '{}'", temp.getValue());
+				LOGGER.warn("DIE TEMPERATUR '{}'", temp.getValue());
 				
 			}		
 			

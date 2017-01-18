@@ -16,7 +16,7 @@ version.properties
 .settings
 bin/
 target/
-src/main/resources/client_secret.json
+
 /example-app.jardesc
 
 # front end resources
