@@ -4,6 +4,9 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+
+import de.iolite.apps.example.devices.SonosController;
+
 /** 
  * This class stores all the DAILY events and their attributes.
  * @author Ariane Ziehn
@@ -12,6 +15,8 @@ import java.util.List;
 public class DailyEvents {
 
 	List<GoogleEvent> todayEvents = new LinkedList<GoogleEvent>();
+	SonosController sonosController;
+	
 
 	public DailyEvents(List<GoogleEvent> list) {
 		this.todayEvents = list;
@@ -76,6 +81,7 @@ public class DailyEvents {
 						+ dummy.notifications.get(0).getTime()
 						+ "\n" + newline;
 						
+						sonosController.notifySonos(dummy.notifications.get(0).getTime());
 
 			}
 			return event;
@@ -84,4 +90,6 @@ public class DailyEvents {
 		}
 	}
 
+
+	
 }
