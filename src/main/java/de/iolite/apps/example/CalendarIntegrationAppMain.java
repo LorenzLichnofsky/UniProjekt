@@ -65,6 +65,7 @@ import de.iolite.utilities.time.series.DataEntries.AggregatedEntry;
 import de.iolite.utilities.time.series.DataEntries.BooleanEntry;
 import de.iolite.utilities.time.series.Function;
 import de.iolite.utilities.time.series.TimeInterval;
+import de.iolite.apps.example.devices.SonosController;
 
 /**
  * <code>ExampleApp</code> is an example IOLITE App.
@@ -334,86 +335,12 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
-		// go through all devices, and register a property observer for ON/OFF properties
 		for (final Device device : this.deviceAPI.getDevices()) {
-			// each device has some properties (accessible under device.getProperties())
-			// let's get the 'on/off' status property
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				LOGGER.debug("device '{}' has ON/OFF property, current value: '{}'", device.getIdentifier(), onProperty.getValue());
-
-				onProperty.setObserver(new DeviceOnOffStatusLogger(device.getIdentifier()));
-			}
-		}
-
-		// go through all devices, and toggle ON/OFF properties
-		for (final Device device : this.deviceAPI.getDevices()) {
-			// let's get the 'on/off' status property
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			final Boolean onValue;
-			if (onProperty != null && (onValue = onProperty.getValue()) != null) {
-				LOGGER.debug("toggling device '{}'", device.getIdentifier());
-				try {
-					onProperty.requestValueUpdate(!onValue);
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to control device", e);
-				}
-			}
-		}
-
-		// go through all devices, and print ON/OFF and POWER USAGE property history datas
-		for (final Device device : this.deviceAPI.getDevices()) {
-			LOGGER.warn("Devices known'{}'", device.getName());
-			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
-				LOGGER.warn("ItemWeatherStation");
-				DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
-				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
-				if(time != null)
-				LOGGER.warn("DIE ZEIT'{}'", time.getValue() );
-				if (temp != null)
-				LOGGER.warn("DIE TEMPERATUR '{}'", temp.getValue());
-				
-			}		
 			
-			// ON/OFF history data
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				// retrieve the on/off history of last hour
-				final long hourMillis = TimeUnit.SECONDS.toMillis(60 * 60);
-				final List<BooleanEntry> onHistory;
-				
-				try {
-					onHistory = onProperty.getValuesSince(System.currentTimeMillis() - hourMillis);
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve the history of property '{}'", onProperty.getKey(), e);
-					continue;
-				}
-				LOGGER.debug("Got '{}' historical values for property '{}'", onHistory.size(), onProperty.getKey());
-				// log history values
-				final DateFormat dateFormat = DateFormat.getTimeInstance();
-				for (final BooleanEntry historyEntry : onHistory) {
-					LOGGER.debug("At '{}' the value was '{}'", dateFormat.format(new Date(historyEntry.time)), historyEntry.value);
-				}
+			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)){
+				new SonosController().setSonos(device);
 			}
-
-			// POWER USAGE history data
-			final DeviceDoubleProperty powerUsage = device.getDoubleProperty(DriverConstants.PROPERTY_powerUsage_ID);
-			if (powerUsage != null) {
-				LOGGER.debug("Reading today's hourly power usage data from device '{}':", device.getIdentifier());
-				List<AggregatedEntry> history;
-				try {
-					history = powerUsage.getAggregatedValuesOf(System.currentTimeMillis(), TimeInterval.DAY, TimeInterval.HOUR, Function.AVERAGE);
-					for (final AggregatedEntry entry : history) {
-						LOGGER.debug("The device used an average of {} Watt at '{}'.", entry.getAggregatedValue(),
-								DateFormat.getTimeInstance().format(new Date(entry.getEndTime())));
-					}
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve history data of device", e);
-				}
-			}
+			
 		}
 	}
 
