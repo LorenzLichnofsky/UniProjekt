@@ -72,6 +72,7 @@ import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleData;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.apps.example.ViewRegistrator.TemplateConfig;
+import de.iolite.apps.example.devices.SonosController;
 import de.iolite.insys.mirror.api.MirrorApiException;
 import de.iolite.insys.mirror.api.SimpleMirrorManager;
 import de.iolite.utilities.disposeable.Disposeable;
