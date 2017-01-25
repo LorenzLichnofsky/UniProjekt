@@ -93,7 +93,7 @@ public class DailyEvents {
 						
 						event += "\n" + newline;
 						
-						sonosController.notifySonos(dummy.notifications.get(0).getTime());
+//						sonosController.notifySonos(dummy.notifications.get(0).getTime());
 
 			}
 			return event;
