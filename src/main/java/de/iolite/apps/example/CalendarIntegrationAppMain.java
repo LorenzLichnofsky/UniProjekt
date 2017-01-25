@@ -77,6 +77,7 @@ import de.iolite.utilities.time.series.TimeInterval;
  * @author Grzegorz Lehmann
  * @author Erdene-Ochir Tuguldur
  * @author Felix Rodemund
+ * edit by Group Calendar Integration 
  * @since 1.0
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
