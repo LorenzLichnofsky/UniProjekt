@@ -53,18 +53,29 @@
         };
     </script>
     
-    <!-- Model API dependencies -->
-    <script type="text/javascript" src="/bus/ModelAPICommunicationObject.js"></script>
-    <script type="text/javascript" src="/bus/ModelAPI.js"></script>
-    <script type="text/javascript" src="/bus/ModelAPIWebsocketClientFactory.js"></script>
-    <script type="text/javascript" src="/bus/bus-client-bootstrap.js"></script>
+      <!-- Model API dependencies -->
+      <script type="text/javascript" src="/hcc/jquery-2.1.0.min.js"></script>
+      <script type="text/javascript" src="/bus/ModelAPICommunicationObject.js"></script>
+      <script type="text/javascript" src="/bus/ModelAPI.js"></script>
+      <script type="text/javascript" src="/bus/ModelAPIWebsocketClientFactory.js"></script>
+      <script type="text/javascript" src="/bus/bus-client-bootstrap.js"></script>
 </head>
 
 <body>
-	<!-- include the content template -->
-	<div ng-include="'content.tpl.html'"></div>
+	<!-- include the content template 
+		<div ng-include="'content.tpl.html'"></div> -->
+		
+		<iframe src="weather.html" name="weather" FRAMEBORDER="0" style="overflow: hidden; height: 100%;
+        width: 100%; position: absolute;" height="100%" width="100%" scrolling="yes"></iframe> 
+		
+		
+<!-- 		<iframe src="calendar.html" name="calendar" FRAMEBORDER="0" style="overflow: hidden; height: 100%;
+        width: 100%; position: absolute;" height="100%" width="100%" scrolling="yes"></iframe> 
+         -->
+        
+        
 
-	
+
 	<!-- load our angular modules/controllers/services/.. -->
 	<script type="text/javascript" src="app/example-app.js"></script>
 	<script type="text/javascript" src="app/example-controller1.js"></script>

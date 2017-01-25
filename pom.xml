@@ -95,7 +95,7 @@
 						</configuration>
 					</execution>
 					<!-- validate all JS/HTML/LESS assets, see Gruntfile.js -->
-					<execution>
+<!-- 					<execution>
 						<id>grunt validate-frontend-resources</id>
 						<goals>
 							<goal>grunt</goal>
@@ -104,7 +104,7 @@
 							<arguments>validate-frontend-resources</arguments>
 						</configuration>
 					</execution>
-					<!-- build front end assets, see Gruntfile.js -->
+					build front end assets, see Gruntfile.js
 					<execution>
 						<id>grunt build-frontend-resources</id>
 						<goals>
@@ -113,7 +113,7 @@
 						<configuration>
 							<arguments>build-frontend-resources</arguments>
 						</configuration>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 			<!-- FindBugs check on compile, fail even on Low priority violations -->
@@ -244,6 +244,15 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 		</dependency>
+		
+		
+		<dependency>
+			<groupId>de.hendrikmotza.mirror.api</groupId>
+			<artifactId>iolite-app-mirror-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		
 	
 	<!--  GOOGLE  -->
 		<dependency>
@@ -266,5 +275,31 @@
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.google.http-client/google-http-client -->
 </dependencies>
+
+		<repositories>
+        <repository>
+			<id>hmotza.releases.public</id>
+			<name>Releases</name>
+			<url>http://maven.hmotza.de/content/repositories/extern/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+			<id>hmotza.snapshots.public</id>
+			<name>Public Snapshots</name>
+			<url>http://maven.hmotza.de/content/repositories/public-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+	</repositories>
     
 </project>

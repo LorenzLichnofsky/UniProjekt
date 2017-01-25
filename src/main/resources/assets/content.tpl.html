@@ -46,9 +46,14 @@
 					       <button type="submit">Login</button>
 					     </div>
 					</form>
+					
+					<div id="testdiv">
+					</div>
+
+							
+
 		
 			  </div>
-
 
 	 		  <!----- Devices TAB ------> 
 	
@@ -62,7 +67,7 @@
 					        
 						        <div class="align_divs">Smart Mirror</div>
 									<div class="align_divs"><div class="onoffswitch">
-									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked>
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked onchange="saveMirrorCheckbox()">
 									    <label class="onoffswitch-label" for="mirror_checker">
 									        <span class="onoffswitch-inner"></span>
 									        <span class="onoffswitch-switch"></span>
@@ -268,10 +273,94 @@ function onSignIn2(googleUser) {
 
 /* Event Handling: Hide/Show Checkboxes if User Enables/Disables different devices
  */
+ 
+function saveMirrorCheckbox(){
+	  
+	  console.log("Aktueller Mirror Status:" + " " + $('#mirror_checker').is(':checked'));
+
+		    ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
+		        success: function(storageAPI) {
+		          storageAPI.action({
+		            request: new ActionRequest(null, null, ".", "saveString", [new ValueParameter("Mirror"), new ValueParameter($('#mirror_checker').is(':checked'))]),
+		            success: function() {
+		              console.log('Successfully executed requestValueUpdate');
+		            },
+		            error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
+		              console.log("Requesting value update of ", device, " failed due to ",
+		                responseErrorCode, ": ", responseError);
+		            }
+		          });
+		         }
+		        });
+
+
+		      console.log(form.name.value);
+		    
+	  
+}
+
+
 
 $(document).ready(function () {
-	$('#mirror_checker').click(function(){
-		
+	
+	
+/* 	  ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
+	      success: function(storageAPI) {
+	        console.log("Test: get function 1 success");
+	        storageAPI.action({
+	          request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("mirror_checker")]),
+	          success: function(mirror_state) {
+	            console.log('Mirror State: '+mirror_state);
+	              $(document).ready(function() {
+					  console.log("document ready" + mirror_state);
+	              });
+	          },
+	          error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
+	        	  console.log("fail");
+	            console.log("Requesting value update of ", device, " failed due to ",
+	              responseErrorCode, ": ", responseError);
+	          }
+	        });
+
+	      }
+	 }); */
+	  
+	  
+	  
+	  
+	  
+
+/* 	  function loadUserName() {
+	    ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
+	        success: function(storageAPI) {
+	          console.log("Test: get function 1 success");
+	          storageAPI.action({
+	            request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("uName")]),
+	            success: function(username) {
+	              console.info('Username: '+username);
+	                $(document).ready(function() {
+	                  $('#name').attr('value', username);
+	                });
+	            },
+	            error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
+	              console.error("Requesting value update of ", device, " failed due to ",
+	                responseErrorCode, ": ", responseError);
+	            }
+	          });
+
+	        }
+	   });
+
+
+	    console.log(form.name.value);
+	  } */
+
+
+
+
+	  
+	  $('#mirror_checker').click(function(){		
+			
 		   /* user is not able to unfold mirror functionalities if this device is "disabled" */
 		   //$('#mirror_triangle').attr('disabled',!this.checked)
 
@@ -282,8 +371,12 @@ $(document).ready(function () {
 		    	 /* uncheck the triangle checkbox*/
 		    	 $( "#mirror_triangle" ).prop( "checked", false );
 		     }
-		});
+		});	  
+	
+	
 });	
+
+
 	
 $(document).ready(function () {	
 	$('#tv_checker').click(function(){
@@ -397,6 +490,39 @@ $('#input-file').hide();
 $('body').on('click', '#button-file', function() { 
     $('#input-file').trigger('click');    
 });
+
+
+
+function CheckboxState(){
+	
+	  var msg = $('#mirror_checker').is(':checked');
+	  console.log("Test");
+
+	  ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
+	      success: function(storageAPI) {
+	        console.log("Test: get function 1 success");
+	        storageAPI.action({
+	          request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("uName")]),
+	          success: function(username) {
+	            console.info('Username: '+username);
+	              $(document).ready(function() {
+					  msg += '<div class="uName">' + $('#name').attr('value') + '</div>';
+	              });
+	          },
+	          error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
+	            console.error("Requesting value update of ", device, " failed due to ",
+	              responseErrorCode, ": ", responseError);
+	          }
+	        });
+
+	      }
+	 });
+
+	  $('#testdiv').html(msg);
+	}
+
+
+
 
 </script>	
 
