@@ -237,24 +237,35 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	
 	/** Mirror variables */
 	
+	private static final String MSG_ERR_RETRIEVE_USERAPI = "Could not retrieve instance of UserAPI!";
+	
 	private static final String HTML_RESOURCES = "assets/html/";
-	private static final String VIEW_RESOURCES = "assets/view/";
+	private static final String VIEW_RESOURCES = "assets/views/";
 	private static final String APP_ID = "de.iolite.apps.example.CalendarIntegrationAppMain";
 	
 
 	private static final String VIEW_ID_CALENDAR = "CalendarView";
-	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "quote.png";
-	//private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
+	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar-icon.jpg";
+	private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
 	private static final String VIEW_TEMPLATE_CALENDAR = VIEW_RESOURCES + "calendar.template";
 	private static final String VIEW_WEBPATH_CALENDAR = "calendar.html";
+	
+	private static final String VIEW_ID_CLOCK = "DateTimeView";
+	private static final String ICON_RESPATH_CLOCK = VIEW_RESOURCES + "clock-icon.jpg";
+	private static final String VIEW_RESPATH_CLOCK = VIEW_RESOURCES + "clock.html";
+
 
 	private static final String VIEW_ID_WEATHER = "WeatherView";
-	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather.jpg";
-	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "DummyWeather.html";
+	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
+	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "weather.html";
+	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
 	
 	DailyEvents calendar = null;
+	
 	private ViewRegistrator viewRegistrator;
+	
 	String temperature = "0";
+	
 	private ScheduledFuture<?> calendarUpdateThread = null;
 
 	/**
@@ -335,13 +346,27 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				LOGGER.debug("Heating schedule found for place '{}'", placeSchedule.getPlaceIdentifier());
 			}
 		
+			
+			// getting IOLTE user-ID
+			final UserAPI userApi;
+			final String userId;
+			try {
+				userApi = context.getAPI(UserAPI.class);
+				userId = userApi.getUser().getIdentifier();
+			}
+			catch (final IOLITEAPINotResolvableException | IOLITEPermissionDeniedException e) {
+				LOGGER.error(MSG_ERR_RETRIEVE_USERAPI, e);
+				throw new StartFailedException(MSG_ERR_RETRIEVE_USERAPI, e);
+			}
+			
 		final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
-//		staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
+		staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
+		staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
 //		staticResourceConfig.addView(VIEW_ID_HELLO_WORLD, VIEW_RESPATH_HELLO_WORLD, ICON_RESPATH_HELLO_WORLD);
 //		staticResourceConfig.addView(VIEW_ID_LNDW, VIEW_RESPATH_LNDW, ICON_RESPATH_LNDW);
 //		staticResourceConfig.addView(VIEW_ID_WELCOME, VIEW_RESPATH_WELCOME, ICON_RESPATH_WELCOME);
-		staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_TEMPLATE_CALENDAR, ICON_RESPATH_CALENDAR);
-		this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, "Spaß mit Flaggen");
+		staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
+		this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
 		deviceAPI.setObserver(this.viewRegistrator);
 		deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 		this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
@@ -349,9 +374,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			//initializeDeviceManager();
 			GoogleData calendar_data = new GoogleData();
 			CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
-			final TemplateConfig templateConf = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
-			templateConf.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf);
+			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+			templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);		
+			
+			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+			templateConf_weather.putReplacement("{WEATHER}", temperature + " &deg C");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);	
+			
+			
+			
 		}
 		catch (final MirrorApiException e) {
 			LOGGER.error("Could not create views!", e);
@@ -368,7 +400,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}, 0, 1, TimeUnit.MINUTES);
+	}, 0, 15, TimeUnit.MINUTES);
 	LOGGER.debug("Mirror Views got registered!");
 		}
 		catch (final IOLITEAPINotResolvableException e) {
@@ -493,7 +525,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	}
 
 	/**
-	 * Example method showing how to use the Storate API.
+	 * Example method showing how to use the Storage API.
 	 *
 	 * @throws StorageAPIException
 	 */

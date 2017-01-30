@@ -37,8 +37,7 @@ public class DailyEvents {
 
 	@Override
 	public String toString() {
-		// new line
-		String newline = System.lineSeparator();
+
 		String event = "";
 		if (!todayEvents.isEmpty()) {
 			for (int i = 0; i < todayEvents.size(); i++) {
@@ -47,6 +46,7 @@ public class DailyEvents {
 				int minutesStart = dummy.begin.get(Calendar.MINUTE);
 				String ende = "";
 				String start = "";
+				String shortlocation = dummy.Location.split(",")[0];
 				if (minutes < 10) {
 					ende = ":0" + minutes;
 				} else
@@ -57,41 +57,47 @@ public class DailyEvents {
 				} else
 					start = ":" + minutesStart;
 
-				event += dummy.Name
-						+ "\n Location: "
-						+ dummy.Location
+				event += dummy.Name + "<br/>"
+//						+ "<br/> Location: "
+						+ shortlocation
 						+
+						
 						// "\n Status:"+ dummy.Status +
-						"\n type: "
-						+ dummy.Color
-						+
+//						"<br/> type: "
+//						+ dummy.Color
+//						+
+						
 						// "\n Start: "+dummy.begin.get(Calendar.HOUR_OF_DAY)+start+
 						// "\n End: "+dummy.end.get(Calendar.HOUR_OF_DAY)+ende+"\n"
 						// + newline;
 
-						"\n " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
+						"<br/> " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
 						+ " - " + dummy.end.get(Calendar.HOUR_OF_DAY) + ende;
-						if(dummy.attendee == null){
-							
-						}
-						else{ //(dummy.attendee != null || dummy.attendee.isEmpty()){
+				
+				
+//						if(dummy.attendee == null){
+//							
+//						}
+//						else{ //(dummy.attendee != null || dummy.attendee.isEmpty()){
+//						
+//						//TODO Design... raus nehmen aus String wenn niemand anders dabei?
+//						event += "<br/> attendee: ";
+//								for(int k= 0; k<dummy.attendee.size(); k++){	
+//						event += dummy.attendee.get(k)+",";
+//						}
+//						}
+//						
 						
-						//TODO Design... raus nehmen aus String wenn niemand anders dabei?
-						event += "\n attendee: ";
-								for(int k= 0; k<dummy.attendee.size(); k++){	
-						event += dummy.attendee.get(k)+",";
-						}
-						}
-						if(dummy.notifications != null || dummy.notifications.isEmpty()){
-							
-							//TODO Design... raus nehmen aus String wenn niemand anders dabei?
-							for(int j= 0; j<dummy.notifications.size(); j++){
-							event += "\n notification: "
-							+ dummy.notifications.get(j).getTime();
-							}
-						}
+//						if(dummy.notifications != null || dummy.notifications.isEmpty()){
+//							
+//							//TODO Design... raus nehmen aus String wenn niemand anders dabei?
+//							for(int j= 0; j<dummy.notifications.size(); j++){
+//							event += "<br/> notification: "
+//							+ dummy.notifications.get(j).getTime();
+//							}
+//						}
 						
-						event += "\n" + newline;
+						event += "<br/>" + "<br/>";
 						
 //						sonosController.notifySonos(dummy.notifications.get(0).getTime());
 

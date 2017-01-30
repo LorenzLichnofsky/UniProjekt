@@ -13,6 +13,7 @@ public class GoogleEvent {
 	String Name;
 	String Color;
 	String Location;
+	String Short_Location;
 	Calendar begin;
 	Calendar end;
 	List<String> attendee; 

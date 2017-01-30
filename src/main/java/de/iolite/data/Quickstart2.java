@@ -212,8 +212,10 @@ public class Quickstart2 {
 				;
 				if (location != null)
 					today.setLocation(location);
+				
 				else
 					today.setLocation("unkown");
+				
 
 				
 				allToday.add(today);

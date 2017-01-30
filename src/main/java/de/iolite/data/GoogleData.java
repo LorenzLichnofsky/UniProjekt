@@ -231,8 +231,9 @@ public class GoogleData {
 
 				if (location != null)
 					today.setLocation(location);
+
 				else
-					today.setLocation("Unkown Location");
+					today.setLocation("Unknown Location");
 
 				// get the people adding the appointment
 				List<EventAttendee> share = event.getAttendees();
