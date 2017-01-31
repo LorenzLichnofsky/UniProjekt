@@ -35,6 +35,34 @@ public class DailyEvents {
 		this.todayEvents = todayEvents;
 	}
 
+	
+	
+	private static String [][] UMLAUT_REPLACEMENT = { 
+			{new String("Ä"),"&Auml;" }, 
+			{new String("Ö"),"&Ouml;" }, 
+			{new String("Ü"),"&Uuml;" },
+			{new String("ä"),"&auml;" },
+			{new String("ö"),"&ouml;" },
+			{new String("ü"),"&uuml;" },
+			{new String("ß"),"&szlig;" }
+	};
+	
+	/** 
+	 * Replaces all german Umlaute by responding HTML name. 
+	 * 
+	 */
+	public static String replaceUmlaute (String orig){
+		String result = orig;
+		
+		for(int i = 0; i<UMLAUT_REPLACEMENT.length; i++) {
+			result = result.replaceAll(UMLAUT_REPLACEMENT[i][0], UMLAUT_REPLACEMENT[i][1]);
+		}
+		
+		return result;
+	}
+			
+			
+			
 	@Override
 	public String toString() {
 
@@ -46,7 +74,7 @@ public class DailyEvents {
 				int minutesStart = dummy.begin.get(Calendar.MINUTE);
 				String ende = "";
 				String start = "";
-				String shortlocation = dummy.Location.split(",")[0];
+				String shortlocation = dummy.Location.split(",")[0]; //cut postal code, city and country to keep location short
 				if (minutes < 10) {
 					ende = ":0" + minutes;
 				} else
@@ -57,9 +85,11 @@ public class DailyEvents {
 				} else
 					start = ":" + minutesStart;
 
-				event += dummy.Name + "<br/>"
+				event += replaceUmlaute(dummy.Name) + "<br/>"
+						
 //						+ "<br/> Location: "
-						+ shortlocation
+						+ replaceUmlaute(shortlocation)
+
 						+
 						
 						// "\n Status:"+ dummy.Status +
@@ -98,6 +128,7 @@ public class DailyEvents {
 //						}
 						
 						event += "<br/>" + "<br/>";
+						
 						
 //						sonosController.notifySonos(dummy.notifications.get(0).getTime());
 
