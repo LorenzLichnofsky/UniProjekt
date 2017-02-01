@@ -139,7 +139,7 @@ public class GoogleData {
 		// get all events of today from service
 		Events events = service.events().list("primary").setMaxResults(5)
 				.setTimeMin(now)
-				// .setTimeMax(latest)
+				.setTimeMax(latest)
 				.setOrderBy("startTime").setSingleEvents(true).execute();
 
 		List<Event> items = events.getItems();

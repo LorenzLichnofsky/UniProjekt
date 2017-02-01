@@ -362,16 +362,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
 		staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
 		staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
-//		staticResourceConfig.addView(VIEW_ID_HELLO_WORLD, VIEW_RESPATH_HELLO_WORLD, ICON_RESPATH_HELLO_WORLD);
-//		staticResourceConfig.addView(VIEW_ID_LNDW, VIEW_RESPATH_LNDW, ICON_RESPATH_LNDW);
-//		staticResourceConfig.addView(VIEW_ID_WELCOME, VIEW_RESPATH_WELCOME, ICON_RESPATH_WELCOME);
 		staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
 		this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
 		deviceAPI.setObserver(this.viewRegistrator);
 		deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
+		
 		this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
 		try {
-			//initializeDeviceManager();
 			GoogleData calendar_data = new GoogleData();
 			CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
 			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
@@ -381,9 +378,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
 			templateConf_weather.putReplacement("{WEATHER}", temperature + " &deg C");
 			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);	
-			
-			
-			
 		}
 		catch (final MirrorApiException e) {
 			LOGGER.error("Could not create views!", e);
@@ -400,8 +394,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}, 0, 15, TimeUnit.MINUTES);
+	}, 0, 1, TimeUnit.MINUTES);
+		
 	LOGGER.debug("Mirror Views got registered!");
+	
 		}
 		catch (final IOLITEAPINotResolvableException e) {
 			throw new StartFailedException(MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()), e);
@@ -415,6 +411,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		LOGGER.debug("Started");
 	}
+
 
 	/**
 	 * {@inheritDoc}
@@ -439,40 +436,24 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
-		// go through all devices, and register a property observer for ON/OFF properties
-		for (final Device device : this.deviceAPI.getDevices()) {
-			// each device has some properties (accessible under device.getProperties())
-			// let's get the 'on/off' status property
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				LOGGER.debug("device '{}' has ON/OFF property, current value: '{}'", device.getIdentifier(), onProperty.getValue());
+		
 
-				onProperty.setObserver(new DeviceOnOffStatusLogger(device.getIdentifier()));
-			}
-		}
-
-		// go through all devices, and toggle ON/OFF properties
+		// go through all devices
 		for (final Device device : this.deviceAPI.getDevices()) {
-			// let's get the 'on/off' status property
+
+			
 			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			final Boolean onValue;
-			if (onProperty != null && (onValue = onProperty.getValue()) != null) {
-				LOGGER.debug("toggling device '{}'", device.getIdentifier());
-				try {
-					onProperty.requestValueUpdate(!onValue);
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to control device", e);
-				}
-			}
+
+		
 			LOGGER.warn("Devices known'{}'", device.getName());
+			
+			// Get Weather
 			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
 				LOGGER.warn("ItemWeatherStation");
-				//DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
 				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
 			
 				if (temp != null && temp.getValue().toString() != null){
-				LOGGER.warn("DIE TEMPERATUR '{}'", temp.getValue());				
+				LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());				
 				temperature = temp.getValue().toString();
 				}
 			}	
@@ -579,4 +560,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			throw new InitializeFailedException("Loading templates for the dummy app failed", e);
 		}
 	}
+	
+
 }
+
