@@ -2,8 +2,7 @@
 package de.iolite.apps.example.devices;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,16 +31,16 @@ public class SonosController {
 
 	public void setTimer(@Nonnull final Date date) {
 		Validate.notNull(date, "'date' must not be null");
-		final Date reminderTime = date;
-		final Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
+		final long millisToEvent = date.getTime() - System.currentTimeMillis();
+		if (millisToEvent < 0) {
+			throw new IllegalArgumentException(String.format("Cannot schedule timer for past date '%s'", date));
+		}
+		this.scheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
+	}
 
-			@Override
-			public void run() {
-				if (SonosController.this.environment.isUserAtHome() == true) {
-					new SonosMusic().addSong(SonosController.this.sonos, SonosController.this.scheduler);
-				}
-			}
-		}, reminderTime);
+	private void addSong() {
+		if (this.environment.isUserAtHome() == true) {
+			new SonosMusic().addSong(this.sonos, this.scheduler);
+		}
 	}
 }
