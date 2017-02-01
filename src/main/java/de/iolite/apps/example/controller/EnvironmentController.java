@@ -33,6 +33,6 @@ public class EnvironmentController {
 	 * @return Boolean value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
-		return this.api.getCurrentSituationIdentifier().equals(SITUATION_TYPE_AT_HOME);
+		return SITUATION_TYPE_AT_HOME.equals(this.api.getSituationProfileIdentifier());
 	}
 }
