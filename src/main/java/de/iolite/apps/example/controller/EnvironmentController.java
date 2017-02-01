@@ -1,21 +1,27 @@
+
 package de.iolite.apps.example.controller;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 
 import de.iolite.app.api.environment.EnvironmentAPI;
 import de.iolite.apps.example.CalendarIntegrationAppMain;
 
 /** Handles the Current Situation of the user. */
 public class EnvironmentController {
-	
-	EnvironmentAPI environmentAPI;
 
-	/** 
+	@Nonnull
+	private final EnvironmentAPI environmentAPI;
+
+	/**
 	 * Constructor with the environmentAPI that is initialized in the startHook() Method of the Main Class.
 	 *
 	 * @param environmentAPI
 	 * @see CalendarIntegrationAppMain
 	 */
-	public EnvironmentController (EnvironmentAPI environmentAPI){
-		this.environmentAPI = environmentAPI;
+	public EnvironmentController(@Nonnull final EnvironmentAPI environmentAPI) {
+		this.environmentAPI = Validate.notNull(environmentAPI, "'environmentAPI' must not be null");
 	}
 
 	/**
