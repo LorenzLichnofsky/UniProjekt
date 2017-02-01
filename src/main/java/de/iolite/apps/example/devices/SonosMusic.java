@@ -41,9 +41,6 @@ public class SonosMusic {
 	}
 
 	private void playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
-		Validate.notNull(device, "'device' must not be null");
-		Validate.notNull(scheduler, "'scheduler' must not be null");
-
 		final String PLAY = "play";
 		final DeviceStringProperty playMusicProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
 		if (playMusicProperty != null) {
@@ -67,7 +64,7 @@ public class SonosMusic {
 		}
 	}
 
-	public Runnable stopMusic(@Nonnull final Device device) {
+	private Runnable stopMusic(@Nonnull final Device device) {
 		Validate.notNull(device, "'device' must not be null");
 		return new Runnable() {
 
