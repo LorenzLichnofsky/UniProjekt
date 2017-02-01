@@ -12,6 +12,9 @@ import de.iolite.apps.example.CalendarIntegrationAppMain;
 public class EnvironmentController {
 
 	@Nonnull
+	private static final String SITUATION_TYPE_AT_HOME = "https://dev.iolite.de/situation/type#AtHome";
+
+	@Nonnull
 	private final EnvironmentAPI api;
 
 	/**
@@ -30,6 +33,6 @@ public class EnvironmentController {
 	 * @return Boolean value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
-		return this.api.getCurrentSituationIdentifier().equals("https://dev.iolite.de/situation/type#AtHome");
+		return this.api.getCurrentSituationIdentifier().equals(SITUATION_TYPE_AT_HOME);
 	}
 }
