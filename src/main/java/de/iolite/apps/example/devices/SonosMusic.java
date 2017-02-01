@@ -3,6 +3,9 @@ package de.iolite.apps.example.devices;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +17,12 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosMusic {
 
+	@Nonnull
 	private static final Logger LOGGER = LoggerFactory.getLogger(SonosMusic.class);
 
-	public void addSong(final Device device, final Scheduler scheduler) {
+	public void addSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+		Validate.notNull(device, "'device' must not be null");
+		Validate.notNull(scheduler, "'scheduler' must not be null");
 
 		final DeviceStringProperty song = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
 		if (song != null) {
@@ -34,7 +40,10 @@ public class SonosMusic {
 		}
 	}
 
-	public void playMusic(final Device device, final Scheduler scheduler) {
+	public void playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+		Validate.notNull(device, "'device' must not be null");
+		Validate.notNull(scheduler, "'scheduler' must not be null");
+
 		final String PLAY = "play";
 		final DeviceStringProperty playMusicProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
 		if (playMusicProperty != null) {
@@ -44,7 +53,6 @@ public class SonosMusic {
 					playMusicProperty.requestValueUpdateFromString(PLAY);
 				}
 				catch (final DeviceAPIException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				final TimeUnit sec = TimeUnit.SECONDS;
@@ -59,8 +67,10 @@ public class SonosMusic {
 		}
 	}
 
-	public Runnable stopMusic(final Device device) {
+	public Runnable stopMusic(@Nonnull final Device device) {
+		Validate.notNull(device, "'device' must not be null");
 		return new Runnable() {
+
 			@Override
 			public void run() {
 				final String STOP = "stop";
