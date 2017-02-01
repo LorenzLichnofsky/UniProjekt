@@ -40,7 +40,7 @@ public class SonosMusic {
 		}
 	}
 
-	public void playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+	private void playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
 		Validate.notNull(device, "'device' must not be null");
 		Validate.notNull(scheduler, "'scheduler' must not be null");
 
