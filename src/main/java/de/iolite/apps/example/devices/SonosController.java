@@ -64,6 +64,14 @@ public class SonosController {
 				LOGGER.debug("User is not at home, SONOS song will not be added");
 			}
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.format("%s[device='%s']", getClass().getSimpleName(), this.sonosDevice.getIdentifier());
+		}
 	}
 
 	private enum NotConfigured implements State {
@@ -84,6 +92,14 @@ public class SonosController {
 		@Override
 		public void playSongAt(@Nonnull final SonosController context, @Nonnull final Date date) {
 			throw new IllegalStateException("Not configured");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return getClass().getSimpleName();
 		}
 	}
 
@@ -115,5 +131,14 @@ public class SonosController {
 
 	private void setState(@Nonnull final State newState) {
 		this.state = newState;
+		LOGGER.debug("Changed state in {}", toString());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return String.format("%s[state='%s']", getClass().getSimpleName(), this.state);
 	}
 }
