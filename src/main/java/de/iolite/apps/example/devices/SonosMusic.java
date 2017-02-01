@@ -23,20 +23,28 @@ public class SonosMusic {
 	public void addSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
 		Validate.notNull(device, "'device' must not be null");
 		Validate.notNull(scheduler, "'scheduler' must not be null");
-
-		final DeviceStringProperty song = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
-		if (song != null) {
-			try {
-				song.requestValueUpdate("http://downloads.hendrik-motza.de/river.mp3");
-			}
-			catch (final DeviceAPIException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			playMusic(device, scheduler);
+		if (!setMediaURI(device, "http://downloads.hendrik-motza.de/river.mp3")) {
+			LOGGER.error("Failed to set song URI, aborting");
+			return;
 		}
-		else {
-			LOGGER.info("Song Property not found!");
+		playMusic(device, scheduler);
+	}
+
+	private static boolean setMediaURI(@Nonnull final Device device, @Nonnull final String value) {
+		final DeviceStringProperty mediaURI = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+		if (mediaURI == null) {
+			LOGGER.warn("Device '{}' has no '{}' property, failed to set URI", device.getIdentifier(),
+					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+			return false;
+		}
+		try {
+			mediaURI.requestValueUpdate(value);
+			LOGGER.debug("Successfully set URI '{}' in device '{}'", value, device.getIdentifier());
+			return true;
+		}
+		catch (final DeviceAPIException e) {
+			LOGGER.error("Failed to set new URI '{}' in device '{}' due to error: {}", value, device.getIdentifier(), e);
+			return false;
 		}
 	}
 
