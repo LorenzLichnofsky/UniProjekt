@@ -5,27 +5,37 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.iolite.app.api.device.access.Device;
+import de.iolite.apps.example.controller.EnvironmentController;
+import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosController {
 	
-	static Device sonos = null;
+	Device sonos;
+	Scheduler scheduler;
+	EnvironmentController environment;
 
-	public void setSonos (Device device){
-		sonos = device;
+	public void setSonos (Device sonos, Scheduler scheduler){
+		this.sonos = sonos;
+		this.scheduler = scheduler;
 	}
 	
-	public void notifySonos(Date date){
-		//hier müsste noch überprüft werden, ob Sonos überhaupt enabled ist. Oder es wird schon vorher überprüft!
+	
+	public void setTimer (Date date){
+		
 		Date reminderTime = date;
 		Timer timer = new Timer();
-		timer.schedule(remindSonos(), reminderTime);
+		timer.schedule(new TimerTask() {
+		
+			@Override
+			public void run() {
+				
+				if (environment.isUserAtHome() == true){
+					new SonosMusic().addSong(sonos,scheduler);
+				}
+				
+			}
+		}, reminderTime);
 		
 	}
-	
-	public TimerTask remindSonos(){
-		new SonosMusic().addSong(sonos);
-		return null;
-	}
-	
 
 }
