@@ -12,7 +12,7 @@ import de.iolite.apps.example.CalendarIntegrationAppMain;
 public class EnvironmentController {
 
 	@Nonnull
-	private final EnvironmentAPI environmentAPI;
+	private final EnvironmentAPI api;
 
 	/**
 	 * Constructor with the environmentAPI that is initialized in the startHook() Method of the Main Class.
@@ -21,7 +21,7 @@ public class EnvironmentController {
 	 * @see CalendarIntegrationAppMain
 	 */
 	public EnvironmentController(@Nonnull final EnvironmentAPI environmentAPI) {
-		this.environmentAPI = Validate.notNull(environmentAPI, "'environmentAPI' must not be null");
+		this.api = Validate.notNull(environmentAPI, "'environmentAPI' must not be null");
 	}
 
 	/**
@@ -30,6 +30,6 @@ public class EnvironmentController {
 	 * @return Boolean value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
-		return this.environmentAPI.getCurrentSituationIdentifier().equals("https://dev.iolite.de/situation/type#AtHome");
+		return this.api.getCurrentSituationIdentifier().equals("https://dev.iolite.de/situation/type#AtHome");
 	}
 }
