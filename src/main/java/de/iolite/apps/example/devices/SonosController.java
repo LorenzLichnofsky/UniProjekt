@@ -1,3 +1,4 @@
+
 package de.iolite.apps.example.devices;
 
 import java.util.Date;
@@ -9,33 +10,27 @@ import de.iolite.apps.example.controller.EnvironmentController;
 import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosController {
-	
+
 	Device sonos;
 	Scheduler scheduler;
 	EnvironmentController environment;
 
-	public void setSonos (Device sonos, Scheduler scheduler){
+	public void setSonos(final Device sonos, final Scheduler scheduler) {
 		this.sonos = sonos;
 		this.scheduler = scheduler;
 	}
-	
-	
-	public void setTimer (Date date){
-		
-		Date reminderTime = date;
-		Timer timer = new Timer();
+
+	public void setTimer(final Date date) {
+		final Date reminderTime = date;
+		final Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
-		
+
 			@Override
 			public void run() {
-				
-				if (environment.isUserAtHome() == true){
-					new SonosMusic().addSong(sonos,scheduler);
+				if (SonosController.this.environment.isUserAtHome() == true) {
+					new SonosMusic().addSong(SonosController.this.sonos, SonosController.this.scheduler);
 				}
-				
 			}
 		}, reminderTime);
-		
 	}
-
 }
