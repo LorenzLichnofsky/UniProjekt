@@ -124,7 +124,7 @@ public class SonosController {
 		this.state.setSonos(this, sonos, scheduler, environmentController);
 	}
 
-	public void setTimer(@Nonnull final Date date) {
+	public void playSongAt(@Nonnull final Date date) {
 		Validate.notNull(date, "'date' must not be null");
 		this.state.playSongAt(this, date);
 	}
