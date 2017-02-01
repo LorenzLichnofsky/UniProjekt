@@ -17,18 +17,34 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosMusic {
 
+	private static final class StopPlayback implements Runnable {
+
+		@Nonnull
+		private final DeviceStringProperty playback;
+
+		private StopPlayback(@Nonnull final DeviceStringProperty playbackProperty) {
+			this.playback = playbackProperty;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			try {
+				setValue(this.playback, DriverConstants.PlaybackState.stop.toString());
+			}
+			catch (final DeviceAPIException e) {
+				LOGGER.error("Failed to stop playback in device '{}' due to error: {}", this.playback.getDevice(), e);
+			}
+		}
+	}
+
+	@Nonnull
+	private static final String SONG_URI = "http://downloads.hendrik-motza.de/river.mp3";
+
 	@Nonnull
 	private static final Logger LOGGER = LoggerFactory.getLogger(SonosMusic.class);
-
-	public void addSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
-		Validate.notNull(device, "'device' must not be null");
-		Validate.notNull(scheduler, "'scheduler' must not be null");
-		if (!setMediaURI(device, "http://downloads.hendrik-motza.de/river.mp3")) {
-			LOGGER.error("Failed to set song URI, aborting");
-			return;
-		}
-		playMusic(device, scheduler);
-	}
 
 	private static boolean setMediaURI(@Nonnull final Device device, @Nonnull final String value) {
 		final DeviceStringProperty mediaURI = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
@@ -48,56 +64,49 @@ public class SonosMusic {
 		}
 	}
 
-	private void playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
-		final String PLAY = "play";
-		final DeviceStringProperty playMusicProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
-		if (playMusicProperty != null) {
-			final String musicStatus = playMusicProperty.getValue();
-			if (musicStatus != "play") {
-				try {
-					playMusicProperty.requestValueUpdateFromString(PLAY);
-				}
-				catch (final DeviceAPIException e) {
-					e.printStackTrace();
-				}
-				final TimeUnit sec = TimeUnit.SECONDS;
-				scheduler.schedule(stopMusic(device), 15, sec);
-			}
-			else {
-				LOGGER.debug("Current Status is already play.");
-			}
+	private static void setValue(@Nonnull final DeviceStringProperty property, @Nonnull final String newValue)
+			throws DeviceAPIException {
+		if (newValue.equals(property.getValue())) {
+			LOGGER.debug("Property '{}' already has value '{}', skipping requestValueUpdate call", property.getKey(), newValue);
+			return;
 		}
-		else {
-			LOGGER.info("PlayMusicProperty not found!");
-		}
+		property.requestValueUpdate(newValue);
+		LOGGER.trace("Requested value update in property '{}' for new value '{}'", property.getKey(), newValue);
 	}
 
-	private Runnable stopMusic(@Nonnull final Device device) {
+	public static void playSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
 		Validate.notNull(device, "'device' must not be null");
-		return new Runnable() {
+		Validate.notNull(scheduler, "'scheduler' must not be null");
+		if (!setMediaURI(device, SONG_URI)) {
+			LOGGER.error("Failed to set song URI in device '{}', aborting", device.getIdentifier());
+			return;
+		}
+		if (!playMusic(device, scheduler)) {
+			LOGGER.error("Failed properly schedule music playing with device '{}'", device.getIdentifier());
+		}
+		LOGGER.debug("Successfully scheduled music playing with device '{}'", device.getIdentifier());
+	}
 
-			@Override
-			public void run() {
-				final String STOP = "stop";
-				final DeviceStringProperty stopMusicProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
-				if (stopMusicProperty != null) {
-					final String musicStatus = stopMusicProperty.getValue();
-					if (musicStatus != "stop") {
-						try {
-							stopMusicProperty.requestValueUpdateFromString(STOP);
-						}
-						catch (final DeviceAPIException e) {
-							e.printStackTrace();
-						}
-					}
-					else {
-						LOGGER.debug("Current Status is already stop.");
-					}
-				}
-				else {
-					LOGGER.info("PlayMusicProperty not found!");
-				}
-			}
-		};
+	private static boolean playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+		final DeviceStringProperty playbackState = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
+		if (playbackState == null) {
+			LOGGER.error("Device '{}' has no '{}' property, music will not be played", device.getIdentifier(),
+					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
+			return false;
+		}
+
+		try {
+			setValue(playbackState, DriverConstants.PlaybackState.play.toString());
+			LOGGER.debug("Requested change of playback state of device '{}' to '{}'", device.getIdentifier(), DriverConstants.PlaybackState.play);
+		}
+		catch (final DeviceAPIException e) {
+			LOGGER.error("Failed to change playback state of device '{}' to '{}' due to error: {}", device.getIdentifier(), DriverConstants.PlaybackState.play,
+					e);
+			return false;
+		}
+
+		scheduler.schedule(new StopPlayback(playbackState), 15, TimeUnit.SECONDS);
+		LOGGER.debug("Scheduled playback stop for device '{}'", device.getIdentifier());
+		return true;
 	}
 }

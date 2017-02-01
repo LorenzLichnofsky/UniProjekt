@@ -58,7 +58,7 @@ public class SonosController {
 		private void addSong() {
 			if (this.environment.isUserAtHome()) {
 				LOGGER.debug("User is at home, adding song to SONOS");
-				new SonosMusic().addSong(this.sonosDevice, this.taskScheduler);
+				SonosMusic.playSong(this.sonosDevice, this.taskScheduler);
 			}
 			else {
 				LOGGER.debug("User is not at home, SONOS song will not be added");
