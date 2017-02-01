@@ -15,12 +15,14 @@ import de.iolite.apps.example.devices.SonosController;
 public class DailyEvents {
 
 	List<GoogleEvent> todayEvents = new LinkedList<GoogleEvent>();
-	SonosController sonosController;
+	SonosController controller;
 	
 
-	public DailyEvents(List<GoogleEvent> list) {
+	public DailyEvents(List<GoogleEvent> list, final SonosController sonosController) {
 		this.todayEvents = list;
+		this.controller = sonosController;
 		System.out.println(this.toString());
+		setAlarm();
 	}
 
 	public DailyEvents() {
@@ -38,13 +40,13 @@ public class DailyEvents {
 	
 	
 	private static String [][] UMLAUT_REPLACEMENT = { 
-			{new String("Ä"),"&Auml;" }, 
-			{new String("Ö"),"&Ouml;" }, 
-			{new String("Ü"),"&Uuml;" },
-			{new String("ä"),"&auml;" },
-			{new String("ö"),"&ouml;" },
-			{new String("ü"),"&uuml;" },
-			{new String("ß"),"&szlig;" }
+			{new String("Ã„"),"&Auml;" }, 
+			{new String("Ã–"),"&Ouml;" }, 
+			{new String("Ãœ"),"&Uuml;" },
+			{new String("Ã¤"),"&auml;" },
+			{new String("Ã¶"),"&ouml;" },
+			{new String("Ã¼"),"&uuml;" },
+			{new String("ÃŸ"),"&szlig;" }
 	};
 	
 	/** 
@@ -138,6 +140,25 @@ public class DailyEvents {
 			return event + "today no upcoming events";
 		}
 	}
+
+	public void setAlarm (){
+    	
+    		if (!todayEvents.isEmpty()) {
+            
+    			for (int i = 0; i < todayEvents.size(); i++) {
+               	 	GoogleEvent event = todayEvents.get(i);
+                
+                		if(event.notifications != null || event.notifications.isEmpty()){
+            
+                			for(int j= 0; j<event.notifications.size(); j++){
+           
+                			Date date = event.notifications.get(j).getTime();
+                			controller.setTimer(date);
+                			}
+                		} 
+    			}
+    		}	
+    	}
 
 
 	
