@@ -76,8 +76,7 @@ import de.iolite.utilities.time.series.TimeInterval;
  *
  * @author Grzegorz Lehmann
  * @author Erdene-Ochir Tuguldur
- * @author Felix Rodemund
- * edit by Group Calendar Integration 
+ * @author Felix Rodemund edit by Group Calendar Integration
  * @since 1.0
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
@@ -90,7 +89,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 			final JSONObject response = new JSONObject();
 			response.put("identifiers", deviceIdentifiers);
-			return new IOLITEHTTPStaticResponse(response.toString(), HTTPStatus.OK, IOLITEHTTPResponse.JSON_CONTENT_TYPE);
+			return new IOLITEHTTPStaticResponse(response.toString(), HTTPStatus.OK,
+					IOLITEHTTPResponse.JSON_CONTENT_TYPE);
 		}
 	}
 
@@ -107,35 +107,37 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 	}
 
-	private static final class DeviceOnOffStatusLogger implements DeviceBooleanPropertyObserver {
-
-		@Nonnull
-		private final String identifier;
-
-		private DeviceOnOffStatusLogger(final String deviceIdentifier) {
-			this.identifier = Validate.notNull(deviceIdentifier, "'deviceIdentifier' must not be null");
-		}
-
-		@Override
-		public void deviceChanged(final Device element) {
-			// nothing here
-		}
-
-		@Override
-		public void keyChanged(final String key) {
-			// nothing here
-		}
-
-		@Override
-		public void valueChanged(final Boolean value) {
-			if (value) {
-				LOGGER.debug("device '{}' turned on", this.identifier);
-			}
-			else {
-				LOGGER.debug("device '{}' turned off", this.identifier);
-			}
-		}
-	}
+	// private static final class DeviceOnOffStatusLogger implements
+	// DeviceBooleanPropertyObserver {
+	//
+	// @Nonnull
+	// private final String identifier;
+	//
+	// private DeviceOnOffStatusLogger(final String deviceIdentifier) {
+	// this.identifier = Validate.notNull(deviceIdentifier, "'deviceIdentifier'
+	// must not be null");
+	// }
+	//
+	// @Override
+	// public void deviceChanged(final Device element) {
+	// // nothing here
+	// }
+	//
+	// @Override
+	// public void keyChanged(final String key) {
+	// // nothing here
+	// }
+	//
+	// @Override
+	// public void valueChanged(final Boolean value) {
+	// if (value) {
+	// LOGGER.debug("device '{}' turned on", this.identifier);
+	// }
+	// else {
+	// LOGGER.debug("device '{}' turned off", this.identifier);
+	// }
+	// }
+	// }
 
 	/**
 	 * A response handler returning devices filtered by the property type.
@@ -147,12 +149,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			String propertyType;
 			try {
 				propertyType = new JSONObject(readPassedData(request)).getString("propertyType");
-			}
-			catch (final JSONException e) {
+			} catch (final JSONException e) {
 				LOGGER.error("Could not handle devices request due to a JSON error: {}", e.getMessage(), e);
 				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
-			}
-			catch (final IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("Could not handle devices request due to an I/O error: {}", e.getMessage(), e);
 				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
 			}
@@ -178,10 +178,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			return charset == null || charset.length() == 0 ? IOLITEHTTPStaticResponse.ENCODING_UTF8 : charset;
 		}
 
-		private String readPassedData(final IOLITEHTTPRequest request)
-				throws IOException {
+		private String readPassedData(final IOLITEHTTPRequest request) throws IOException {
 			final String charset = getCharset(request);
-			try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getContent(), charset))) {
+			try (BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(request.getContent(), charset))) {
 				final StringBuilder stringBuilder = new StringBuilder();
 				String line;
 				while ((line = bufferedReader.readLine()) != null) {
@@ -234,42 +234,41 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	/** front end assets */
 	private Disposeable disposeableAssets;
-	
+
 	/** Mirror variables */
-	
+
 	private static final String MSG_ERR_RETRIEVE_USERAPI = "Could not retrieve instance of UserAPI!";
-	
+
 	private static final String HTML_RESOURCES = "assets/html/";
 	private static final String VIEW_RESOURCES = "assets/views/";
 	private static final String APP_ID = "de.iolite.apps.example.CalendarIntegrationAppMain";
-	
 
 	private static final String VIEW_ID_CALENDAR = "CalendarView";
 	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar-icon.jpg";
 	private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
 	private static final String VIEW_TEMPLATE_CALENDAR = VIEW_RESOURCES + "calendar.template";
 	private static final String VIEW_WEBPATH_CALENDAR = "calendar.html";
-	
+
 	private static final String VIEW_ID_CLOCK = "DateTimeView";
 	private static final String ICON_RESPATH_CLOCK = VIEW_RESOURCES + "clock-icon.jpg";
 	private static final String VIEW_RESPATH_CLOCK = VIEW_RESOURCES + "clock.html";
-
 
 	private static final String VIEW_ID_WEATHER = "WeatherView";
 	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
 	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "weather.html";
 	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
-	
+
 	DailyEvents calendar = null;
-	
+
 	private ViewRegistrator viewRegistrator;
-	
+
 	String temperature = "0";
-	
+
 	private ScheduledFuture<?> calendarUpdateThread = null;
 
 	/**
-	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public, parameter-less constructor.
+	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public,
+	 * parameter-less constructor.
 	 */
 	public CalendarIntegrationAppMain() {
 		// empty
@@ -279,8 +278,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void cleanUpHook()
-			throws CleanUpFailedException {
+	protected void cleanUpHook() throws CleanUpFailedException {
 		LOGGER.debug("Cleaning");
 		LOGGER.debug("Cleaned");
 	}
@@ -289,17 +287,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void initializeHook()
-			throws InitializeFailedException {
+	protected void initializeHook() throws InitializeFailedException {
 		LOGGER.debug("Initializing");
 		LOGGER.debug("Initialized");
-		
-		GoogleData  data = new GoogleData();
+
+		GoogleData data = new GoogleData();
 		try {
 			calendar = data.getData();
 			LOGGER.warn(calendar.toString());
 		} catch (IOException | ParseException | GeneralSecurityException | URISyntaxException e) {
-			LOGGER.error("calendar.getData()");
+			LOGGER.error("ERROR calendar.getData()");
 			e.printStackTrace();
 		}
 	}
@@ -308,8 +305,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void startHook(@Nonnull final IOLITEAPIProvider context)
-			throws StartFailedException {
+	protected final void startHook(@Nonnull final IOLITEAPIProvider context) throws StartFailedException {
 		// here the IOLITE App is started
 		// the context gives access to IOLITE App APIs
 		LOGGER.debug("Starting");
@@ -317,10 +313,12 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		try {
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
-			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(), this.userAPI.getUser().getLocale());
+			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(),
+					this.userAPI.getUser().getLocale());
 
 			// Storage API enables the App to store data persistently
-			// whatever is stored via the storage API will also be available if the App is restarted
+			// whatever is stored via the storage API will also be available if
+			// the App is restarted
 			this.storageAPI = context.getAPI(StorageAPI.class);
 			initializeStorage();
 
@@ -345,80 +343,106 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			for (final PlaceSchedule placeSchedule : this.heatingAPI.getHeatingSchedulesOfPlaces()) {
 				LOGGER.debug("Heating schedule found for place '{}'", placeSchedule.getPlaceIdentifier());
 			}
-		
-			
+
 			// getting IOLTE user-ID
 			final UserAPI userApi;
 			final String userId;
 			try {
 				userApi = context.getAPI(UserAPI.class);
 				userId = userApi.getUser().getIdentifier();
-			}
-			catch (final IOLITEAPINotResolvableException | IOLITEPermissionDeniedException e) {
+			} catch (final IOLITEAPINotResolvableException | IOLITEPermissionDeniedException e) {
 				LOGGER.error(MSG_ERR_RETRIEVE_USERAPI, e);
 				throw new StartFailedException(MSG_ERR_RETRIEVE_USERAPI, e);
 			}
-			
-		final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
-		staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
-		staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
-		staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
-		this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
-		deviceAPI.setObserver(this.viewRegistrator);
-		deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
-		
-		this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
-		try {
-			GoogleData calendar_data = new GoogleData();
-			CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
-			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
-			templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);		
-			
-			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
-			templateConf_weather.putReplacement("{WEATHER}", temperature + " &deg C");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);	
-		}
-		catch (final MirrorApiException e) {
-			LOGGER.error("Could not create views!", e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}, 0, 1, TimeUnit.MINUTES);
-		
-	LOGGER.debug("Mirror Views got registered!");
-	
-		}
-		catch (final IOLITEAPINotResolvableException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()), e);
-		}
-		catch (final IOLITEPermissionDeniedException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to permission denied problems in the examples: {0}", e.getMessage()), e);
-		}
-		catch (final StorageAPIException | FrontendAPIException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to an error in the App API examples: {0}", e.getMessage()), e);
+
+			final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
+			staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
+			staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
+			staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
+			this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
+			deviceAPI.setObserver(this.viewRegistrator);
+			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
+
+			this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
+				try {
+					GoogleData calendar_data = new GoogleData();
+					CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
+					final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
+							VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+					templateConf_calendar.putReplacement("{CALENDAR}",
+							CalendarIntegrationAppMain.this.calendar.toString());
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+
+					final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
+							VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+					refreshWeather();
+					templateConf_weather.putReplacement("{WEATHER}", temperature + " &deg C");
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+				} catch (final MirrorApiException e) {
+					LOGGER.error("Could not create views!", e);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (GeneralSecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}, 0, 1, TimeUnit.MINUTES);
+
+			LOGGER.debug("Mirror Views got registered!");
+
+		} catch (final IOLITEAPINotResolvableException e) {
+			throw new StartFailedException(
+					MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()),
+					e);
+		} catch (final IOLITEPermissionDeniedException e) {
+			throw new StartFailedException(MessageFormat
+					.format("Start failed due to permission denied problems in the examples: {0}", e.getMessage()), e);
+		} catch (final StorageAPIException | FrontendAPIException e) {
+			throw new StartFailedException(
+					MessageFormat.format("Start failed due to an error in the App API examples: {0}", e.getMessage()),
+					e);
 		}
 
 		LOGGER.debug("Started");
 	}
 
+	/**
+	 * Updates the weather information for calendar scheduler
+	 * 
+	 * @return a String containing the current temperatur
+	 */
+	private void refreshWeather() {
+		for (final Device device : this.deviceAPI.getDevices()) {
+
+			LOGGER.warn("Update Weather");
+
+			// Get Weather
+			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
+				
+				DeviceDoubleProperty temp = device
+						.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
+
+				if (temp != null && temp.getValue().toString() != null) {
+					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
+					temperature = temp.getValue().toString();
+				}
+			}
+		}
+		
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void stopHook()
-			throws StopFailedException {
+	protected void stopHook() throws StopFailedException {
 		LOGGER.debug("Stopping");
 
 		// deregister the static assets
@@ -436,34 +460,33 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
-		
-
 		// go through all devices
 		for (final Device device : this.deviceAPI.getDevices()) {
 
-			
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
+			// final DeviceBooleanProperty onProperty =
+			// device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
 
-		
 			LOGGER.warn("Devices known'{}'", device.getName());
-			
+
 			// Get Weather
-			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
+			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
 				LOGGER.warn("ItemWeatherStation");
-				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
-			
-				if (temp != null && temp.getValue().toString() != null){
-				LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());				
-				temperature = temp.getValue().toString();
+				DeviceDoubleProperty temp = device
+						.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
+
+				if (temp != null && temp.getValue().toString() != null) {
+					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
+					temperature = temp.getValue().toString();
 				}
-			}	
-			
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)){
+			}
+
+			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
 				new SonosController().setSonos(device);
 			}
 		}
 
-		// go through all devices, and print ON/OFF and POWER USAGE property history datas
+		// go through all devices, and print ON/OFF and POWER USAGE property
+		// history datas
 		for (final Device device : this.deviceAPI.getDevices()) {
 			// ON/OFF history data
 			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
@@ -473,8 +496,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				final List<BooleanEntry> onHistory;
 				try {
 					onHistory = onProperty.getValuesSince(System.currentTimeMillis() - hourMillis);
-				}
-				catch (final DeviceAPIException e) {
+				} catch (final DeviceAPIException e) {
 					LOGGER.error("Failed to retrieve the history of property '{}'", onProperty.getKey(), e);
 					continue;
 				}
@@ -482,7 +504,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				// log history values
 				final DateFormat dateFormat = DateFormat.getTimeInstance();
 				for (final BooleanEntry historyEntry : onHistory) {
-					LOGGER.debug("At '{}' the value was '{}'", dateFormat.format(new Date(historyEntry.time)), historyEntry.value);
+					LOGGER.debug("At '{}' the value was '{}'", dateFormat.format(new Date(historyEntry.time)),
+							historyEntry.value);
 				}
 			}
 
@@ -492,13 +515,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				LOGGER.debug("Reading today's hourly power usage data from device '{}':", device.getIdentifier());
 				List<AggregatedEntry> history;
 				try {
-					history = powerUsage.getAggregatedValuesOf(System.currentTimeMillis(), TimeInterval.DAY, TimeInterval.HOUR, Function.AVERAGE);
+					history = powerUsage.getAggregatedValuesOf(System.currentTimeMillis(), TimeInterval.DAY,
+							TimeInterval.HOUR, Function.AVERAGE);
 					for (final AggregatedEntry entry : history) {
 						LOGGER.debug("The device used an average of {} Watt at '{}'.", entry.getAggregatedValue(),
 								DateFormat.getTimeInstance().format(new Date(entry.getEndTime())));
 					}
-				}
-				catch (final DeviceAPIException e) {
+				} catch (final DeviceAPIException e) {
 					LOGGER.error("Failed to retrieve history data of device", e);
 				}
 			}
@@ -510,14 +533,15 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 *
 	 * @throws StorageAPIException
 	 */
-	private void initializeStorage()
-			throws StorageAPIException {
-		// basically the Storage API provides a key/value storage for different data types
+	private void initializeStorage() throws StorageAPIException {
+		// basically the Storage API provides a key/value storage for different
+		// data types
 		// save an integer under the key 'test'
 		this.storageAPI.saveInt("test", 10);
 		// now let's store a string
 		this.storageAPI.saveString("some key", "some value");
-//		LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
+		// LOGGER.debug("loading 'mirror' from storage: {}",
+		// String.valueOf(this.storageAPI.loadString("Mirror")));
 		// log the value of an entry, just to demonstrate
 		LOGGER.debug("loading 'test' from storage: {}", Integer.valueOf(this.storageAPI.loadInt("test")));
 	}
@@ -525,17 +549,18 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	/**
 	 * Registering web resources.
 	 *
-	 * @throws FrontendAPIException if some resources are not found.
+	 * @throws FrontendAPIException
+	 *             if some resources are not found.
 	 */
-	private final void initializeWebResources()
-			throws FrontendAPIException {
+	private final void initializeWebResources() throws FrontendAPIException {
 
 		// go through static assets and register them
 		final Map<URI, PathHandlerPair> assets = StaticResources.scanClasspath("assets", getClass().getClassLoader());
 		this.disposeableAssets = FrontendAPIUtility.registerPublicHandlers(this.frontendAPI, assets);
 
 		// index page
-		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(loadTemplate("assets/index.html"));
+		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(
+				loadTemplate("assets/index.html"));
 		this.frontendAPI.registerRequestHandler("", indexPageRequestHandler);
 		this.frontendAPI.registerRequestHandler("index.html", indexPageRequestHandler);
 
@@ -555,12 +580,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private String loadTemplate(final String templateResource) {
 		try {
 			return StaticResources.loadResource(templateResource, getClass().getClassLoader());
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			throw new InitializeFailedException("Loading templates for the dummy app failed", e);
 		}
 	}
-	
 
 }
-
