@@ -118,7 +118,7 @@ public class GoogleData {
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
 	 */
-	public DailyEvents getData() throws IOException, ParseException,
+	public DailyEvents getData(final SonosController sonosController) throws IOException, ParseException,
 			GeneralSecurityException, URISyntaxException {
 
 		// Build a new authorized API client service.
@@ -246,7 +246,7 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					//System.out.println("keine Gäste!");
+					//System.out.println("keine GÃ¤ste!");
 				} // if
 
 				allToday.add(today);
@@ -257,7 +257,7 @@ public class GoogleData {
 		// create final list of today's events usable for devices
 		DailyEvents todayFinal = new DailyEvents();
 		if(allToday != null){
-		todayFinal = new DailyEvents(allToday);
+		todayFinal = new DailyEvents(allToday, sonosController);
 		}
 		
 		return todayFinal;
