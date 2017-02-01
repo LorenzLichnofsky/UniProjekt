@@ -67,7 +67,7 @@
 					        
 						        <div class="align_divs">Smart Mirror</div>
 									<div class="align_divs"><div class="onoffswitch">
-									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked onchange="saveMirrorCheckbox()">
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mirror_checker" checked onchange="saveMirrorEnabler()">
 									    <label class="onoffswitch-label" for="mirror_checker">
 									        <span class="onoffswitch-inner"></span>
 									        <span class="onoffswitch-switch"></span>
@@ -86,7 +86,10 @@
 								<div id = "mirror_functionalities" ng-controller="MirrorCheckboxController">
 									<section id="mirror_id" class ="mirror">
 										<div class="container" ng-repeat="setting in settings">
-									 		<input type="checkbox" ng-attr-id="{{ setting.id }}" ng-model="checkedElements[setting.id]">
+									 		<input type="checkbox" ng-attr-id="{{ setting.id }}" ng-model="checkedElements[setting.id]" onchange="saveMirror_ClockEnabler();
+																															                		saveMirror_CalendarEnabler();
+																															                		saveMirror_TrafficEnabler();
+																															                		saveMirror_WeatherEnabler();">
 									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
 										</div>
 										
@@ -125,10 +128,10 @@
 					
 					        <div class="topic">
 					        
-								<div class="align_divs">Smart TV</div>
+								<div class="align_divs">Control Panel</div>
 									<div class="align_divs"><div class="onoffswitch">
-									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="tv_checker" checked>
-									    <label class="onoffswitch-label" for="tv_checker">
+									    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="panel_checker" checked>
+									    <label class="onoffswitch-label" for="panel_checker">
 									        <span class="onoffswitch-inner"></span>
 									        <span class="onoffswitch-switch"></span>
 									    </label>
@@ -137,20 +140,9 @@
 							        
 					        </div>
 					
-					        <input type="checkbox" id = "tv_triangle"/>
+					        <input type="checkbox" id = "panel_triangle"/>
 					
 					        <div class="checkWrap"></div>
-					
-					        <div class="tvtext"><!-- Choose desired functionalities of the smart TV -->	
-								<div id = "tv_functionalities" ng-controller="TVCheckboxController">
-									<section id="tv_id" class ="tv">
-										<div class="container" ng-repeat="setting in settings">
-									 		<input type="checkbox" ng-attr-id="{{ setting.id }}">
-									 		<label ng-attr-for="{{ setting.id }}"><span class="checkbox" ng-attr-id="{{ setting.id }}">{{setting.name}}</span></label>
-										</div>
-									</section>
-								</div>
-							</div>
 					
 					    </li>
 					
@@ -271,35 +263,6 @@ function onSignIn2(googleUser) {
 <script type="text/javascript">
 
 
-/* Event Handling: Hide/Show Checkboxes if User Enables/Disables different devices
- */
- 
-function saveMirrorCheckbox(){
-	  
-	  console.log("Aktueller Mirror Status:" + " " + $('#mirror_checker').is(':checked'));
-
-		    ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
-		        success: function(storageAPI) {
-		          storageAPI.action({
-		            request: new ActionRequest(null, null, ".", "saveString", [new ValueParameter("Mirror"), new ValueParameter($('#mirror_checker').is(':checked'))]),
-		            success: function() {
-		              console.log('Successfully executed requestValueUpdate');
-		            },
-		            error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
-		              console.log("Requesting value update of ", device, " failed due to ",
-		                responseErrorCode, ": ", responseError);
-		            }
-		          });
-		         }
-		        });
-
-
-		      console.log(form.name.value);
-		    
-	  
-}
-
-
 
 $(document).ready(function () {
 	
@@ -379,14 +342,14 @@ $(document).ready(function () {
 
 	
 $(document).ready(function () {	
-	$('#tv_checker').click(function(){
+	$('#panel_checker').click(function(){
 		   
 		   	 var $this = $(this);
 		     if ($this.is(':checked')) {
-		    	 $( "#tv_triangle" ).prop( "checked", true );
+		    	 $( "#panel_triangle" ).prop( "checked", true );
 		     } else {
 		    	 /* uncheck the triangle checkbox*/
-		    	 $( "#tv_triangle" ).prop( "checked", false );
+		    	 $( "#panel_triangle" ).prop( "checked", false );
 		     }
 		});
 });	
@@ -403,19 +366,6 @@ $(document).ready(function () {
 		     }
 		});
 });
-
-
-// If user wants to see his personal schedule on the mirror, the desired event types have to be selected
-$('#sonos_checker').change(function(){
-	  if($(this).prop("checked")) {
-	    $('#events').show();
-	  } else {
-	    $('#events').hide();
-	  }
-	});
- 
-
-
 
 
 /* Navigation TAB - Selection handling*/
@@ -493,33 +443,7 @@ $('body').on('click', '#button-file', function() {
 
 
 
-function CheckboxState(){
-	
-	  var msg = $('#mirror_checker').is(':checked');
-	  console.log("Test");
 
-	  ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
-	      success: function(storageAPI) {
-	        console.log("Test: get function 1 success");
-	        storageAPI.action({
-	          request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("uName")]),
-	          success: function(username) {
-	            console.info('Username: '+username);
-	              $(document).ready(function() {
-					  msg += '<div class="uName">' + $('#name').attr('value') + '</div>';
-	              });
-	          },
-	          error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
-	            console.error("Requesting value update of ", device, " failed due to ",
-	              responseErrorCode, ": ", responseError);
-	          }
-	        });
-
-	      }
-	 });
-
-	  $('#testdiv').html(msg);
-	}
 
 
 

@@ -20,7 +20,7 @@ public class DailyEvents {
 
 	public DailyEvents(List<GoogleEvent> list) {
 		this.todayEvents = list;
-		System.out.println(this.toString());
+		//System.out.println(this.toString());
 	}
 
 	public DailyEvents() {

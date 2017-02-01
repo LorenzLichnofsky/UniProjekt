@@ -36,6 +36,14 @@
 	<!-- all third party dependencies created with Grunt -->
     <script type="text/javascript" src="lib/third-party.js"></script>
 
+	<!-- JavaScript Files for saving the current Frontend states -->
+	<script src="html/js/MirrorToggler.js"></script>
+	<script src="html/js/Mirror_ClockToggler.js"></script>
+	<script src="html/js/Mirror_CalendarToggler.js"></script>
+	<script src="html/js/Mirror_WeatherToggler.js"></script>
+	<script src="html/js/Mirror_TrafficToggler.js"></script>
+
+
 	<!-- wait until Model API is initialized -->
     <script type="text/javascript">
         // wait until bus service is available
@@ -49,6 +57,11 @@
                         angular.resumeBootstrap([]);
                     });
                 })();
+                loadMirrorEnabler();
+                loadMirror_ClockEnabler();
+                loadMirror_CalendarEnabler();
+                loadMirror_TrafficEnabler();
+                loadMirror_WeatherEnabler();
             }
         };
     </script>
