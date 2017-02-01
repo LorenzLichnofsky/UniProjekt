@@ -10,15 +10,17 @@ public class EnvironmentController {
 
 	/** 
 	 * Constructor with the environmentAPI that is initialized in the startHook() Method of the Main Class.
-	 * @param environmentAPI 
+	 *
+	 * @param environmentAPI
 	 * @see CalendarIntegrationAppMain
 	 */
 	public EnvironmentController (EnvironmentAPI environmentAPI){
 		this.environmentAPI = environmentAPI;
 	}
-	
-	/** 
+
+	/**
 	 * Checks, whether the user is at home or not.
+	 *
 	 * @return Boolean value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
