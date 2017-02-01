@@ -21,13 +21,7 @@ public class EnvironmentController {
 	 * Checks, whether the user is at home or not.
 	 * @return Boolean value of the users current situation.
 	 */
-	public boolean isUserAtHome (){
-		
-		if (this.environmentAPI.getCurrentSituationIdentifier().equals("https://dev.iolite.de/situation/type#AtHome")){
-			return true;
-		} else {
-			return false;
-		}
-		
+	public boolean isUserAtHome() {
+		return this.environmentAPI.getCurrentSituationIdentifier().equals("https://dev.iolite.de/situation/type#AtHome");
 	}
 }
