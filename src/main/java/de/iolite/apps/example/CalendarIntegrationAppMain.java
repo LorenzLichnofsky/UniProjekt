@@ -48,6 +48,7 @@ import de.iolite.app.api.storage.StorageAPIException;
 import de.iolite.app.api.user.access.UserAPI;
 import de.iolite.apps.example.ViewRegistrator.ResourcePackageConfig;
 import de.iolite.apps.example.ViewRegistrator.TemplateConfig;
+import de.iolite.apps.example.controller.EnvironmentController;
 import de.iolite.apps.example.devices.SonosController;
 import de.iolite.apps.example.internals.PageWithEmbeddedSessionTokenRequestHandler;
 import de.iolite.common.lifecycle.exception.CleanUpFailedException;
@@ -65,6 +66,7 @@ import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleData;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.insys.mirror.api.MirrorApiException;
+import de.iolite.utilities.concurrency.scheduler.Scheduler;
 import de.iolite.utilities.disposeable.Disposeable;
 import de.iolite.utilities.time.series.DataEntries.AggregatedEntry;
 import de.iolite.utilities.time.series.DataEntries.BooleanEntry;
@@ -237,7 +239,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	
 	/** Sonos assets */
 	private final SonosController sonosController = new SonosController();
-	private Scheduler sonosScheduler;
+	private Scheduler scheduler;
 
 	/** Mirror variables */
 
@@ -268,7 +270,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	String temperature = "0";
 
-	private ScheduledFuture<?> calendarUpdateThread = null;
+	//private ScheduledFuture<?> calendarUpdateThread = null;
 
 	/**
 	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public,
@@ -314,7 +316,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		// the context gives access to IOLITE App APIs
 		LOGGER.debug("Starting");
 
-		try {
+		try {		
+			// Scheduler
+			this.scheduler = context.getScheduler();
+			
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
 			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(),
@@ -329,9 +334,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			// Frontend API enables the App to expose a user interface
 			this.frontendAPI = context.getAPI(FrontendAPI.class);
 			initializeWebResources();
-			
-			// Sonos Scheduler
-			this.sonosScheduler = context.getScheduler();
 
 			// Device API gives access to devices connected to IOLITE
 			this.deviceAPI = context.getAPI(DeviceAPI.class);
@@ -363,10 +365,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			deviceAPI.setObserver(this.viewRegistrator);
 			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
-			this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
+			scheduler.scheduleAtFixedRate(() -> {
 				try {
 					GoogleData calendar_data = new GoogleData();
-					CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
+					CalendarIntegrationAppMain.this.calendar = calendar_data.getData(sonosController);
 					final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
 							VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 					templateConf_calendar.putReplacement("{CALENDAR}",
@@ -449,7 +451,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		if (this.disposeableAssets != null) {
 			this.disposeableAssets.dispose();
 		}
-		this.calendarUpdateThread.cancel(false);
+		//this.calendarUpdateThread.cancel(false);
 		LOGGER.debug("Stopped");
 	}
 
@@ -463,7 +465,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		for (final Device device : this.deviceAPI.getDevices()) {
 			
 			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)){
-				sonosController.setSonos(device, sonosScheduler);
+				sonosController.setSonos(device, scheduler);
 			}
 			
 		}
@@ -488,51 +490,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				}
 			}
 
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
-				new SonosController().setSonos(device);
-			}
-		}
-
-		// go through all devices, and print ON/OFF and POWER USAGE property
-		// history datas
-		for (final Device device : this.deviceAPI.getDevices()) {
-			// ON/OFF history data
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				// retrieve the on/off history of last hour
-				final long hourMillis = TimeUnit.SECONDS.toMillis(60 * 60);
-				final List<BooleanEntry> onHistory;
-				try {
-					onHistory = onProperty.getValuesSince(System.currentTimeMillis() - hourMillis);
-				} catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve the history of property '{}'", onProperty.getKey(), e);
-					continue;
-				}
-				LOGGER.debug("Got '{}' historical values for property '{}'", onHistory.size(), onProperty.getKey());
-				// log history values
-				final DateFormat dateFormat = DateFormat.getTimeInstance();
-				for (final BooleanEntry historyEntry : onHistory) {
-					LOGGER.debug("At '{}' the value was '{}'", dateFormat.format(new Date(historyEntry.time)),
-							historyEntry.value);
-				}
-			}
-
-			// POWER USAGE history data
-			final DeviceDoubleProperty powerUsage = device.getDoubleProperty(DriverConstants.PROPERTY_powerUsage_ID);
-			if (powerUsage != null) {
-				LOGGER.debug("Reading today's hourly power usage data from device '{}':", device.getIdentifier());
-				List<AggregatedEntry> history;
-				try {
-					history = powerUsage.getAggregatedValuesOf(System.currentTimeMillis(), TimeInterval.DAY,
-							TimeInterval.HOUR, Function.AVERAGE);
-					for (final AggregatedEntry entry : history) {
-						LOGGER.debug("The device used an average of {} Watt at '{}'.", entry.getAggregatedValue(),
-								DateFormat.getTimeInstance().format(new Date(entry.getEndTime())));
-					}
-				} catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve history data of device", e);
-				}
-			}
 		}
 	}
 

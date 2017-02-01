@@ -14,6 +14,8 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event.Reminders;
 
+import de.iolite.apps.example.devices.SonosController;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -264,10 +266,10 @@ public class GoogleData {
 
 	}		
 
-	public static void main(String[] args) throws IOException, ParseException,
-			GeneralSecurityException, URISyntaxException {
-		new GoogleData().getData();
-
-	}
+//	public static void main(String[] args) throws IOException, ParseException,
+//			GeneralSecurityException, URISyntaxException {
+//		new GoogleData().getData(new SonosController());
+//
+//	}
 
 }

@@ -1,6 +1,7 @@
 package de.iolite.apps.example.controller;
 
 import de.iolite.app.api.environment.EnvironmentAPI;
+import de.iolite.apps.example.CalendarIntegrationAppMain;
 
 /** Handles the Current Situation of the user. */
 public class EnvironmentController {
