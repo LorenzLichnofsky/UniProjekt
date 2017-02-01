@@ -5,9 +5,10 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.iolite.app.api.device.access.Device;
 import de.iolite.apps.example.controller.EnvironmentController;
@@ -15,32 +16,104 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosController {
 
-	@Nullable
-	private Device sonos;
+	private static final class Configured implements State {
 
-	@Nullable
-	private Scheduler scheduler;
+		@Nonnull
+		private final Device sonosDevice;
 
-	@Nullable
-	private EnvironmentController environment;
+		@Nonnull
+		private final Scheduler taskScheduler;
 
-	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler) {
-		this.sonos = Validate.notNull(sonos, "'sonos' must not be null");
-		this.scheduler = Validate.notNull(scheduler, "'scheduler' must not be null");
+		@Nonnull
+		private final EnvironmentController environment;
+
+		private Configured(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController) {
+			this.sonosDevice = sonos;
+			this.taskScheduler = scheduler;
+			this.environment = environmentController;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
+				@Nonnull final EnvironmentController environmentController) {
+			context.setState(new Configured(sonos, scheduler, environmentController));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final Date date) {
+			final long millisToEvent = date.getTime() - System.currentTimeMillis();
+			if (millisToEvent < 0) {
+				throw new IllegalArgumentException(String.format("Cannot schedule timer for past date '%s'", date));
+			}
+			this.taskScheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
+			LOGGER.debug("Scheduled SONOS 'addSong' task in {}s", TimeUnit.MILLISECONDS.toSeconds(millisToEvent));
+		}
+
+		private void addSong() {
+			if (this.environment.isUserAtHome()) {
+				LOGGER.debug("User is at home, adding song to SONOS");
+				new SonosMusic().addSong(this.sonosDevice, this.taskScheduler);
+			}
+			else {
+				LOGGER.debug("User is not at home, SONOS song will not be added");
+			}
+		}
+	}
+
+	private enum NotConfigured implements State {
+		INSTANCE;
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
+				@Nonnull final EnvironmentController environmentController) {
+			context.setState(new Configured(sonos, scheduler, environmentController));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final Date date) {
+			throw new IllegalStateException("Not configured");
+		}
+	}
+
+	private interface State {
+
+		void setSonos(@Nonnull SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
+				@Nonnull final EnvironmentController environmentController);
+
+		void playSongAt(@Nonnull SonosController context, @Nonnull final Date date);
+	}
+
+	@Nonnull
+	private static final Logger LOGGER = LoggerFactory.getLogger(SonosController.class);
+
+	@Nonnull
+	private volatile State state = NotConfigured.INSTANCE;
+
+	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController) {
+		Validate.notNull(sonos, "'sonos' must not be null");
+		Validate.notNull(scheduler, "'scheduler' must not be null");
+		Validate.notNull(environmentController, "'environmentController' must not be null");
+		this.state.setSonos(this, sonos, scheduler, environmentController);
 	}
 
 	public void setTimer(@Nonnull final Date date) {
 		Validate.notNull(date, "'date' must not be null");
-		final long millisToEvent = date.getTime() - System.currentTimeMillis();
-		if (millisToEvent < 0) {
-			throw new IllegalArgumentException(String.format("Cannot schedule timer for past date '%s'", date));
-		}
-		this.scheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
+		this.state.playSongAt(this, date);
 	}
 
-	private void addSong() {
-		if (this.environment.isUserAtHome() == true) {
-			new SonosMusic().addSong(this.sonos, this.scheduler);
-		}
+	private void setState(@Nonnull final State newState) {
+		this.state = newState;
 	}
 }
