@@ -155,7 +155,7 @@ public class DailyEvents {
                 			for(int j= 0; j<event.notifications.size(); j++){
            
                 			Date date = event.notifications.get(j).getTime();
-                			controller.setTimer(date);
+                			controller.playSongAt(date);
                 			}
                 		} 
     			}
