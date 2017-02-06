@@ -2,6 +2,8 @@
 package de.iolite.apps.example.devices;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import de.iolite.app.api.device.access.Device;
 import de.iolite.apps.example.controller.EnvironmentController;
+import de.iolite.data.DailyEvents;
+import de.iolite.data.GoogleEvent;
 import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosController {
@@ -26,11 +30,15 @@ public class SonosController {
 
 		@Nonnull
 		private final EnvironmentController environment;
+		
+		@Nonnull
+		private final DailyEvents dailyEvents;
 
-		private Configured(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController) {
+		private Configured(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents) {
 			this.sonosDevice = sonos;
 			this.taskScheduler = scheduler;
 			this.environment = environmentController;
+			this.dailyEvents = dailyEvents;
 		}
 
 		/**
@@ -38,30 +46,42 @@ public class SonosController {
 		 */
 		@Override
 		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController) {
-			context.setState(new Configured(sonos, scheduler, environmentController));
+				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents) {
+			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void playSongAt(@Nonnull final SonosController context, @Nonnull final Date date) {
-			final long millisToEvent = date.getTime() - System.currentTimeMillis();
-			if (millisToEvent < 0) {
-				throw new IllegalArgumentException(String.format("Cannot schedule timer for past date '%s'", date));
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents) {
+			
+		List<Date> reminders = dailyEvents.getAlarm();
+		
+			if (!reminders.isEmpty()){
+				for (Date d: reminders){
+			
+					final long millisToEvent = d.getTime() - System.currentTimeMillis();
+					if (millisToEvent < 0) {
+						LOGGER.warn("Cannot schedule timer for past date '%s'", d);
+					} else {
+						this.taskScheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
+						LOGGER.debug("Scheduled SONOS 'addSong' task in {}s", TimeUnit.MILLISECONDS.toSeconds(millisToEvent));
+					}
+				}
+			} else {
+				LOGGER.warn("No reminders. Sonos will not be scheduled!");
 			}
-			this.taskScheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
-			LOGGER.debug("Scheduled SONOS 'addSong' task in {}s", TimeUnit.MILLISECONDS.toSeconds(millisToEvent));
 		}
 
 		private void addSong() {
+			
 			if (this.environment.isUserAtHome()) {
 				LOGGER.debug("User is at home, adding song to SONOS");
 				SonosMusic.playSong(this.sonosDevice, this.taskScheduler);
 			}
 			else {
-				LOGGER.debug("User is not at home, SONOS song will not be added");
+				LOGGER.debug("User is not at home, SONOS song will not be added.");
 			}
 		}
 
@@ -82,15 +102,15 @@ public class SonosController {
 		 */
 		@Override
 		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController) {
-			context.setState(new Configured(sonos, scheduler, environmentController));
+				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents) {
+			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void playSongAt(@Nonnull final SonosController context, @Nonnull final Date date) {
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents) {
 			throw new IllegalStateException("Not configured");
 		}
 
@@ -106,9 +126,9 @@ public class SonosController {
 	private interface State {
 
 		void setSonos(@Nonnull SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController);
+				@Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents);
 
-		void playSongAt(@Nonnull SonosController context, @Nonnull final Date date);
+		void playSongAt(@Nonnull SonosController context, @Nonnull final DailyEvents dailyEvents);
 	}
 
 	@Nonnull
@@ -117,16 +137,17 @@ public class SonosController {
 	@Nonnull
 	private volatile State state = NotConfigured.INSTANCE;
 
-	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController) {
+	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents) {
 		Validate.notNull(sonos, "'sonos' must not be null");
 		Validate.notNull(scheduler, "'scheduler' must not be null");
 		Validate.notNull(environmentController, "'environmentController' must not be null");
-		this.state.setSonos(this, sonos, scheduler, environmentController);
+		Validate.notNull(dailyEvents, "'dailyEvents' must not be null");
+		this.state.setSonos(this, sonos, scheduler, environmentController, dailyEvents);
 	}
 
-	public void playSongAt(@Nonnull final Date date) {
-		Validate.notNull(date, "'date' must not be null");
-		this.state.playSongAt(this, date);
+	public void playSongAt(@Nonnull final DailyEvents dailyEvents) {
+		Validate.notNull(dailyEvents, "'date' must not be null");
+		this.state.playSongAt(this, dailyEvents);
 	}
 
 	private void setState(@Nonnull final State newState) {

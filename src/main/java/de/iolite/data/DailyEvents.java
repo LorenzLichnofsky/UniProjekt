@@ -7,6 +7,9 @@ import java.util.List;
 
 
 
+
+
+import de.iolite.apps.example.CalendarIntegrationAppMain;
 import de.iolite.apps.example.devices.SonosController;
 
 /** 
@@ -18,13 +21,10 @@ public class DailyEvents {
 
 	List<GoogleEvent> todayEvents = new LinkedList<GoogleEvent>();
 	SonosController controller;
-	
 
-	public DailyEvents(List<GoogleEvent> list, final SonosController sonosController) {
+	public DailyEvents(List<GoogleEvent> list) {
 		this.todayEvents = list;
-		this.controller = sonosController;
 		System.out.println(this.toString());
-		setAlarm();
 	}
 
 	public DailyEvents() {
@@ -143,8 +143,11 @@ public class DailyEvents {
 		}
 	}
 
-	public void setAlarm (){
+
+	public LinkedList<Date> getAlarm (){
     	
+		LinkedList <Date> reminders = new LinkedList<Date>();
+		
     		if (!todayEvents.isEmpty()) {
             
     			for (int i = 0; i < todayEvents.size(); i++) {
@@ -155,11 +158,12 @@ public class DailyEvents {
                 			for(int j= 0; j<event.notifications.size(); j++){
            
                 			Date date = event.notifications.get(j).getTime();
-                			controller.playSongAt(date);
+                			reminders.add(date);
                 			}
                 		} 
     			}
-    		}	
+    		}
+			return reminders;	
     	}
 
 

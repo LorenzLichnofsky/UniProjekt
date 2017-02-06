@@ -227,8 +227,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private Disposeable disposeableAssets;
 
 	/** Sonos assets */
-	private final SonosController sonosController = new SonosController();
-	private Scheduler scheduler;
+	SonosController sonosController = new SonosController();
+	Scheduler scheduler;
 
 	/** Mirror variables */
 
@@ -289,7 +289,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		final GoogleData data = new GoogleData();
 		try {
-			this.calendar = data.getData(this.sonosController);
+			this.calendar = data.getData();
+
 			LOGGER.warn(this.calendar.toString());
 		}
 		catch (IOException | ParseException | GeneralSecurityException | URISyntaxException e) {
@@ -325,14 +326,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			// Frontend API enables the App to expose a user interface
 			this.frontendAPI = context.getAPI(FrontendAPI.class);
 			initializeWebResources();
+			
+			// Environment API gives a access for rooms, current situation etc.
+			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
 
 			// Device API gives access to devices connected to IOLITE
 			this.deviceAPI = context.getAPI(DeviceAPI.class);
 			initializeDeviceManager();
-
-			// Environment API gives a access for rooms, current situation etc.
-			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
-			initializeEnvironment();
 
 			// Heating API
 			this.heatingAPI = context.getAPI(HeatingAPI.class);
@@ -360,11 +360,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			this.scheduler.scheduleAtFixedRate(() -> {
 				try {
 					final GoogleData calendar_data = new GoogleData();
-					CalendarIntegrationAppMain.this.calendar = calendar_data.getData(this.sonosController);
+					CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
 					final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 					templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
 					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
-
+					
+					this.sonosController.playSongAt(this.calendar);
+					
 					final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
 					refreshWeather();
 					templateConf_weather.putReplacement("{WEATHER}", this.temperature + " &deg C");
@@ -455,33 +457,37 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
 		for (final Device device : this.deviceAPI.getDevices()) {
-
+			
 			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
-				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI));
+				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
+			} else {
+				LOGGER.warn("ICH FINDE KEINE SONOSBOX!!");
 			}
 		}
-
-		// go through all devices
-		for (final Device device : this.deviceAPI.getDevices()) {
-
-			// final DeviceBooleanProperty onProperty =
-			// device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-
-			LOGGER.warn("Devices known'{}'", device.getName());
-
-			// Get Weather
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
-				LOGGER.warn("ItemWeatherStation");
-				final DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
-
-				if (temp != null && temp.getValue().toString() != null) {
-					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
-					this.temperature = temp.getValue().toString();
-				}
-			}
-
-		}
+// Sonos ID : sonos-driver.jar/RINCON_B8E9373AD10E01400
+		
+		
+//		// go through all devices
+//		for (final Device device : this.deviceAPI.getDevices()) {
+//
+//			// final DeviceBooleanProperty onProperty =
+//			// device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
+//
+//			LOGGER.warn("Devices known'{}'", device.getName());
+//
+//			// Get Weather
+//			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
+//				LOGGER.warn("ItemWeatherStation");
+//				final DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
+//
+//				if (temp != null && temp.getValue() != null) {
+//					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
+//					this.temperature = temp.getValue().toString();
+//				}
+//			}
+//
+//		}
 	}
 
 	/**
@@ -503,12 +509,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		LOGGER.debug("loading 'test' from storage: {}", Integer.valueOf(this.storageAPI.loadInt("test")));
 	}
 
-	/** Initializes the EnvironmentController class. */
-	private final void initializeEnvironment() {
-
-		final EnvironmentController environmentController = new EnvironmentController(this.environmentAPI);
-
-	}
 
 	/**
 	 * Registering web resources.

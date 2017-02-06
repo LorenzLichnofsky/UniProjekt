@@ -1,4 +1,3 @@
-
 package de.iolite.apps.example.devices;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +31,7 @@ public class SonosMusic {
 		@Override
 		public void run() {
 			try {
-				setValue(this.playback, DriverConstants.PlaybackState.stop.toString());
+				setValue(this.playback, "stop");
 			}
 			catch (final DeviceAPIException e) {
 				LOGGER.error("Failed to stop playback in device '{}' due to error: {}", this.playback.getDevice(), e);
@@ -96,16 +95,15 @@ public class SonosMusic {
 		}
 
 		try {
-			setValue(playbackState, DriverConstants.PlaybackState.play.toString());
-			LOGGER.debug("Requested change of playback state of device '{}' to '{}'", device.getIdentifier(), DriverConstants.PlaybackState.play);
+			setValue(playbackState, "play");
+			LOGGER.debug("Requested change of playback state of device '{}' to play.", device.getIdentifier());
 		}
 		catch (final DeviceAPIException e) {
-			LOGGER.error("Failed to change playback state of device '{}' to '{}' due to error: {}", device.getIdentifier(), DriverConstants.PlaybackState.play,
-					e);
+			LOGGER.error("Failed to change playback state of device '{}' to play due to error: {}", device.getIdentifier(), e);
 			return false;
 		}
 
-		scheduler.schedule(new StopPlayback(playbackState), 15, TimeUnit.SECONDS);
+		scheduler.schedule(new StopPlayback(playbackState), 30, TimeUnit.SECONDS);
 		LOGGER.debug("Scheduled playback stop for device '{}'", device.getIdentifier());
 		return true;
 	}

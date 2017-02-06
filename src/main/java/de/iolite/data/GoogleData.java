@@ -60,6 +60,9 @@ public class GoogleData {
 	/** Global instance of the required scopes */
 	private static final List<String> SCOPES = Arrays
 			.asList(CalendarScopes.CALENDAR_READONLY);
+	
+	/** Instance of Sonos Controller */
+	SonosController controller;
 
 	/** Initializing HTTP_TRANSPORT and DATA_STORE_FACTORY */
 	static {
@@ -120,7 +123,7 @@ public class GoogleData {
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
 	 */
-	public DailyEvents getData(final SonosController sonosController) throws IOException, ParseException,
+	public DailyEvents getData() throws IOException, ParseException,
 			GeneralSecurityException, URISyntaxException {
 
 		// Build a new authorized API client service.
@@ -259,7 +262,7 @@ public class GoogleData {
 		// create final list of today's events usable for devices
 		DailyEvents todayFinal = new DailyEvents();
 		if(allToday != null){
-		todayFinal = new DailyEvents(allToday, sonosController);
+		todayFinal = new DailyEvents(allToday);
 		}
 		
 		return todayFinal;
