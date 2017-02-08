@@ -48,6 +48,7 @@ import de.iolite.app.api.storage.StorageAPIException;
 import de.iolite.app.api.user.access.UserAPI;
 import de.iolite.apps.example.ViewRegistrator.ResourcePackageConfig;
 import de.iolite.apps.example.ViewRegistrator.TemplateConfig;
+import de.iolite.apps.example.controller.EnvironmentController;
 import de.iolite.apps.example.devices.SonosController;
 import de.iolite.apps.example.internals.PageWithEmbeddedSessionTokenRequestHandler;
 import de.iolite.common.lifecycle.exception.CleanUpFailedException;
@@ -70,6 +71,7 @@ import de.iolite.utilities.time.series.DataEntries.AggregatedEntry;
 import de.iolite.utilities.time.series.DataEntries.BooleanEntry;
 import de.iolite.utilities.time.series.Function;
 import de.iolite.utilities.time.series.TimeInterval;
+import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 /**
  * Orginal code from: <code>ExampleApp</code> is an example IOLITE App.
@@ -201,10 +203,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private EnvironmentAPI environmentAPI;
 	private UserAPI userAPI;
 
-	// private HeatingAPI heatingAPI;
-
 	/** front end assets */
 	private Disposeable disposeableAssets;
+	
+	/** sonos assets */
+	SonosController sonosController = new SonosController();
+    Scheduler scheduler;
+	
 
 	/*
 	 * Mirror variables basic idea is taken over from Hendrik Motza from
@@ -244,7 +249,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	String temperature = "0";
 
-	private ScheduledFuture<?> calendarUpdateThread = null;
+	// private ScheduledFuture<?> calendarUpdateThread = null;
 
 	/**
 	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public,
@@ -259,7 +264,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	@Override
 	protected void cleanUpHook() throws CleanUpFailedException {
-		// LOGGER.debug("Cleaning");
 		LOGGER.debug("Cleaned");
 	}
 
@@ -268,13 +272,12 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	@Override
 	protected void initializeHook() throws InitializeFailedException {
-		// LOGGER.debug("Initializing");
 		LOGGER.debug("Initialized");
 
 		GoogleData data = new GoogleData();
 		try {
-			calendar = data.getData();
-			LOGGER.warn(calendar.toString());
+			this.calendar = data.getData();
+			LOGGER.warn(this.calendar.toString());
 		} catch (IOException | ParseException | GeneralSecurityException | URISyntaxException e) {
 			LOGGER.error("ERROR while getting calendar.getData()");
 			e.printStackTrace();
@@ -291,6 +294,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		LOGGER.debug("Starting");
 
 		try {
+			
+			// Scheduler
+            this.scheduler = context.getScheduler();
+			
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
 			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(),
@@ -306,17 +313,20 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			this.frontendAPI = context.getAPI(FrontendAPI.class);
 			initializeWebResources();
 
+			
+			// Environment API gives a access for rooms, current situation etc.
+			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
+			
 			// Device API gives access to devices connected to IOLITE
 			this.deviceAPI = context.getAPI(DeviceAPI.class);
 			initializeDeviceManager();
 
-			// Environment API gives a access for rooms, current situation etc.
-			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
-			LOGGER.debug("Current Situation: {}", this.environmentAPI.getCurrentSituationIdentifier());
-			LOGGER.debug("Locations:");
-			for (final Location location : this.environmentAPI.getLocations()) {
-				LOGGER.debug("\t{}", location.getName());
-			}
+
+//			LOGGER.debug("Current Situation: {}", this.environmentAPI.getCurrentSituationIdentifier());
+//			LOGGER.debug("Locations:");
+//			for (final Location location : this.environmentAPI.getLocations()) {
+//				LOGGER.debug("\t{}", location.getName());
+//			}
 
 
 			// getting IOLTE user-ID
@@ -340,7 +350,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
 			// schedule that update the calendar information every 15 min
-			this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
+			this.scheduler.scheduleAtFixedRate(() -> {
 
 				try {
 					this.storageAPI = context.getAPI(StorageAPI.class);
@@ -349,6 +359,14 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					boolean clock = this.storageAPI.loadString("Mirror_Clock").equals("true");
 					boolean calendar = this.storageAPI.loadString("Mirror_Calendar").equals("true");
 					boolean traffic = this.storageAPI.loadString("Mirror_Traffic").equals("true");
+					boolean sonos = this.storageAPI.loadString("Sonos").equals("true");
+					
+					if (sonos){
+						GoogleData calendar_data = new GoogleData();
+						this.calendar = calendar_data.getData();
+						this.sonosController.playSongAt(this.calendar);
+					}
+					
 
 					if (mirror) {
 
@@ -509,7 +527,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		if (this.disposeableAssets != null) {
 			this.disposeableAssets.dispose();
 		}
-		this.calendarUpdateThread.cancel(false);
+		//this.calendarUpdateThread.cancel(false);
 		LOGGER.debug("Stopped");
 	}
 
@@ -517,17 +535,18 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * Example method showing how to use the Device API.
 	 */
 	private void initializeDeviceManager() {
-		// register a device observer
-		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
+        // register a device observer
+        this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
-		// go through all devices
-		for (final Device device : this.deviceAPI.getDevices()) {
-
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
-				new SonosController().setSonos(device);
-			}
-		}
-
+        for (final Device device : this.deviceAPI.getDevices()) {
+            
+            if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
+                this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
+                LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
+            } else {
+                LOGGER.warn("ICH FINDE KEINE SONOSBOX!!");
+            }
+        }
 	}
 
 	/**

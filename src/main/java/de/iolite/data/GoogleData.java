@@ -14,6 +14,8 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event.Reminders;
 
+import de.iolite.apps.example.devices.SonosController;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,6 +60,9 @@ public class GoogleData {
 	/** Global instance of the required scopes */
 	private static final List<String> SCOPES = Arrays
 			.asList(CalendarScopes.CALENDAR_READONLY);
+	
+	/** Instance of Sonos Controller */
+	SonosController controller;
 
 	/** Initializing HTTP_TRANSPORT and DATA_STORE_FACTORY */
 	static {
@@ -244,7 +249,7 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					//System.out.println("keine Gäste!");
+					//System.out.println("keine GÃ¤ste!");
 				} // if
 
 				allToday.add(today);
@@ -262,10 +267,10 @@ public class GoogleData {
 
 	}		
 
-	public static void main(String[] args) throws IOException, ParseException,
-			GeneralSecurityException, URISyntaxException {
-		new GoogleData().getData();
-
-	}
+//	public static void main(String[] args) throws IOException, ParseException,
+//			GeneralSecurityException, URISyntaxException {
+//		new GoogleData().getData(new SonosController());
+//
+//	}
 
 }
