@@ -95,7 +95,7 @@
 						</configuration>
 					</execution>
 					<!-- validate all JS/HTML/LESS assets, see Gruntfile.js -->
-<!-- 					<execution>
+ 					<!-- <execution>
 						<id>grunt validate-frontend-resources</id>
 						<goals>
 							<goal>grunt</goal>
@@ -103,9 +103,9 @@
 						<configuration>
 							<arguments>validate-frontend-resources</arguments>
 						</configuration>
-					</execution>
-					build front end assets, see Gruntfile.js
-					<execution>
+					</execution> -->
+					<!-- build front end assets, see Gruntfile.js -->
+<!-- 					<execution>
 						<id>grunt build-frontend-resources</id>
 						<goals>
 							<goal>grunt</goal>
@@ -113,7 +113,7 @@
 						<configuration>
 							<arguments>build-frontend-resources</arguments>
 						</configuration>
-					</execution> -->
+					</execution>  -->
 				</executions>
 			</plugin>
 			<!-- FindBugs check on compile, fail even on Low priority violations -->
@@ -258,18 +258,7 @@
 			<version>1.3.2</version>
 		</dependency>
 
-		<!-- Mirror dependencies -->
-		<dependency>
-			<groupId>de.hendrikmotza.mirror.api</groupId>
-			<artifactId>iolite-app-mirror-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 		
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.3.2</version>
-		</dependency>
 	
 	<!--  GOOGLE  -->
 		<dependency>
@@ -291,6 +280,8 @@
       <scope>compile</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.google.http-client/google-http-client -->
+    
+    
 </dependencies>
 
 		<repositories>

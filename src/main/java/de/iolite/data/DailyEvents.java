@@ -1,5 +1,6 @@
 package de.iolite.data;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -24,7 +25,7 @@ public class DailyEvents {
 
 	public DailyEvents(List<GoogleEvent> list) {
 		this.todayEvents = list;
-		System.out.println(this.toString());
+		//System.out.println(this.toString());
 	}
 
 	public DailyEvents() {
@@ -141,6 +142,35 @@ public class DailyEvents {
 		} else {
 			return event + "today no upcoming events";
 		}
+	}
+
+	/**
+	 * sort out the different event types chosen by the user. 
+	 * @param sport
+	 * @param friend
+	 * @param uni
+	 * @param other
+	 * @return only google events selected by user
+	 */
+	public DailyEvents sortOut(boolean sport, boolean friend, boolean uni, boolean other) {
+		
+		List<GoogleEvent> todayEventsSorted = new ArrayList<GoogleEvent>();
+		
+		for (int i = 0; i<this.todayEvents.size(); i++){
+			GoogleEvent g = this.todayEvents.get(i);
+			if(g.Color=="Friend" && friend)
+				todayEventsSorted.add(g);
+			if(g.Color=="Sport" && sport)
+				todayEventsSorted.add(g);
+			if(g.Color=="University" && uni)
+				todayEventsSorted.add(g);
+			if(g.Color=="Other" && other)
+				todayEventsSorted.add(g);
+		}
+		
+		
+		
+		return new DailyEvents(todayEventsSorted);
 	}
 
 
