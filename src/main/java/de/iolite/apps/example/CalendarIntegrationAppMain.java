@@ -435,25 +435,25 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				} catch (final MirrorApiException e) {
 					LOGGER.error("Could not create views!", e);
 				} catch (GeneralSecurityException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (StorageAPIException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (IOLITEAPINotResolvableException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (IOLITEPermissionDeniedException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("Could not create views!", e);
 					e.printStackTrace();
 				}
 
