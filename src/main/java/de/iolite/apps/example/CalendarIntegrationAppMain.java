@@ -453,19 +453,19 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * Example method showing how to use the Device API.
 	 */
 	private void initializeDeviceManager() {
+		
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
+		//Find Driver of the Sonos Box and make Settings in the sonosController Class
 		for (final Device device : this.deviceAPI.getDevices()) {
 			
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
+			if (device.getIdentifier().equals("sonos-driver.jar/RINCON_B8E9373AD10E01400")) {
 				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
-			} else {
-				LOGGER.warn("ICH FINDE KEINE SONOSBOX!!");
-			}
+			} 
 		}
-// Sonos ID : sonos-driver.jar/RINCON_B8E9373AD10E01400
+
 		
 		
 //		// go through all devices
