@@ -31,6 +31,11 @@ function loadMirrorEnabler(){
 	            var mirror_status_as_bool = (mirror_status === 'true');
 	              $(document).ready(function() {
 	                $('#mirror_checker').prop('checked', mirror_status_as_bool);
+	           	 	
+	                if (mirror_status_as_bool == true) {
+	   		    	 $(".mirrortext").show();
+	   		    	 $( "#mirror_triangle" ).prop( "checked", true );
+	                }
 	                
 	              });
 	          },

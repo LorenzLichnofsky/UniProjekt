@@ -7,7 +7,7 @@ function saveMirror_CalendarEnabler(){
 		          storageAPI.action({
 		            request: new ActionRequest(null, null, ".", "saveString", [new ValueParameter("Mirror_Calendar"), new ValueParameter($('#mirror-4').is(':checked'))]),
 		            success: function() {
-		              console.log('Successfully executed requestValueUpdate for calendar toggler');
+		              console.log('Successfully executed requestValueUpdate for calendar toggler');		              
 		            },
 		            error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
 		              console.log("Requesting value update of ", device, " failed due to ",
@@ -31,7 +31,13 @@ function loadMirror_CalendarEnabler(){
 	            var calendar_status_as_bool = (calendar_status === 'true');
 	              $(document).ready(function() {
 	                $('#mirror-4').prop('checked', calendar_status_as_bool);
-	                
+           
+		    		 // TODO if calendar is true in storage, show the event container below when loading the app
+		    		 if ($('#mirror-4').is(':checked')){
+		  		    	
+
+		    		 }
+
 	              });
 	          },
 	          error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {

@@ -180,17 +180,15 @@ public class GoogleData {
 				if (color != null) {
 					switch (color) {
 					case "5":
-						status = "Freetime Appointment";
+						status = "Friend";
 						break;
 
-					case "9":
-						status = "Special Event";
-						break;
+					
 					case "10":
-						status = "Sports";
+						status = "Sport";
 						break;
 					case "11":
-						status = "Work";
+						status = "University";
 						break;
 					default:
 						status = "Other";
@@ -198,7 +196,7 @@ public class GoogleData {
 				}
 
 				if (color == null)
-					status = "Special Event";
+					status = "Other";
 
 				today.setColor(status);
 
