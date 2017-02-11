@@ -1,13 +1,13 @@
-function saveMirrorEnabler(){
+function saveSonosEnabler(){
 	  
-	  console.log("Current Mirror Status:" + " " + $('#mirror_checker').is(':checked'));
+	  console.log("Current Sonos Status:" + " " + $('#sonos_checker').is(':checked'));
 
 		    ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
 		        success: function(storageAPI) {
 		          storageAPI.action({
-		            request: new ActionRequest(null, null, ".", "saveString", [new ValueParameter("Mirror"), new ValueParameter($('#mirror_checker').is(':checked'))]),
+		            request: new ActionRequest(null, null, ".", "saveString", [new ValueParameter("Sonos"), new ValueParameter($('#sonos_checker').is(':checked'))]),
 		            success: function() {
-		              console.log('Successfully executed requestValueUpdate for mirror toggler');
+		              console.log('Successfully executed requestValueUpdate for sonos toggler');
 		            },
 		            error: function(storageAPI, responseRequestID, responseErrorCode, responseError) {
 		              console.log("Requesting value update of ", device, " failed due to ",
@@ -19,23 +19,23 @@ function saveMirrorEnabler(){
 }
 
 
-function loadMirrorEnabler(){
+function loadSonosEnabler(){
 	
 	  ModelAPIProfiles.get(ModelAPIProfiles.storageId, {
 	      success: function(storageAPI) {
 	        console.log("Test: get success for function 1 of mirror toggle");
 	        storageAPI.action({
-	          request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("Mirror")]),
-	          success: function(mirror_status) {
-	            console.log('Mirror: '+ mirror_status);
-	            var mirror_status_as_bool = (mirror_status === 'true');
+	          request: new ActionRequest(null, null, ".", "loadString", [new ValueParameter("Sonos")]),
+	          success: function(sonos_status) {
+	            console.log('Sonos: '+ sonos_status);
+	            var sonos_status_as_bool = (sonos_status === 'true');
 	              $(document).ready(function() {
-	                $('#mirror_checker').prop('checked', mirror_status_as_bool);
-	           	 	
-	                if (mirror_status_as_bool == true) {
-	   		    	 $(".mirrortext").show();
-	   		    	 $( "#mirror_triangle" ).prop( "checked", true );
-	                }
+	                $('#sonos_checker').prop('checked', sonos_status_as_bool);
+	                
+	                if (sonos_status_as_bool) {
+		   		    	 $(".sonostext").show();
+		   		    	 $( "#sonos_triangle" ).prop( "checked", true );
+		                }
 	                
 	              });
 	          },

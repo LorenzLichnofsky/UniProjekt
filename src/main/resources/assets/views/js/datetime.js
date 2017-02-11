@@ -1,3 +1,7 @@
+/** Original idea taken from Hendrik Motza
+Edited by Calender Integration Group */
+
+
 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -5,8 +9,6 @@ showDateAndTime();
 
 
 window.setInterval(function() {
-  // var myDate = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
-  // $('#center').html(myDate);
   showDateAndTime();
 }, 1000);
 

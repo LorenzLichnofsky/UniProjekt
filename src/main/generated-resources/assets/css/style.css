@@ -19,6 +19,9 @@ body {
   font-size: 1.0em;
   color: #000; /* font - color in the whole application*/
 }
+input, button {
+  font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
+}
 .headline{
 font-family: "Lucida Grande", Tahoma;
  font-size: 22px;
@@ -31,7 +34,11 @@ font-family: "Lucida Grande", Tahoma;
  padding-bottom: 30px;
 }
 .smaller{
-	font-size: 0.8em;
+	font-size: 0.9em;
+}
+#app-image{
+	padding-left: 220px; 
+	padding-bottom: 20px;
 }
 
 
@@ -258,9 +265,21 @@ input[type="checkbox"]:checked + label span.checkbox_blue::after {
 	padding-bottom: 40px;
 	border-bottom: 2.5px solid #333332;
 }
-.mirrortext, .sonostext {
+.mirrortext {
     display: none;
     padding: 10px;  
+}
+.sonostext{
+	display: none;
+    padding: 20px; 
+    margin-left: 40px;
+}
+#SongURI{
+	width: 325px;
+	background-color: #F5F5F5;
+}
+#Sonos_URI{
+	padding-bottom: 10px;
 }
 input[type="checkbox"] {
     position: relative;

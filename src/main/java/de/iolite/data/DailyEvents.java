@@ -6,13 +6,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-
-
-
-
-import de.iolite.apps.example.CalendarIntegrationAppMain;
-import de.iolite.apps.example.devices.SonosController;
-
 /** 
  * This class stores all the DAILY events and their attributes.
  * @author Ariane Ziehn
@@ -21,11 +14,9 @@ import de.iolite.apps.example.devices.SonosController;
 public class DailyEvents {
 
 	List<GoogleEvent> todayEvents = new LinkedList<GoogleEvent>();
-	SonosController controller;
 
 	public DailyEvents(List<GoogleEvent> list) {
 		this.todayEvents = list;
-		//System.out.println(this.toString());
 	}
 
 	public DailyEvents() {
@@ -40,8 +31,6 @@ public class DailyEvents {
 		this.todayEvents = todayEvents;
 	}
 
-	
-	
 	private static String [][] UMLAUT_REPLACEMENT = { 
 			{new String("Ä"),"&Auml;" }, 
 			{new String("Ö"),"&Ouml;" }, 
@@ -67,7 +56,9 @@ public class DailyEvents {
 	}
 			
 			
-			
+	/**
+	 * Calendar Content displayed on the Mirror	
+	 */
 	@Override
 	public String toString() {
 
@@ -91,51 +82,12 @@ public class DailyEvents {
 					start = ":" + minutesStart;
 
 				event += replaceUmlaute(dummy.Name) + "<br/>"
-						
-//						+ "<br/> Location: "
 						+ replaceUmlaute(shortlocation)
-
-						+
-						
-						// "\n Status:"+ dummy.Status +
-//						"<br/> type: "
-//						+ dummy.Color
-//						+
-						
-						// "\n Start: "+dummy.begin.get(Calendar.HOUR_OF_DAY)+start+
-						// "\n End: "+dummy.end.get(Calendar.HOUR_OF_DAY)+ende+"\n"
-						// + newline;
-
-						"<br/> " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
+						+ "<br/> " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
 						+ " - " + dummy.end.get(Calendar.HOUR_OF_DAY) + ende;
-				
-				
-//						if(dummy.attendee == null){
-//							
-//						}
-//						else{ //(dummy.attendee != null || dummy.attendee.isEmpty()){
-//						
-//						//TODO Design... raus nehmen aus String wenn niemand anders dabei?
-//						event += "<br/> attendee: ";
-//								for(int k= 0; k<dummy.attendee.size(); k++){	
-//						event += dummy.attendee.get(k)+",";
-//						}
-//						}
-//						
-						
-//						if(dummy.notifications != null || dummy.notifications.isEmpty()){
-//							
-//							//TODO Design... raus nehmen aus String wenn niemand anders dabei?
-//							for(int j= 0; j<dummy.notifications.size(); j++){
-//							event += "<br/> notification: "
-//							+ dummy.notifications.get(j).getTime();
-//							}
-//						}
-						
+	
 						event += "<br/>" + "<br/>";
-						
-						
-//						sonosController.notifySonos(dummy.notifications.get(0).getTime());
+
 
 			}
 			return event;
@@ -156,6 +108,10 @@ public class DailyEvents {
 		
 		List<GoogleEvent> todayEventsSorted = new ArrayList<GoogleEvent>();
 		
+		if(sport && friend && uni && other)
+			this.todayEvents = todayEventsSorted;
+		
+		else{
 		for (int i = 0; i<this.todayEvents.size(); i++){
 			GoogleEvent g = this.todayEvents.get(i);
 			if(g.Color=="Friend" && friend)
@@ -167,13 +123,16 @@ public class DailyEvents {
 			if(g.Color=="Other" && other)
 				todayEventsSorted.add(g);
 		}
-		
+		}
 		
 		
 		return new DailyEvents(todayEventsSorted);
 	}
 
-
+	/**
+	 * Sonos searching for the exact time of the reminder of all daily events 
+	 * @return List of all reminders
+	 */
 	public LinkedList<Date> getAlarm (){
     	
 		LinkedList <Date> reminders = new LinkedList<Date>();

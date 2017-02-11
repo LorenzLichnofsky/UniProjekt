@@ -1,3 +1,7 @@
+/**
+ * Controller for User Interface
+ */
+
 (function() {
 	'use strict';
 	
@@ -42,17 +46,30 @@
 	    		 saveMirror_CalendarEnabler();
 	    	}   
 	    };
-	    
-	        
+
 	    
 	    $(document).ready(function () {
+	    	
+	    	// by clicking the edit button, the URI-textfield will be editable for the user
+	    	$('#editButton').click(function () {
+	    		  $('#SongURI').removeAttr('readonly');
+	    		  $("#SongURI").css("background-color", "white");
+	    		  $('#SongURI').focus();
+	    	})
+	    	
+	    	// by clicking the save button, the URI-textfield won't be editable for the user anymore
+	    	$('#saveButton').click(function () {
+	    		  $('#SongURI').prop('readonly', true);
+	    		  $("#SongURI").css("background-color", "#F5F5F5");
+	    	})
 	    	
 	    	
 		    // the method to display or hide the event container
 		    $scope.showEvents = function(obj) {
-		    		return (obj['mirror-4']);
-		    };
 
+		    	return (obj['mirror-4']);
+		    		
+		    };
 
 	  	  /* handler for clicking-events of the mirror's enable/disable toggler */	  
 	  	  $('#mirror_checker').click(function(){		
@@ -69,8 +86,7 @@
 	  		    	 $(".mirrortext").hide();
 
 	  		     }
-	  		});	  
-
+	  	  });	  
 	  	  /* handler for clicking-events of the mirror triangle */	
 	  	  $('#mirror_triangle').click(function(){		
 
@@ -81,7 +97,36 @@
 	  		    	 $(".mirrortext").hide();
 
 	  		     }
+	  	  });    
+	  	  
+	  	  /* handler for clicking-events of the sonos's enable/disable toggler */	  
+	  	  $('#sonos_checker').click(function(){		
+
+	  			 var $this = $(this);
+	  		     if ($this.is(':checked')) {
+	  		    	 /* check the triangle checkbox*/
+	  		    	 $( "#sonos_triangle" ).prop( "checked", true );
+	  		    	 /* show div to select different functionalities of mirror*/
+	  		    	 $(".sonostext").show();
+
+	  		     } else {
+	  		    	 $( "#sonos_triangle" ).prop( "checked", false );
+	  		    	 $(".sonostext").hide();
+
+	  		     }
+	  	  });	  
+	  	  /* handler for clicking-events of the sonos triangle */	
+	  	  $('#sonos_triangle').click(function(){		
+
+	  			 var $this = $(this);
+	  		     if ($this.is(':checked')) {
+	  		    	 $(".sonostext").show();
+	  		     } else {
+	  		    	 $(".sonostext").hide();
+
+	  		     }   
 	  		});	
+	  	  
 	  });	
 
 

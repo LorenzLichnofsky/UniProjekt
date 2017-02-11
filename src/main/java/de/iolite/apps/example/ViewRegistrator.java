@@ -315,7 +315,7 @@ public class ViewRegistrator implements DeviceAPIObserver {
 			for (final Entry<String, String> replacement : replacements.entrySet()) {
 				template = template.replaceAll(Pattern.quote(replacement.getKey()), replacement.getValue());
 			}
-			return template.getBytes();
+			return template.getBytes("UTF-8");
 		}
 	}
 

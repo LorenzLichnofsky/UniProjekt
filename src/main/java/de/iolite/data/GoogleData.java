@@ -142,7 +142,7 @@ public class GoogleData {
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
-		Events events = service.events().list("primary").setMaxResults(5)
+		Events events = service.events().list("primary").setMaxResults(3)
 				.setTimeMin(now)
 				.setTimeMax(latest)
 				.setOrderBy("startTime").setSingleEvents(true).execute();
@@ -188,7 +188,6 @@ public class GoogleData {
 						status = "Friend";
 						break;
 
-					
 					case "10":
 						status = "Sport";
 						break;
@@ -249,7 +248,11 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					//System.out.println("keine Gäste!");
+					
+					/**
+					 * do something else. Attendee in general not used by our group
+					 */
+					
 				} // if
 
 				allToday.add(today);
@@ -267,10 +270,6 @@ public class GoogleData {
 
 	}		
 
-//	public static void main(String[] args) throws IOException, ParseException,
-//			GeneralSecurityException, URISyntaxException {
-//		new GoogleData().getData(new SonosController());
-//
-//	}
+	
 
 }

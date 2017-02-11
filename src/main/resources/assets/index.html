@@ -1,3 +1,6 @@
+<!-- Original taken from example App
+Edited by Calender Integration Group-->
+
 <!DOCTYPE html>
 <html lang="en" ng-app="exampleApp">
 
@@ -13,7 +16,6 @@
 	<!-- our style sheet -->
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	
-	
 	<link href="css/magic-check.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
@@ -25,17 +27,18 @@
     <script type="text/javascript" src="lib/third-party.js"></script>
 
 	<!-- JavaScript Files for saving the current Frontend states -->
-	<script src="html/js/MirrorToggler.js"></script>
-	<script src="html/js/PanelToggler.js"></script>
-	<script src="html/js/SonosToggler.js"></script>
-	<script src="html/js/Mirror_ClockToggler.js"></script>
-	<script src="html/js/Mirror_CalendarToggler.js"></script>
-	<script src="html/js/Mirror_WeatherToggler.js"></script>
-	<script src="html/js/Mirror_TrafficToggler.js"></script>
-	<script src="html/js/SportAppointmentToggler.js"></script>
-	<script src="html/js/OtherAppointmentToggler.js"></script>
-	<script src="html/js/UniversityAppointmentToggler.js"></script>
-	<script src="html/js/FriendAppointmentToggler.js"></script>
+	<script src="views/js/MirrorToggler.js"></script>
+	<script src="views/js/PanelToggler.js"></script>
+	<script src="views/js/SonosToggler.js"></script>
+	<script src="views/js/Mirror_ClockToggler.js"></script>
+	<script src="views/js/Mirror_CalendarToggler.js"></script>
+	<script src="views/js/Mirror_WeatherToggler.js"></script>
+	<script src="views/js/Mirror_TrafficToggler.js"></script>
+	<script src="views/js/SportAppointmentToggler.js"></script>
+	<script src="views/js/OtherAppointmentToggler.js"></script>
+	<script src="views/js/UniversityAppointmentToggler.js"></script>
+	<script src="views/js/FriendAppointmentToggler.js"></script>
+	<script src="views/js/SonosURI.js"></script>
 
 
 	<!-- wait until Model API is initialized -->
@@ -51,6 +54,7 @@
                         angular.resumeBootstrap([]);
                     });
                 })();
+                //load current checkbox states from the storage API while loading
                 loadMirrorEnabler();
                 loadSonosEnabler();
                 loadPanelEnabler();
@@ -62,6 +66,7 @@
                 loadFriendEnabler();
                 loadSportEnabler();
                 loadUniversityEnabler();
+                loadURI();
             }
         };
     </script>
@@ -84,6 +89,6 @@
 	<script type="text/javascript" src="app/example-app.js"></script>
 	<script type="text/javascript" src="app/example-controller1.js"></script>
 	<script type="text/javascript" src="app/example-controller2.js"></script>
-	<script type="text/javascript" src="app/example-controller3.js"></script>
+	<script type="text/javascript" src="app/example-controller3.js"></script> <!-- own implemented Controller -->
 </body>
 </html>
