@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iolite.app.api.device.access.Device;
 import de.iolite.apps.example.controller.EnvironmentController;
+import de.iolite.apps.example.controller.StorageController;
 import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleEvent;
 import de.iolite.utilities.concurrency.scheduler.Scheduler;
@@ -33,12 +34,16 @@ public class SonosController {
 		
 		@Nonnull
 		private final DailyEvents dailyEvents;
+		
+		@Nonnull 
+		private final StorageController storageController;
 
-		private Configured(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents) {
+		private Configured(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
 			this.sonosDevice = sonos;
 			this.taskScheduler = scheduler;
 			this.environment = environmentController;
 			this.dailyEvents = dailyEvents;
+			this.storageController = storageController;
 		}
 
 		/**
@@ -46,15 +51,15 @@ public class SonosController {
 		 */
 		@Override
 		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents) {
-			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents));
+				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
+			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents, storageController));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents) {
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
 			
 		List<Date> reminders = dailyEvents.getAlarm();
 		
@@ -76,12 +81,17 @@ public class SonosController {
 
 		private void addSong() {
 			
-			if (this.environment.isUserAtHome()) {
-				LOGGER.debug("User is at home, adding song to SONOS");
-				SonosMusic.playSong(this.sonosDevice, this.taskScheduler);
-			}
-			else {
-				LOGGER.debug("User is not at home, SONOS song will not be added.");
+			if (this.storageController.isSonosEnabled()){
+				
+				if (this.environment.isUserAtHome()) {
+					LOGGER.debug("User is at home, adding song to SONOS");
+					SonosMusic.playSong(this.sonosDevice, this.taskScheduler, this.storageController);
+				} else {
+					LOGGER.debug("User is not at home, SONOS song will not be added.");
+				}
+				
+			} else {
+				LOGGER.warn("Sonos is not enabled. Song will not be added.");
 			}
 		}
 
@@ -102,15 +112,15 @@ public class SonosController {
 		 */
 		@Override
 		public void setSonos(@Nonnull final SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents) {
-			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents));
+				@Nonnull final EnvironmentController environmentController, @Nonnull DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
+			context.setState(new Configured(sonos, scheduler, environmentController, dailyEvents, storageController));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents) {
+		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
 			throw new IllegalStateException("Not configured");
 		}
 
@@ -126,9 +136,9 @@ public class SonosController {
 	private interface State {
 
 		void setSonos(@Nonnull SonosController context, @Nonnull final Device sonos, @Nonnull final Scheduler scheduler,
-				@Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents);
+				@Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController);
 
-		void playSongAt(@Nonnull SonosController context, @Nonnull final DailyEvents dailyEvents);
+		void playSongAt(@Nonnull SonosController context, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController);
 	}
 
 	@Nonnull
@@ -137,17 +147,19 @@ public class SonosController {
 	@Nonnull
 	private volatile State state = NotConfigured.INSTANCE;
 
-	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents) {
+	public void setSonos(@Nonnull final Device sonos, @Nonnull final Scheduler scheduler, @Nonnull final EnvironmentController environmentController, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
 		Validate.notNull(sonos, "'sonos' must not be null");
 		Validate.notNull(scheduler, "'scheduler' must not be null");
 		Validate.notNull(environmentController, "'environmentController' must not be null");
 		Validate.notNull(dailyEvents, "'dailyEvents' must not be null");
-		this.state.setSonos(this, sonos, scheduler, environmentController, dailyEvents);
+		Validate.notNull(storageController, "'storageController' must not be null");
+		this.state.setSonos(this, sonos, scheduler, environmentController, dailyEvents, storageController);
 	}
 
-	public void playSongAt(@Nonnull final DailyEvents dailyEvents) {
-		Validate.notNull(dailyEvents, "'date' must not be null");
-		this.state.playSongAt(this, dailyEvents);
+	public void playSongAt(@Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
+		Validate.notNull(dailyEvents, "'dailyEvents' must not be null");
+		Validate.notNull(storageController, "'storagecontroller' must not be null");
+		this.state.playSongAt(this, dailyEvents, storageController);
 	}
 
 	private void setState(@Nonnull final State newState) {

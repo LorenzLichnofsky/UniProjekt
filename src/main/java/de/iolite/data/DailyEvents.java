@@ -125,7 +125,14 @@ public class DailyEvents {
 				todayEventsSorted.add(g);
 		}
 		}
-		List<GoogleEvent> todayEventsReduced = todayEventsSorted.subList(0, 3);	
+		
+		List<GoogleEvent> todayEventsReduced = new ArrayList<>();
+		
+		if (todayEventsSorted.size() >= 3 ){
+			todayEventsReduced = todayEventsSorted.subList(0, 3);	
+		} else {
+			todayEventsReduced = todayEventsSorted;
+		}
 	
 		
 		return new DailyEvents(todayEventsReduced);
