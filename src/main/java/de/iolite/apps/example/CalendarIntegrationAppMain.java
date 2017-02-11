@@ -250,6 +250,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
 					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
 					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
+					boolean sonosURI = "true".equals(getStringorDefault("SonosURI", "http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3"));
 					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
 					
 
