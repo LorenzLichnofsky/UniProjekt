@@ -256,6 +256,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					String sonosURI = getStringorDefault("SonosURI", "http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
 					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
 					
+					
 
 					sonosActive(sonos);
 					mirrorActive(mirror, weather, clock, calendarBool, traffic);
