@@ -1,5 +1,6 @@
 package de.iolite.apps.example.devices;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iolite.app.api.device.DeviceAPIException;
 import de.iolite.app.api.device.access.Device;
+import de.iolite.app.api.device.access.DeviceProperty;
 import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.utilities.concurrency.scheduler.Scheduler;
@@ -46,21 +48,23 @@ public class SonosMusic {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SonosMusic.class);
 
 	private static boolean setMediaURI(@Nonnull final Device device, @Nonnull final String value) {
-		final DeviceStringProperty mediaURI = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
-		if (mediaURI == null) {
-			LOGGER.warn("Device '{}' has no '{}' property, failed to set URI", device.getIdentifier(),
-					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
-			return false;
-		}
-		try {
-			mediaURI.requestValueUpdate(value);
-			LOGGER.debug("Successfully set URI '{}' in device '{}'", value, device.getIdentifier());
-			return true;
-		}
-		catch (final DeviceAPIException e) {
-			LOGGER.error("Failed to set new URI '{}' in device '{}' due to error: {}", value, device.getIdentifier(), e);
-			return false;
-		}
+		//final DeviceStringProperty mediaURI = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+
+//		if (mediaURI == null) {
+//			LOGGER.warn("Device '{}' has no '{}' property, failed to set URI", device.getIdentifier(),
+//					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+//			return false;
+//		}
+//		try {
+//			mediaURI.requestValueUpdate(value);
+//			LOGGER.debug("Successfully set URI '{}' in device '{}'", value, device.getIdentifier());
+//			return true;
+//		}
+//		catch (final DeviceAPIException e) {
+//			LOGGER.error("Failed to set new URI '{}' in device '{}' due to error: {}", value, device.getIdentifier(), e);
+//			return false;
+//		}
+		return true;
 	}
 
 	private static void setValue(@Nonnull final DeviceStringProperty property, @Nonnull final String newValue)
@@ -76,14 +80,20 @@ public class SonosMusic {
 	public static void playSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
 		Validate.notNull(device, "'device' must not be null");
 		Validate.notNull(scheduler, "'scheduler' must not be null");
-		if (!setMediaURI(device, SONG_URI)) {
-			LOGGER.error("Failed to set song URI in device '{}', aborting", device.getIdentifier());
-			return;
+		
+		List<DeviceProperty<?, ?>> properties = device.getProperties();
+		
+		for (DeviceProperty<?, ?> property: properties){
+		LOGGER.debug("DeviceStringProperty: '{}','{}'", property.getPropertyType().getIdentifier(), property.getPropertyType().isWritable());
 		}
-		if (!playMusic(device, scheduler)) {
-			LOGGER.error("Failed properly schedule music playing with device '{}'", device.getIdentifier());
-		}
-		LOGGER.debug("Successfully scheduled music playing with device '{}'", device.getIdentifier());
+//		if (!setMediaURI(device, SONG_URI)) {
+//			LOGGER.error("Failed to set song URI in device '{}', aborting", device.getIdentifier());
+//			return;
+//		}
+//		if (!playMusic(device, scheduler)) {
+//			LOGGER.error("Failed properly schedule music playing with device '{}'", device.getIdentifier());
+//		}
+//		LOGGER.debug("Successfully scheduled music playing with device '{}'", device.getIdentifier());
 	}
 
 	private static boolean playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
