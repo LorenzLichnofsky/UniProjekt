@@ -382,8 +382,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			}
 
 			if (traffic) {
+				trafficActive();
 				final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
 						VIEW_ID_TRAFFIC);
+				LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(1).getLocation());
+				templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(1).getLocation());
 				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 			} // traffic is active
 			if (!traffic) {
@@ -410,6 +413,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			
 		}
 
+	}
+
+	private void trafficActive() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
