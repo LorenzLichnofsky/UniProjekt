@@ -98,12 +98,12 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		@Override
 		public void addedToDevices(final Device device) {
-			LOGGER.debug("a new device added '{}'", device.getIdentifier());
+			//LOGGER.debug("a new device added '{}'", device.getIdentifier());
 		}
 
 		@Override
 		public void removedFromDevices(final Device device) {
-			LOGGER.debug("a device removed '{}'", device.getIdentifier());
+			//LOGGER.debug("a device removed '{}'", device.getIdentifier());
 		}
 	}
 
@@ -371,6 +371,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 		this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
 		try {
+			
 			//initializeDeviceManager();
 			GoogleData calendar_data = new GoogleData();
 			CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
@@ -438,6 +439,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private void initializeDeviceManager() {
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
+		
 
 		// go through all devices, and register a property observer for ON/OFF properties
 		for (final Device device : this.deviceAPI.getDevices()) {
@@ -548,11 +550,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	private final void initializeWebResources()
 			throws FrontendAPIException {
-
+	
 		// go through static assets and register them
 		final Map<URI, PathHandlerPair> assets = StaticResources.scanClasspath("assets", getClass().getClassLoader());
 		this.disposeableAssets = FrontendAPIUtility.registerPublicHandlers(this.frontendAPI, assets);
-
+		
 		// index page
 		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(loadTemplate("assets/index.html"));
 		this.frontendAPI.registerRequestHandler("", indexPageRequestHandler);
