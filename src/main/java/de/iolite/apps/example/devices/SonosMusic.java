@@ -1,163 +1,110 @@
 package de.iolite.apps.example.devices;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iolite.app.api.device.DeviceAPIException;
 import de.iolite.app.api.device.access.Device;
-import de.iolite.app.api.device.access.DeviceBooleanProperty;
-import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanPropertyObserver;
-import de.iolite.app.api.device.access.DeviceProperty;
 import de.iolite.app.api.device.access.DeviceStringProperty;
-import de.iolite.app.api.device.access.DeviceStringProperty.DeviceStringPropertyObserver;
 import de.iolite.drivers.basic.DriverConstants;
-import de.iolite.drivers.basic.DriverConstants.PlaybackState;
+import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 public class SonosMusic {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SonosMusic.class);
-	
-//	public void turnSonosOn (final Device device){
-//
-//		final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_on_ID);
-//		
-//		if (onProperty != null){
-//			final boolean isDeviceOn = onProperty.getValue();
-//			
-//			if (isDeviceOn == false){
-//				
-//				try {
-//					onProperty.requestValueUpdate(true);
-//					onProperty.setObserver(new DeviceBooleanPropertyObserver() {
-//
-//						@Override
-//						public void valueChanged(Boolean value) {
-//							
-//							if (value) {
-//								LOGGER.info("Sonos turned on.");
-//								//playMusic(device);
-//							}
-//							else {
-//								LOGGER.info("Sonos still off.");
-//							}
-//							
-//						}
-//
-//						@Override
-//						public void deviceChanged(Device device) {
-//							// TODO Auto-generated method stub
-//							
-//						}
-//
-//						@Override
-//						public void keyChanged(String key) {
-//							// TODO Auto-generated method stub
-//							
-//						}
-//						
-//					});
-//					
-//				} catch (DeviceAPIException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			} else {
-//				LOGGER.info("Sonos is already on.");
-//			}
-//			
-//		} else {
-//			LOGGER.info("Property not found!");
-//		}
-//		
-//		
-//	}
-	
-	public void playMusic (final Device device){
-		
-//		for (DeviceProperty property: device.getProperties()){
-//			LOGGER.debug("{}", property.getKey());
-//		}
-//		
-		String PLAY = "play";
-		
-		final DeviceStringProperty playMusicProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
 
-		
-		if (playMusicProperty != null){
-			final String musicStatus = playMusicProperty.getValue();
-			LOGGER.debug("Der Status ist: '{}'", musicStatus);
-			
-			if (musicStatus != "play"){
-				try {
-					playMusicProperty.requestValueUpdateFromString(PLAY);
-					playMusicProperty.setObserver(new DeviceStringPropertyObserver() {
+	private static final class StopPlayback implements Runnable {
 
-						@Override
-						public void deviceChanged(Device device) {
-							// TODO Auto-generated method stub
-						}
+		@Nonnull
+		private final DeviceStringProperty playback;
 
-						@Override
-						public void keyChanged(String key) {
-							// TODO Auto-generated method stub
-						}
+		private StopPlayback(@Nonnull final DeviceStringProperty playbackProperty) {
+			this.playback = playbackProperty;
+		}
 
-						@Override
-						public void valueChanged(String status) {
-							LOGGER.debug("Sonos turned status to {}.", musicStatus);
-						}
-						
-					});
-					
-				} catch (DeviceAPIException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else {
-				LOGGER.debug("Current Status is already play.");
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			try {
+				setValue(this.playback, "stop");
 			}
-			
-		} else {
-			LOGGER.info("PlayMusicProperty not found!");
+			catch (final DeviceAPIException e) {
+				LOGGER.error("Failed to stop playback in device '{}' due to error: {}", this.playback.getDevice(), e);
+			}
 		}
 	}
-	
-	public void addSong (final Device device){
-		
-		 final DeviceStringProperty song = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
-		 
-		 if (song != null){
-			 
-			 try {
-				song.requestValueUpdate("http://downloads.hendrik-motza.de/river.mp3");
-				song.setObserver(new DeviceStringPropertyObserver(){
 
-					@Override
-					public void deviceChanged(Device device) {
-						// TODO Auto-generated method stub
-						
-					}
+	@Nonnull
+	private static final String SONG_URI = "http://downloads.hendrik-motza.de/river.mp3";
 
-					@Override
-					public void keyChanged(String key) {
-						// TODO Auto-generated method stub
-						
-					}
+	@Nonnull
+	private static final Logger LOGGER = LoggerFactory.getLogger(SonosMusic.class);
 
-					@Override
-					public void valueChanged(String value) {
-						LOGGER.info("Habe die URI geändert in: {}", value);
-						playMusic(device);
-						
-					}
-					
-				});
-			} catch (DeviceAPIException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}				
-		 
-		 }
+	private static boolean setMediaURI(@Nonnull final Device device, @Nonnull final String value) {
+		final DeviceStringProperty mediaURI = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+		if (mediaURI == null) {
+			LOGGER.warn("Device '{}' has no '{}' property, failed to set URI", device.getIdentifier(),
+					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_mediaURI_ID);
+			return false;
+		}
+		try {
+			mediaURI.requestValueUpdate(value);
+			LOGGER.debug("Successfully set URI '{}' in device '{}'", value, device.getIdentifier());
+			return true;
+		}
+		catch (final DeviceAPIException e) {
+			LOGGER.error("Failed to set new URI '{}' in device '{}' due to error: {}", value, device.getIdentifier(), e);
+			return false;
+		}
+	}
+
+	private static void setValue(@Nonnull final DeviceStringProperty property, @Nonnull final String newValue)
+			throws DeviceAPIException {
+		if (newValue.equals(property.getValue())) {
+			LOGGER.debug("Property '{}' already has value '{}', skipping requestValueUpdate call", property.getKey(), newValue);
+			return;
+		}
+		property.requestValueUpdate(newValue);
+		LOGGER.trace("Requested value update in property '{}' for new value '{}'", property.getKey(), newValue);
+	}
+
+	public static void playSong(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+		Validate.notNull(device, "'device' must not be null");
+		Validate.notNull(scheduler, "'scheduler' must not be null");
+		if (!setMediaURI(device, SONG_URI)) {
+			LOGGER.error("Failed to set song URI in device '{}', aborting", device.getIdentifier());
+			return;
+		}
+		if (!playMusic(device, scheduler)) {
+			LOGGER.error("Failed properly schedule music playing with device '{}'", device.getIdentifier());
+		}
+		LOGGER.debug("Successfully scheduled music playing with device '{}'", device.getIdentifier());
+	}
+
+	private static boolean playMusic(@Nonnull final Device device, @Nonnull final Scheduler scheduler) {
+		final DeviceStringProperty playbackState = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
+		if (playbackState == null) {
+			LOGGER.error("Device '{}' has no '{}' property, music will not be played", device.getIdentifier(),
+					DriverConstants.PROFILE_PROPERTY_MediaPlayerDevice_playbackState_ID);
+			return false;
+		}
+
+		try {
+			setValue(playbackState, "play");
+			LOGGER.debug("Requested change of playback state of device '{}' to play.", device.getIdentifier());
+		}
+		catch (final DeviceAPIException e) {
+			LOGGER.error("Failed to change playback state of device '{}' to play due to error: {}", device.getIdentifier(), e);
+			return false;
+		}
+
+		scheduler.schedule(new StopPlayback(playbackState), 30, TimeUnit.SECONDS);
+		LOGGER.debug("Scheduled playback stop for device '{}'", device.getIdentifier());
+		return true;
 	}
 }
-

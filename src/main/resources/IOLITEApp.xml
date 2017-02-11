@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:iolite-app-configuration
 	xmlns:ns2="www.iolite.de/iolite-app-configuration"
-	name="Calendar Integration App"
+	name="Calendar Integration"
 	className="de.iolite.apps.example.CalendarIntegrationAppMain">
 
 	<api-permission name="de.iolite.app.api.frontend.FrontendAPI" type="READ_WRITE"/>
@@ -12,7 +12,7 @@
 	<api-permission name="de.iolite.app.api.network.NetworkAPI" type="READ_WRITE"/>
 	<api-permission name="de.iolite.api.heating.access.HeatingAPI" type="READ_WRITE"/>
 
-	<icon-url>appicon2.jpg</icon-url>
+	<icon-url>app-icon-calendar.png</icon-url>
 
 	<preferred-width>0</preferred-width>
 	<preferred-height>0</preferred-height>

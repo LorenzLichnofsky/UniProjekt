@@ -1,3 +1,9 @@
+/**
+ * Taken from Hendrik Motza
+ * aligns the view depending on which corner the user wants to place the view
+ * 
+ */
+
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

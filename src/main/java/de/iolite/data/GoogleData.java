@@ -14,6 +14,8 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event.Reminders;
 
+import de.iolite.apps.example.devices.SonosController;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,6 +60,9 @@ public class GoogleData {
 	/** Global instance of the required scopes */
 	private static final List<String> SCOPES = Arrays
 			.asList(CalendarScopes.CALENDAR_READONLY);
+	
+	/** Instance of Sonos Controller */
+	SonosController controller;
 
 	/** Initializing HTTP_TRANSPORT and DATA_STORE_FACTORY */
 	static {
@@ -137,9 +142,9 @@ public class GoogleData {
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
-		Events events = service.events().list("primary").setMaxResults(5)
+		Events events = service.events().list("primary").setMaxResults(3)
 				.setTimeMin(now)
-				// .setTimeMax(latest)
+				.setTimeMax(latest)
 				.setOrderBy("startTime").setSingleEvents(true).execute();
 
 		List<Event> items = events.getItems();
@@ -180,17 +185,14 @@ public class GoogleData {
 				if (color != null) {
 					switch (color) {
 					case "5":
-						status = "Freetime Appointment";
+						status = "Friend";
 						break;
 
-					case "9":
-						status = "Special Event";
-						break;
 					case "10":
-						status = "Sports";
+						status = "Sport";
 						break;
 					case "11":
-						status = "Work";
+						status = "University";
 						break;
 					default:
 						status = "Other";
@@ -198,7 +200,7 @@ public class GoogleData {
 				}
 
 				if (color == null)
-					status = "Special Event";
+					status = "Other";
 
 				today.setColor(status);
 
@@ -246,7 +248,11 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					//System.out.println("keine Gäste!");
+					
+					/**
+					 * do something else. Attendee in general not used by our group
+					 */
+					
 				} // if
 
 				allToday.add(today);
@@ -264,10 +270,6 @@ public class GoogleData {
 
 	}		
 
-	public static void main(String[] args) throws IOException, ParseException,
-			GeneralSecurityException, URISyntaxException {
-		new GoogleData().getData();
-
-	}
+	
 
 }
