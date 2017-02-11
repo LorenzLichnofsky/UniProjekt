@@ -192,8 +192,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	/** sonos assets */
 	SonosController sonosController = new SonosController();
 	
-	//TODO scheduler problem lösen
-	// Scheduler scheduler;
+
 
 	/**
 	 * Mirror variables basic idea is taken over from Hendrik Motza from
@@ -232,7 +231,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	DailyEvents calendar = null;
 	
+	
+	//TODO scheduler problem lösen
+	Scheduler scheduler;
 	private ScheduledFuture<?> calendarUpdateThread = null;
+	
 	private ViewRegistrator viewRegistrator;
 
 	String temperature = "0";
@@ -284,7 +287,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		try {
 
 			// Scheduler 
-			// this.scheduler = context.getScheduler();
+			this.scheduler = context.getScheduler();
 
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
@@ -328,8 +331,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			deviceAPI.setObserver(this.viewRegistrator);
 			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
+			LOGGER.warn("Before");
 			/** scheduler that updates the calendar information every 15 min */
-			this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
+			this.calendarUpdateThread = scheduler.scheduleAtFixedRate(() -> {
+				
 
 				// TODO
 
@@ -339,6 +344,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					 * Update storage API and based on user interface settings
 					 * update device functionalities
 					 */
+					LOGGER.warn("Here");
 					this.storageAPI = context.getAPI(StorageAPI.class);
 					boolean mirror = this.storageAPI.loadString("Mirror").equals("true");
 					boolean weather = this.storageAPI.loadString("Mirror_Weather").equals("true");
@@ -366,6 +372,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					LOGGER.error("IOException!", e);
 				} catch (ParseException e) {
 					LOGGER.error("ParseException!", e);
+				}catch (IllegalStateException e) {
+					LOGGER.error("IllegalStateException!", e);
 				}
 				
 				
@@ -402,12 +410,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private void sonosActive(boolean sonos)
 			throws IOException, ParseException, GeneralSecurityException, URISyntaxException {
 		
-//		if (sonos) {
-//			GoogleData calendar_data = new GoogleData();
-//			this.calendar = calendar_data.getData();
-//			this.sonosController.playSongAt(this.calendar);
-//		} 
-
+		if (sonos) {
+			GoogleData calendar_data = new GoogleData();
+			this.calendar = calendar_data.getData();
+			this.sonosController.playSongAt(this.calendar);
+		}
 	}
 
 	/**
@@ -552,24 +559,46 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	/**
 	 * Example method showing how to use the Device API.
 	 */
+
 	private void initializeDeviceManager() {
-		
-		//TODO wieder einfügen und scheduler problem lösen
 		
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
+		//Find Driver of the Sonos Box and make Settings in the sonosController Class
+		for (final Device device : this.deviceAPI.getDevices()) {
+			
+			if (device.getIdentifier().equals("sonos-driver.jar/RINCON_B8E9373AD10E01400")) {
+				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
+				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
+			} 
+		}
+
+	}
+
+		
+		
+//		// go through all devices
 //		for (final Device device : this.deviceAPI.getDevices()) {
 //
-//			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)) {
-//				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI),
-//						calendar);
-//				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
-//			} else {
-//				LOGGER.warn("No sonos box found!");
+//			// final DeviceBooleanProperty onProperty =
+//			// device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
+//
+//			LOGGER.warn("Devices known'{}'", device.getName());
+//
+//			// Get Weather
+//			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
+//				LOGGER.warn("ItemWeatherStation");
+//				final DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
+//
+//				if (temp != null && temp.getValue() != null) {
+//					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
+//					this.temperature = temp.getValue().toString();
+//				}
 //			}
+//
 //		}
-	}
+
 
 	/**
 	 * Loading Checkbox values from StorageAPI
