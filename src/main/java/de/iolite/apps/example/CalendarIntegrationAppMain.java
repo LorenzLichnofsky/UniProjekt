@@ -9,9 +9,12 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.iolite.api.IOLITEAPINotResolvableException;
 import de.iolite.api.IOLITEAPIProvider;
 import de.iolite.api.IOLITEPermissionDeniedException;
@@ -30,6 +33,7 @@ import de.iolite.app.api.user.access.UserAPI;
 import de.iolite.apps.example.ViewRegistrator.ResourcePackageConfig;
 import de.iolite.apps.example.ViewRegistrator.TemplateConfig;
 import de.iolite.apps.example.controller.EnvironmentController;
+import de.iolite.apps.example.controller.StorageController;
 import de.iolite.apps.example.devices.SonosController;
 import de.iolite.apps.example.internals.PageWithEmbeddedSessionTokenRequestHandler;
 import de.iolite.common.lifecycle.exception.CleanUpFailedException;
@@ -88,8 +92,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	/** sonos assets */
 	SonosController sonosController = new SonosController();
-	
-
+	StorageController storageController;
 
 	/**
 	 * Mirror variables basic idea is taken over from Hendrik Motza from
@@ -250,12 +253,12 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
 					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
 					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
-					boolean sonosURI = "true".equals(getStringorDefault("SonosURI", "http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3"));
+					String sonosURI = getStringorDefault("SonosURI", "http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
 					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
 					
 
-					mirrorActive(mirror, weather, clock, calendarBool, traffic);
 					sonosActive(sonos);
+					mirrorActive(mirror, weather, clock, calendarBool, traffic);
 
 				} catch (final MirrorApiException e) {
 					LOGGER.error("MirrorApiException", e);
@@ -314,7 +317,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		if (sonos) {
 			GoogleData calendar_data = new GoogleData();
 			this.calendar = calendar_data.getData();
-			this.sonosController.playSongAt(this.calendar);
+			this.sonosController.playSongAt(this.calendar, this.storageController);
 		}
 	}
 
@@ -489,7 +492,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			LOGGER.debug(device.getIdentifier());
 			
 			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
-				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
+				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar, this.storageController);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			} 
 		}
@@ -503,7 +506,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws StorageAPIException
 	 */
 	private void initializeStorage() throws StorageAPIException {
-
+		
+		this.storageController = new StorageController(this.storageAPI);
+		
 		try {
 			LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
 			LOGGER.debug("loading 'control_panel' from storage: {}",
