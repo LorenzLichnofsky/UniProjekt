@@ -427,6 +427,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws StorageAPIException
 	 * @throws IOException
 	 * @throws ParseException
+	 *
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
 	 */
