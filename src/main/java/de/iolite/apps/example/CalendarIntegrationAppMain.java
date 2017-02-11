@@ -62,7 +62,6 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
-
 	private static final class DeviceAddAndRemoveLogger implements DeviceAPIObserver {
 
 		@Override
@@ -75,7 +74,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			LOGGER.debug("a device removed '{}'", device.getIdentifier());
 		}
 	}
-
 
 	@Nonnull
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIntegrationAppMain.class);
@@ -118,11 +116,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private static final String ICON_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic-icon.jpg";
 	private static final String VIEW_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic.html";
 	private static final String VIEW_WEBPATH_TRAFFIC = "traffic.html";
-	
-	private static final String VIEW_ID_EMPTY_TRAFFIC = "EmptyTrafficView";
 	private static final String VIEW_RESPATH_EMPTY_TRAFFIC = VIEW_RESOURCES + "empty_traffic.html";
-	private static final String VIEW_WEBPATH_EMPTY_TRAFFIC = "empty_traffic.html";
-	
 
 	private static final String VIEW_ID_WEATHER = "WeatherView";
 	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
@@ -130,17 +124,14 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
 
 	DailyEvents calendar = null;
-	
-	
-	//TODO scheduler problem lösen
+
+	// TODO scheduler problem lösen
 	Scheduler scheduler;
 	private ScheduledFuture<?> calendarUpdateThread = null;
-	
+
 	private ViewRegistrator viewRegistrator;
 
 	String temperature = "0";
-
-	
 
 	/**
 	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public,
@@ -186,7 +177,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 		try {
 
-			// Scheduler 
+			// Scheduler
 			this.scheduler = context.getScheduler();
 
 			// use User API
@@ -231,12 +222,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			deviceAPI.setObserver(this.viewRegistrator);
 			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
-			LOGGER.warn("Before");
 			/** scheduler that updates the calendar information every 15 min */
 			this.calendarUpdateThread = scheduler.scheduleAtFixedRate(() -> {
-				
 
-				// TODO
 
 				try {
 
@@ -244,19 +232,18 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					 * Update storage API and based on user interface settings
 					 * update device functionalities
 					 */
-					LOGGER.warn("Here");
+
 					this.storageAPI = context.getAPI(StorageAPI.class);
-					
+
 					boolean mirror = "true".equals(getStringorDefault("Mirror", "false"));
 					boolean weather = "true".equals(getStringorDefault("Mirror_Weather", "false"));
 					boolean clock = "true".equals(getStringorDefault("Mirror_Clock", "false"));
 					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
 					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
 					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
-					String sonosURI = getStringorDefault("SonosURI", "http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
+					String sonosURI = getStringorDefault("SonosURI",
+							"http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
 					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
-					
-					
 
 					sonosActive(sonos);
 					mirrorActive(mirror, weather, clock, calendarBool, traffic);
@@ -277,12 +264,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					LOGGER.error("IOException!", e);
 				} catch (ParseException e) {
 					LOGGER.error("ParseException!", e);
-				}catch (IllegalStateException e) {
+				} catch (IllegalStateException e) {
 					LOGGER.error("IllegalStateException!", e);
 				}
-				
-				
-			//TODO 1 to 15 min	
+
+				// TODO 1 to 15 min
 			}, 0, 1, TimeUnit.MINUTES);
 
 			LOGGER.debug("Mirror Views got registered!");
@@ -304,7 +290,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	}
 
 	/**
-	 * sonos is true if sonos box has been activated by user. latest calendar information is send to sonos controller
+	 * sonos is true if sonos box has been activated by user. latest calendar
+	 * information is send to sonos controller
+	 * 
 	 * @param sonos
 	 * 
 	 * @throws IOException
@@ -314,7 +302,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	private void sonosActive(boolean sonos)
 			throws IOException, ParseException, GeneralSecurityException, URISyntaxException {
-		
+
 		if (sonos) {
 			GoogleData calendar_data = new GoogleData();
 			this.calendar = calendar_data.getData();
@@ -323,7 +311,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	}
 
 	/**
-	 * input parameters are true if views are selected by the user. latest calendar information is send to views.
+	 * input parameters are true if views are selected by the user. latest
+	 * calendar information is send to views.
+	 * 
 	 * @param mirror
 	 * @param weather
 	 * @param clock
@@ -343,7 +333,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			if (calendarBool) {
 
 				getCalendar();
-				
+
 				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
 						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 				templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
@@ -387,15 +377,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 			if (traffic) {
 				trafficActive();
-				final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
-						VIEW_ID_TRAFFIC);
-				LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(1).getLocation());
-				templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(1).getLocation());
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 			} // traffic is active
 			if (!traffic) {
 				final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
-						VIEW_WEBPATH_EMPTY_TRAFFIC, VIEW_ID_EMPTY_TRAFFIC);
+						VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+				templateConf_traffic.putReplacement("{TRAFFIC}", "&nbsp;");
 				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 			}
 
@@ -404,29 +390,61 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 			templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
 			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
-			
+
 			final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
 					VIEW_ID_CLOCK);
 			templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
 			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
-			
-			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
-					VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+
+			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER,
+					VIEW_ID_WEATHER);
 			templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
 			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
-			
+
+			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+
 		}
 
 	}
 
+	/**
+	 * method to find the next upcoming event location
+	 */
 	private void trafficActive() {
-		// TODO Auto-generated method stub
+		
+
+		for (int i = 0; i < this.calendar.getTodayEvents().size(); i++) {
+
+			long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
+			
+			if (time > 0) {
+				LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(i).getLocation().split(",")[0]);
+				if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
+					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+							VIEW_ID_TRAFFIC);
+					templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(i).getLocation());	
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+					break;
+				} // unknown location
+				else {
+					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+							VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+					templateConf_traffic.putReplacement("{TRAFFIC}", "The Location has not been clearly specified by the user.");
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
+					break;
+				} // else
+			} // if 
+		}
 		
 	}
 
 	/**
-	 * get latest calendar data and sort out events by types sport, friends, university and other.
-	 *  In case not all views are required this method reduces the events
+	 * get latest calendar data and sort out events by types sport, friends,
+	 * university and other. In case not all views are required this method
+	 * reduces the events
+	 * 
 	 * @throws IOException
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
@@ -436,7 +454,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			throws IOException, ParseException, GeneralSecurityException, URISyntaxException, StorageAPIException {
 		GoogleData calendar_data = new GoogleData();
 		DailyEvents fulldata = calendar_data.getData();
-		
+
 		boolean sport = "true".equals(getStringorDefault("Sport", "false"));
 		boolean friend = "true".equals(getStringorDefault("Friend", "false"));
 		boolean uni = "true".equals(getStringorDefault("University", "false"));
@@ -481,7 +499,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		if (this.disposeableAssets != null) {
 			this.disposeableAssets.dispose();
 		}
-		// TODO 
+		// TODO
 		this.calendarUpdateThread.cancel(false);
 		LOGGER.debug("Stopped");
 	}
@@ -491,23 +509,24 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 
 	private void initializeDeviceManager() {
-		
+
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 
-		//Find Driver of the Sonos Box and make Settings in the sonosController Class
+		// Find Driver of the Sonos Box and make Settings in the sonosController
+		// Class
 		for (final Device device : this.deviceAPI.getDevices()) {
-			
+
 			LOGGER.debug(device.getIdentifier());
-			
+
 			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
-				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar, this.storageController);
+				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI),
+						calendar, this.storageController);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
-			} 
+			}
 		}
 
 	}
-
 
 	/**
 	 * Loading Checkbox values from StorageAPI
@@ -515,9 +534,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws StorageAPIException
 	 */
 	private void initializeStorage() throws StorageAPIException {
-		
+
 		this.storageController = new StorageController(this.storageAPI);
-		
+
 		try {
 			LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
 			LOGGER.debug("loading 'control_panel' from storage: {}",
@@ -545,14 +564,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 
 	}
-	
+
 	/**
-	 * Read out storage value or set default value in case no value is stored yet
+	 * Read out storage value or set default value in case no value is stored
+	 * yet
+	 * 
 	 * @param key
 	 * @param defaultvalue
 	 * @return
 	 */
-	public String getStringorDefault(String key, String defaultvalue){
+	public String getStringorDefault(String key, String defaultvalue) {
 		try {
 			return this.storageAPI.loadString(key);
 		} catch (StorageAPIException e) {

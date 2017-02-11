@@ -4,17 +4,17 @@
 <!DOCTYPE html>
 <html>
   <head>
+  	<meta charset="utf-8">
     <title>Traffic view</title>
-
-  <!-- Bootstrap Core CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="css/style.css">
   </head>
   <body>
-
-      <div>Traffic situation to next appointment:</div><br>
-      <div id="output"></div>
+  	
+	  <div id="center" class="traffic">
+      Traffic situation to next appointment:<br>
+      <div id="output"></div> 
       <div id="map" style= "display:none"></div>
+      </div>
     
     
       <script>
@@ -82,9 +82,10 @@
 	        for (var j = 0; j < results.length; j++) {
 	          geocoder.geocode({'address': destinationList[j]},
 	              showGeocodedAddressOnMap(true));
-	          outputDiv.innerHTML += originList[i] + ' to ' + destinationList[j] +
-	              ': ' + results[j].distance.text + ' in ' +
-	              results[j].duration.text + '<br>';
+	          outputDiv.innerHTML += 
+	        	  'destination: ' + destinationList[j].split(",")[0] + '<br>'
+	          + 'distance: ' + results[j].distance.text + '<br>'
+	          + 'travelling time: ' + results[j].duration.text;
 	        }
 	      }
 	    }
@@ -101,6 +102,11 @@
     </script>
  		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCW-qjNMDGn4152nmzNTIl2oKjVVDWPYQ&signed_in=true&callback=initMap"
         async defer></script> 
+        
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!-- Bootstrap Core JavaScript -->
+  <script src="js/bootstrap.min.js"></script>
+  <!--  Custom JavaScript-->
     <script src="js/alignment.js"></script>
   </body>
 </html>
