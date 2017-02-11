@@ -1,8 +1,6 @@
 package de.iolite.apps.example;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
@@ -12,9 +10,6 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.iolite.api.IOLITEAPINotResolvableException;
@@ -26,10 +21,8 @@ import de.iolite.app.api.device.access.DeviceAPI;
 import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
-import de.iolite.app.api.environment.Location;
 import de.iolite.app.api.frontend.FrontendAPI;
 import de.iolite.app.api.frontend.FrontendAPIException;
-import de.iolite.app.api.frontend.util.FrontendAPIRequestHandler;
 import de.iolite.app.api.frontend.util.FrontendAPIUtility;
 import de.iolite.app.api.storage.StorageAPI;
 import de.iolite.app.api.storage.StorageAPIException;
@@ -43,11 +36,7 @@ import de.iolite.common.lifecycle.exception.CleanUpFailedException;
 import de.iolite.common.lifecycle.exception.InitializeFailedException;
 import de.iolite.common.lifecycle.exception.StartFailedException;
 import de.iolite.common.lifecycle.exception.StopFailedException;
-import de.iolite.common.requesthandler.HTTPStatus;
-import de.iolite.common.requesthandler.IOLITEHTTPRequest;
 import de.iolite.common.requesthandler.IOLITEHTTPRequestHandler;
-import de.iolite.common.requesthandler.IOLITEHTTPResponse;
-import de.iolite.common.requesthandler.IOLITEHTTPStaticResponse;
 import de.iolite.common.requesthandler.StaticResources;
 import de.iolite.common.requesthandler.StaticResources.PathHandlerPair;
 import de.iolite.data.DailyEvents;
@@ -69,18 +58,6 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
-//	private static final class DeviceJSONRequestHandler extends FrontendAPIRequestHandler {
-//
-//		@Override
-//		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-//			final JSONArray deviceIdentifiers = new JSONArray();
-//
-//			final JSONObject response = new JSONObject();
-//			response.put("identifiers", deviceIdentifiers);
-//			return new IOLITEHTTPStaticResponse(response.toString(), HTTPStatus.OK,
-//					IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-//		}
-//	}
 
 	private static final class DeviceAddAndRemoveLogger implements DeviceAPIObserver {
 
@@ -95,86 +72,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 	}
 
-	/**
-	 * A response handler returning devices filtered by the property type.
-	 */
-//	class DevicesResponseHandler extends FrontendAPIRequestHandler {
-//
-//		@Override
-//		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-//			String propertyType;
-//			try {
-//				propertyType = new JSONObject(readPassedData(request)).getString("propertyType");
-//			} catch (final JSONException e) {
-//				LOGGER.error("Could not handle devices request due to a JSON error: {}", e.getMessage(), e);
-//				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
-//			} catch (final IOException e) {
-//				LOGGER.error("Could not handle devices request due to an I/O error: {}", e.getMessage(), e);
-//				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
-//			}
-//
-//			final JSONArray jsonDeviceArray = new JSONArray();
-//			for (final Device device : CalendarIntegrationAppMain.this.deviceAPI.getDevices()) {
-//				if (device.getProperty(propertyType) != null) {
-//					// device has the correct property type
-//					final JSONObject jsonDeviceObject = new JSONObject();
-//					jsonDeviceObject.put("name", device.getName());
-//					jsonDeviceObject.put("identifier", device.getIdentifier());
-//					jsonDeviceArray.put(jsonDeviceObject);
-//				}
-//			}
-//
-//			final JSONObject response = new JSONObject();
-//			response.put("devices", jsonDeviceArray);
-//			return new IOLITEHTTPStaticResponse(response.toString(), IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-//		}
-//
-//		private String getCharset(final IOLITEHTTPRequest request) {
-//			final String charset = request.getCharset();
-//			return charset == null || charset.length() == 0 ? IOLITEHTTPStaticResponse.ENCODING_UTF8 : charset;
-//		}
-//
-//		private String readPassedData(final IOLITEHTTPRequest request) throws IOException {
-//			final String charset = getCharset(request);
-//			try (BufferedReader bufferedReader = new BufferedReader(
-//					new InputStreamReader(request.getContent(), charset))) {
-//				final StringBuilder stringBuilder = new StringBuilder();
-//				String line;
-//				while ((line = bufferedReader.readLine()) != null) {
-//					stringBuilder.append(line);
-//				}
-//				return stringBuilder.toString();
-//			}
-//		}
-//	}
-
-	/**
-	 * A response handler for returning the "not found" response.
-	 */
-//	static class NotFoundResponseHandler extends FrontendAPIRequestHandler {
-//
-//		@Override
-//		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-//			return new IOLITEHTTPStaticResponse(HTTPStatus.NotFound, IOLITEHTTPResponse.HTML_CONTENT_TYPE);
-//		}
-//	}
-
-	/**
-	 * A response handler returning all rooms as JSON array.
-	 */
-//	class RoomsResponseHandler extends FrontendAPIRequestHandler {
-//
-//		@Override
-//		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-//			final JSONArray locationNames = new JSONArray();
-//			for (final Location location : CalendarIntegrationAppMain.this.environmentAPI.getLocations()) {
-//				locationNames.put(location.getName());
-//			}
-//			final JSONObject response = new JSONObject();
-//			response.put("rooms", locationNames);
-//			return new IOLITEHTTPStaticResponse(response.toString(), IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-//		}
-//	}
 
 	@Nonnull
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIntegrationAppMain.class);
@@ -346,12 +243,15 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					 */
 					LOGGER.warn("Here");
 					this.storageAPI = context.getAPI(StorageAPI.class);
-					boolean mirror = this.storageAPI.loadString("Mirror").equals("true");
-					boolean weather = this.storageAPI.loadString("Mirror_Weather").equals("true");
-					boolean clock = this.storageAPI.loadString("Mirror_Clock").equals("true");
-					boolean calendarBool = this.storageAPI.loadString("Mirror_Calendar").equals("true");
-					boolean traffic = this.storageAPI.loadString("Mirror_Traffic").equals("true");
-					boolean sonos = this.storageAPI.loadString("Sonos").equals("true");
+					
+					boolean mirror = "true".equals(getStringorDefault("Mirror", "false"));
+					boolean weather = "true".equals(getStringorDefault("Mirror_Weather", "false"));
+					boolean clock = "true".equals(getStringorDefault("Mirror_Clock", "false"));
+					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
+					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
+					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
+					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
+					
 
 					mirrorActive(mirror, weather, clock, calendarBool, traffic);
 					sonosActive(sonos);
@@ -438,7 +338,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			if (calendarBool) {
 
 				getCalendar();
-
+				
 				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
 						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 				templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
@@ -491,6 +391,22 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 			}
 
+		} else {
+			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
+					VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+			templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+			
+			final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
+					VIEW_ID_CLOCK);
+			templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+			
+			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
+					VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+			templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+			
 		}
 
 	}
@@ -507,11 +423,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			throws IOException, ParseException, GeneralSecurityException, URISyntaxException, StorageAPIException {
 		GoogleData calendar_data = new GoogleData();
 		DailyEvents fulldata = calendar_data.getData();
-
-		boolean sport = this.storageAPI.loadString("Sport").equals("true");
-		boolean friend = this.storageAPI.loadString("Friend").equals("true");
-		boolean uni = this.storageAPI.loadString("University").equals("true");
-		boolean other = this.storageAPI.loadString("Other").equals("true");
+		
+		boolean sport = "true".equals(getStringorDefault("Sport", "false"));
+		boolean friend = "true".equals(getStringorDefault("Friend", "false"));
+		boolean uni = "true".equals(getStringorDefault("University", "false"));
+		boolean other = "true".equals(getStringorDefault("Other", "false"));
 
 		CalendarIntegrationAppMain.this.calendar = fulldata.sortOut(sport, friend, uni, other);
 
@@ -571,36 +487,13 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			
 			LOGGER.debug(device.getIdentifier());
 			
-			if (device.getIdentifier().equals("RINCON_B8E93750749401400")) {
+			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
 				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI), calendar);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			} 
 		}
 
 	}
-
-		
-		
-//		// go through all devices
-//		for (final Device device : this.deviceAPI.getDevices()) {
-//
-//			// final DeviceBooleanProperty onProperty =
-//			// device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-//
-//			LOGGER.warn("Devices known'{}'", device.getName());
-//
-//			// Get Weather
-//			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
-//				LOGGER.warn("ItemWeatherStation");
-//				final DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
-//
-//				if (temp != null && temp.getValue() != null) {
-//					LOGGER.warn("DIE TEMPERATUR IST:  '{}'", temp.getValue());
-//					this.temperature = temp.getValue().toString();
-//				}
-//			}
-//
-//		}
 
 
 	/**
@@ -637,6 +530,25 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 
 	}
+	
+	/**
+	 * Read out storage value or set default value in case no value is stored yet
+	 * @param key
+	 * @param defaultvalue
+	 * @return
+	 */
+	public String getStringorDefault(String key, String defaultvalue){
+		try {
+			return this.storageAPI.loadString(key);
+		} catch (StorageAPIException e) {
+			try {
+				this.storageAPI.saveString(key, defaultvalue);
+			} catch (StorageAPIException e1) {
+				LOGGER.error("Can't write value for key", e1);
+			}
+			return defaultvalue;
+		}
+	}
 
 	/**
 	 * Registering web resources.
@@ -656,14 +568,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		this.frontendAPI.registerRequestHandler("", indexPageRequestHandler);
 		this.frontendAPI.registerRequestHandler("index.html", indexPageRequestHandler);
 
-		// default handler returning a not found status
-		//this.frontendAPI.registerDefaultRequestHandler(new NotFoundResponseHandler());
-
-		// example JSON request handlers
-		//this.frontendAPI.registerRequestHandler("rooms", new RoomsResponseHandler());
-		//this.frontendAPI.registerRequestHandler("devices", new DevicesResponseHandler());
-
-		//this.frontendAPI.registerRequestHandler("get_devices.json", new DeviceJSONRequestHandler());
 	}
 
 	/**

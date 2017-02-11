@@ -31,12 +31,6 @@ function loadMirror_CalendarEnabler(){
 	            var calendar_status_as_bool = (calendar_status === 'true');
 	              $(document).ready(function() {
 	                $('#mirror-4').prop('checked', calendar_status_as_bool);
-           
-		    		 // TODO if calendar is true in storage, show the event container below when loading the app
-		    		 if ($('#mirror-4').is(':checked')){
-		  		    	
-
-		    		 }
 
 	              });
 	          },

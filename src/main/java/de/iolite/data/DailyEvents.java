@@ -85,6 +85,7 @@ public class DailyEvents {
 						+ replaceUmlaute(shortlocation)
 						+ "<br/> " + dummy.begin.get(Calendar.HOUR_OF_DAY) + start
 						+ " - " + dummy.end.get(Calendar.HOUR_OF_DAY) + ende;
+						
 	
 						event += "<br/>" + "<br/>";
 
@@ -109,7 +110,7 @@ public class DailyEvents {
 		List<GoogleEvent> todayEventsSorted = new ArrayList<GoogleEvent>();
 		
 		if(sport && friend && uni && other)
-			this.todayEvents = todayEventsSorted;
+			todayEventsSorted = this.todayEvents;
 		
 		else{
 		for (int i = 0; i<this.todayEvents.size(); i++){
@@ -124,9 +125,10 @@ public class DailyEvents {
 				todayEventsSorted.add(g);
 		}
 		}
+		List<GoogleEvent> todayEventsReduced = todayEventsSorted.subList(0, 3);	
+	
 		
-		
-		return new DailyEvents(todayEventsSorted);
+		return new DailyEvents(todayEventsReduced);
 	}
 
 	/**

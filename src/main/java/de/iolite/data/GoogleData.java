@@ -142,7 +142,7 @@ public class GoogleData {
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
-		Events events = service.events().list("primary").setMaxResults(3)
+		Events events = service.events().list("primary").setMaxResults(12)
 				.setTimeMin(now)
 				.setTimeMax(latest)
 				.setOrderBy("startTime").setSingleEvents(true).execute();
@@ -180,6 +180,10 @@ public class GoogleData {
 
 				// get the color of the event to define the event type
 				String color = event.getColorId();
+				if (color == null){
+					color = "7";					
+				}
+
 				String status = "";
 
 				if (color != null) {
@@ -199,8 +203,7 @@ public class GoogleData {
 					}
 				}
 
-				if (color == null)
-					status = "Other";
+				
 
 				today.setColor(status);
 
