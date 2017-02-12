@@ -11,7 +11,7 @@
   <body>
   	
 	  <div id="center" class="traffic">
-      Traffic situation to next appointment:<br>
+      Traffic information for upcoming appointment:<br><br>
       <div id="output"></div> 
       <div id="map" style= "display:none"></div>
       </div>
@@ -83,9 +83,9 @@
 	          geocoder.geocode({'address': destinationList[j]},
 	              showGeocodedAddressOnMap(true));
 	          outputDiv.innerHTML += 
-	        	  'destination: ' + destinationList[j].split(",")[0] + '<br>'
-	          + 'distance: ' + results[j].distance.text + '<br>'
-	          + 'travelling time: ' + results[j].duration.text;
+	        	  'destination: ' + '&nbsp;' + destinationList[j].split(",")[0] + '<br>'
+	          + 'distance: ' + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + results[j].distance.text + '<br>'
+	          + 'travel time: ' + '&nbsp;&nbsp;' + results[j].duration.text;
 	        }
 	      }
 	    }
