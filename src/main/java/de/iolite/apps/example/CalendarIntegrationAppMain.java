@@ -116,7 +116,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private static final String ICON_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic-icon.jpg";
 	private static final String VIEW_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic.html";
 	private static final String VIEW_WEBPATH_TRAFFIC = "traffic.html";
+	
 	private static final String VIEW_RESPATH_EMPTY_TRAFFIC = VIEW_RESOURCES + "empty_traffic.html";
+	private static final String VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC = VIEW_RESOURCES + "no_appointment_traffic.html";
 
 	private static final String VIEW_ID_WEATHER = "WeatherView";
 	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
@@ -403,6 +405,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
 					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+			templateConf_traffic.putReplacement("{TRAFFIC}", "&nbsp;");
 			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 
 		}
@@ -413,30 +416,42 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * method to find the next upcoming event location
 	 */
 	private void trafficActive() {
-		
 
-		for (int i = 0; i < this.calendar.getTodayEvents().size(); i++) {
-
-			long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
+		if (this.calendar.getTodayEvents().isEmpty() || this.calendar.getTodayEvents() == null){
 			
-			if (time > 0) {
-				LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(i).getLocation().split(",")[0]);
-				if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
-					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
-							VIEW_ID_TRAFFIC);
-					templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(i).getLocation());	
-					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
-					break;
-				} // unknown location
-				else {
-					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
-							VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
-					templateConf_traffic.putReplacement("{TRAFFIC}", "The Location has not been clearly specified by the user.");
-					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
-					break;
-				} // else
-			} // if 
+			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC,
+					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+			templateConf_traffic.putReplacement("{TRAFFIC}", "No traffic information.");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
 		}
+		else {
+
+			for (int i = 0; i < this.calendar.getTodayEvents().size(); i++) {
+				
+				
+				long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
+				
+				if (time > 0) {
+					LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(i).getLocation().split(",")[0]);
+					if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
+						final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+								VIEW_ID_TRAFFIC);
+						templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(i).getLocation());	
+						CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+						break;
+					} // unknown location
+					else {
+						final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+								VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+						templateConf_traffic.putReplacement("{TRAFFIC}", "The Location has not been clearly specified by the user.");
+						CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
+						break;
+					} // else
+				} // if 
+			}
+			
+		}
+		
 		
 	}
 
