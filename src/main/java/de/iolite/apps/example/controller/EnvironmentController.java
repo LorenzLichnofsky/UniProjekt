@@ -11,9 +11,16 @@ import de.iolite.app.api.environment.EnvironmentAPI;
 import de.iolite.apps.example.CalendarIntegrationAppMain;
 import de.iolite.apps.example.devices.SonosController;
 
-/** Handles the Current Situation of the user. */
+/**
+ * Class that handles environment queries.
+ * @author Alia Siemund
+ *
+ */
 public class EnvironmentController {
 
+	/**
+	 * @value - Type "at Home" in Iolite.
+	 */
 	@Nonnull
 	private static final String SITUATION_TYPE_AT_HOME = "https://dev.iolite.de/situation/profile#Home";
 
@@ -36,7 +43,7 @@ public class EnvironmentController {
 	/**
 	 * Checks, whether the user is at home or not.
 	 *
-	 * @return Boolean value of the users current situation.
+	 * @return boolean - value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
 		LOGGER.debug("Current Situation is: '{}'", this.api.getSituationProfileIdentifier());

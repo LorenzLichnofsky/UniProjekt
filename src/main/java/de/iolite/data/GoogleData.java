@@ -13,9 +13,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event.Reminders;
-
 import de.iolite.apps.example.devices.SonosController;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -139,6 +137,7 @@ public class GoogleData {
 		day.setHours(23);
 		day.setMinutes(59);
 		day.setSeconds(59);
+		
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
@@ -272,7 +271,5 @@ public class GoogleData {
 		return todayFinal;
 
 	}		
-
-	
 
 }

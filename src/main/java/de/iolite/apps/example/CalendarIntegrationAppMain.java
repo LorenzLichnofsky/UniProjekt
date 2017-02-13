@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +20,22 @@ import de.iolite.api.IOLITEAPINotResolvableException;
 import de.iolite.api.IOLITEAPIProvider;
 import de.iolite.api.IOLITEPermissionDeniedException;
 import de.iolite.app.AbstractIOLITEApp;
+
+import de.iolite.app.api.device.DeviceAPIException;
+//import de.iolite.app.api.device.DeviceStringProperty;
+import de.iolite.app.api.device.DeviceProperty;
+
+
 import de.iolite.app.api.device.access.Device;
 import de.iolite.app.api.device.access.DeviceAPI;
 import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
+
+
+import de.iolite.app.api.device.access.DeviceStringProperty.DeviceStringPropertyObserver;
+import de.iolite.app.api.device.access.DeviceBooleanProperty;
+import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanPropertyObserver;
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
+import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
 import de.iolite.app.api.frontend.FrontendAPI;
 import de.iolite.app.api.frontend.FrontendAPIException;
@@ -45,6 +58,7 @@ import de.iolite.common.requesthandler.StaticResources;
 import de.iolite.common.requesthandler.StaticResources.PathHandlerPair;
 import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleData;
+import de.iolite.data.GoogleEvent;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.insys.mirror.api.MirrorApiException;
 import de.iolite.utilities.disposeable.Disposeable;
@@ -521,12 +535,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	/**
 	 * Example method showing how to use the Device API.
+	 * @throws URISyntaxException 
+	 * @throws GeneralSecurityException 
+	 * @throws ParseException 
+	 * @throws IOException 
 	 */
 
 	private void initializeDeviceManager() {
 
-		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
+		
 
 		// Find Driver of the Sonos Box and make Settings in the sonosController
 		// Class
@@ -539,7 +557,45 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 						calendar, this.storageController);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			}
+			 String ID = device.getIdentifier();
+             
+             if (ID != null){
+                 if (ID.equals("knx_kitchen_lcd0")){
+                	 // Find for the display device and its property 
+                     
+                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+                     
+                     if (displayProperty != null){
+                         List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
+							new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
+							displayProperty.setObserver(new DeviceStringPropertyObserver(){
+
+							    @Override
+							    public void deviceChanged(Device arg0) {
+							        // TODO Auto-generated method stub
+							        
+							    }
+
+							    @Override
+							    public void keyChanged(String arg0) {
+							        // TODO Auto-generated method stub
+							        
+							    }
+
+							    @Override
+							    public void valueChanged(String arg0) {
+							        LOGGER.info("Changed TITLE!!!");
+							        
+							    }
+							    
+							});
+                     }
+             }else{
+                 //LOGGER.info("Value is null!!");
+             }
+             }
 		}
+	
 
 	}
 
