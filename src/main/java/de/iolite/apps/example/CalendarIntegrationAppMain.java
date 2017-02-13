@@ -1,16 +1,11 @@
 package de.iolite.apps.example;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -18,26 +13,23 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang3.Validate;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iolite.api.IOLITEAPINotResolvableException;
 import de.iolite.api.IOLITEAPIProvider;
 import de.iolite.api.IOLITEPermissionDeniedException;
-import de.iolite.api.heating.access.HeatingAPI;
-import de.iolite.api.heating.access.PlaceSchedule;
 import de.iolite.app.AbstractIOLITEApp;
 
 import de.iolite.app.api.device.DeviceAPIException;
 //import de.iolite.app.api.device.DeviceStringProperty;
 import de.iolite.app.api.device.DeviceProperty;
+
+
 import de.iolite.app.api.device.access.Device;
 import de.iolite.app.api.device.access.DeviceAPI;
 import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
+
 
 import de.iolite.app.api.device.access.DeviceStringProperty.DeviceStringPropertyObserver;
 import de.iolite.app.api.device.access.DeviceBooleanProperty;
@@ -45,27 +37,23 @@ import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanProper
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
 import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
-import de.iolite.app.api.environment.Location;
 import de.iolite.app.api.frontend.FrontendAPI;
 import de.iolite.app.api.frontend.FrontendAPIException;
-import de.iolite.app.api.frontend.util.FrontendAPIRequestHandler;
 import de.iolite.app.api.frontend.util.FrontendAPIUtility;
 import de.iolite.app.api.storage.StorageAPI;
 import de.iolite.app.api.storage.StorageAPIException;
 import de.iolite.app.api.user.access.UserAPI;
 import de.iolite.apps.example.ViewRegistrator.ResourcePackageConfig;
 import de.iolite.apps.example.ViewRegistrator.TemplateConfig;
+import de.iolite.apps.example.controller.EnvironmentController;
+import de.iolite.apps.example.controller.StorageController;
 import de.iolite.apps.example.devices.SonosController;
 import de.iolite.apps.example.internals.PageWithEmbeddedSessionTokenRequestHandler;
 import de.iolite.common.lifecycle.exception.CleanUpFailedException;
 import de.iolite.common.lifecycle.exception.InitializeFailedException;
 import de.iolite.common.lifecycle.exception.StartFailedException;
 import de.iolite.common.lifecycle.exception.StopFailedException;
-import de.iolite.common.requesthandler.HTTPStatus;
-import de.iolite.common.requesthandler.IOLITEHTTPRequest;
 import de.iolite.common.requesthandler.IOLITEHTTPRequestHandler;
-import de.iolite.common.requesthandler.IOLITEHTTPResponse;
-import de.iolite.common.requesthandler.IOLITEHTTPStaticResponse;
 import de.iolite.common.requesthandler.StaticResources;
 import de.iolite.common.requesthandler.StaticResources.PathHandlerPair;
 import de.iolite.data.DailyEvents;
@@ -74,33 +62,19 @@ import de.iolite.data.GoogleEvent;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.insys.mirror.api.MirrorApiException;
 import de.iolite.utilities.disposeable.Disposeable;
-import de.iolite.utilities.time.series.DataEntries.AggregatedEntry;
-import de.iolite.utilities.time.series.DataEntries.BooleanEntry;
-import de.iolite.utilities.time.series.Function;
-import de.iolite.utilities.time.series.TimeInterval;
+import de.iolite.utilities.concurrency.scheduler.Scheduler;
 
 /**
- * <code>ExampleApp</code> is an example IOLITE App.
+ * Orginal code from: <code>ExampleApp</code> is an example IOLITE App.
  *
  * @author Grzegorz Lehmann
  * @author Erdene-Ochir Tuguldur
- * @author Felix Rodemund
- * edit by Group Calendar Integration 
+ * @author Felix Rodemund edit by Group Calendar Integration
  * @since 1.0
+ * 
+ *        adjustments made be Calendar Group
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
-
-	private static final class DeviceJSONRequestHandler extends FrontendAPIRequestHandler {
-
-		@Override
-		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-			final JSONArray deviceIdentifiers = new JSONArray();
-
-			final JSONObject response = new JSONObject();
-			response.put("identifiers", deviceIdentifiers);
-			return new IOLITEHTTPStaticResponse(response.toString(), HTTPStatus.OK, IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-		}
-	}
 
 	private static final class DeviceAddAndRemoveLogger implements DeviceAPIObserver {
 
@@ -115,158 +89,67 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 	}
 
-	private static final class DeviceOnOffStatusLogger implements DeviceBooleanPropertyObserver {
-
-		@Nonnull
-		private final String identifier;
-
-		private DeviceOnOffStatusLogger(final String deviceIdentifier) {
-			this.identifier = Validate.notNull(deviceIdentifier, "'deviceIdentifier' must not be null");
-		}
-
-		@Override
-		public void deviceChanged(final Device element) {
-			// nothing here
-		}
-
-		@Override
-		public void keyChanged(final String key) {
-			// nothing here
-		}
-
-		@Override
-		public void valueChanged(final Boolean value) {
-			if (value) {
-				LOGGER.debug("device '{}' turned on", this.identifier);
-			}
-			else {
-				LOGGER.debug("device '{}' turned off", this.identifier);
-			}
-		}
-	}
-
-	/**
-	 * A response handler returning devices filtered by the property type.
-	 */
-	class DevicesResponseHandler extends FrontendAPIRequestHandler {
-
-		@Override
-		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-			String propertyType;
-			try {
-				propertyType = new JSONObject(readPassedData(request)).getString("propertyType");
-			}
-			catch (final JSONException e) {
-				LOGGER.error("Could not handle devices request due to a JSON error: {}", e.getMessage(), e);
-				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
-			}
-			catch (final IOException e) {
-				LOGGER.error("Could not handle devices request due to an I/O error: {}", e.getMessage(), e);
-				return new IOLITEHTTPStaticResponse(e.getMessage(), HTTPStatus.BadRequest, "text/plain");
-			}
-
-			final JSONArray jsonDeviceArray = new JSONArray();
-			for (final Device device : CalendarIntegrationAppMain.this.deviceAPI.getDevices()) {
-				if (device.getProperty(propertyType) != null) {
-					// device has the correct property type
-					final JSONObject jsonDeviceObject = new JSONObject();
-					jsonDeviceObject.put("name", device.getName());
-					jsonDeviceObject.put("identifier", device.getIdentifier());
-					jsonDeviceArray.put(jsonDeviceObject);
-				}
-			}
-
-			final JSONObject response = new JSONObject();
-			response.put("devices", jsonDeviceArray);
-			return new IOLITEHTTPStaticResponse(response.toString(), IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-		}
-
-		private String getCharset(final IOLITEHTTPRequest request) {
-			final String charset = request.getCharset();
-			return charset == null || charset.length() == 0 ? IOLITEHTTPStaticResponse.ENCODING_UTF8 : charset;
-		}
-
-		private String readPassedData(final IOLITEHTTPRequest request)
-				throws IOException {
-			final String charset = getCharset(request);
-			try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request.getContent(), charset))) {
-				final StringBuilder stringBuilder = new StringBuilder();
-				String line;
-				while ((line = bufferedReader.readLine()) != null) {
-					stringBuilder.append(line);
-				}
-				return stringBuilder.toString();
-			}
-		}
-	}
-
-	/**
-	 * A response handler for returning the "not found" response.
-	 */
-	static class NotFoundResponseHandler extends FrontendAPIRequestHandler {
-
-		@Override
-		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-			return new IOLITEHTTPStaticResponse(HTTPStatus.NotFound, IOLITEHTTPResponse.HTML_CONTENT_TYPE);
-		}
-	}
-
-	/**
-	 * A response handler returning all rooms as JSON array.
-	 */
-	class RoomsResponseHandler extends FrontendAPIRequestHandler {
-
-		@Override
-		protected IOLITEHTTPResponse handleRequest(final IOLITEHTTPRequest request, final String subPath) {
-			final JSONArray locationNames = new JSONArray();
-			for (final Location location : CalendarIntegrationAppMain.this.environmentAPI.getLocations()) {
-				locationNames.put(location.getName());
-			}
-			final JSONObject response = new JSONObject();
-			response.put("rooms", locationNames);
-			return new IOLITEHTTPStaticResponse(response.toString(), IOLITEHTTPResponse.JSON_CONTENT_TYPE);
-		}
-	}
-
 	@Nonnull
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIntegrationAppMain.class);
 
-	/* App APIs */
+	/** App APIs */
 	private FrontendAPI frontendAPI;
 	private StorageAPI storageAPI;
 	private DeviceAPI deviceAPI;
 	private EnvironmentAPI environmentAPI;
 	private UserAPI userAPI;
 
-	private HeatingAPI heatingAPI;
-
 	/** front end assets */
 	private Disposeable disposeableAssets;
-	
-	/** Mirror variables */
-	
-	private static final String HTML_RESOURCES = "assets/html/";
-	private static final String VIEW_RESOURCES = "assets/view/";
+
+	/** sonos assets */
+	SonosController sonosController = new SonosController();
+	StorageController storageController;
+
+	/**
+	 * Mirror variables basic idea is taken over from Hendrik Motza from
+	 * Calendar Group
+	 */
+	private static final String MSG_ERR_RETRIEVE_USERAPI = "Could not retrieve instance of UserAPI!";
+
+	private static final String VIEW_RESOURCES = "assets/views/";
 	private static final String APP_ID = "de.iolite.apps.example.CalendarIntegrationAppMain";
-	
 
 	private static final String VIEW_ID_CALENDAR = "CalendarView";
-	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "quote.png";
-	//private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
+	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar-icon.jpg";
+	private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
 	private static final String VIEW_TEMPLATE_CALENDAR = VIEW_RESOURCES + "calendar.template";
 	private static final String VIEW_WEBPATH_CALENDAR = "calendar.html";
 
+	private static final String VIEW_ID_CLOCK = "DateTimeView";
+	private static final String ICON_RESPATH_CLOCK = VIEW_RESOURCES + "clock-icon.jpg";
+	private static final String VIEW_RESPATH_CLOCK = VIEW_RESOURCES + "clock.html";
+	private static final String VIEW_WEBPATH_CLOCK = "clock.html";
+
+	private static final String VIEW_ID_TRAFFIC = "TrafficView";
+	private static final String ICON_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic-icon.jpg";
+	private static final String VIEW_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic.html";
+	private static final String VIEW_WEBPATH_TRAFFIC = "traffic.html";
+	private static final String VIEW_RESPATH_EMPTY_TRAFFIC = VIEW_RESOURCES + "empty_traffic.html";
+
 	private static final String VIEW_ID_WEATHER = "WeatherView";
-	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather.jpg";
-	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "DummyWeather.html";
-	
+	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
+	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "weather.html";
+	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
+
 	DailyEvents calendar = null;
-	private ViewRegistrator viewRegistrator;
-	String temperature = "0";
+
+	// TODO scheduler problem lösen
+	Scheduler scheduler;
 	private ScheduledFuture<?> calendarUpdateThread = null;
 
+	private ViewRegistrator viewRegistrator;
+
+	String temperature = "0";
+
 	/**
-	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public, parameter-less constructor.
+	 * <code>ExampleApp</code> constructor. An IOLITE App must have a public,
+	 * parameter-less constructor.
 	 */
 	public CalendarIntegrationAppMain() {
 		// empty
@@ -276,9 +159,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void cleanUpHook()
-			throws CleanUpFailedException {
-		LOGGER.debug("Cleaning");
+	protected void cleanUpHook() throws CleanUpFailedException {
 		LOGGER.debug("Cleaned");
 	}
 
@@ -286,18 +167,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void initializeHook()
-			throws InitializeFailedException {
-		LOGGER.debug("Initializing");
+	protected void initializeHook() throws InitializeFailedException {
 		LOGGER.debug("Initialized");
-		
-		GoogleData  data = new GoogleData();
+
 		try {
-			calendar = data.getData();
-			LOGGER.warn(calendar.toString());
+			/** Read out of Google Data */
+			GoogleData data = new GoogleData();
+			this.calendar = data.getData();
+			LOGGER.info(this.calendar.toString());
 		} catch (IOException | ParseException | GeneralSecurityException | URISyntaxException e) {
-			LOGGER.error("calendar.getData()");
-			e.printStackTrace();
+			LOGGER.error("ERROR while getting calendar.getData()");
 		}
 	}
 
@@ -305,19 +184,24 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void startHook(@Nonnull final IOLITEAPIProvider context)
-			throws StartFailedException {
+	protected final void startHook(@Nonnull final IOLITEAPIProvider context) throws StartFailedException {
 		// here the IOLITE App is started
 		// the context gives access to IOLITE App APIs
 		LOGGER.debug("Starting");
 
 		try {
+
+			// Scheduler
+			this.scheduler = context.getScheduler();
+
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
-			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(), this.userAPI.getUser().getLocale());
+			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(),
+					this.userAPI.getUser().getLocale());
 
 			// Storage API enables the App to store data persistently
-			// whatever is stored via the storage API will also be available if the App is restarted
+			// whatever is stored via the storage API will also be available if
+			// the App is restarted
 			this.storageAPI = context.getAPI(StorageAPI.class);
 			initializeStorage();
 
@@ -325,85 +209,311 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			this.frontendAPI = context.getAPI(FrontendAPI.class);
 			initializeWebResources();
 
+			// Environment API gives a access for rooms, current situation etc.
+			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
+
 			// Device API gives access to devices connected to IOLITE
 			this.deviceAPI = context.getAPI(DeviceAPI.class);
 			initializeDeviceManager();
 
-			// Environment API gives a access for rooms, current situation etc.
-			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
-			LOGGER.debug("Current Situation: {}", this.environmentAPI.getCurrentSituationIdentifier());
-			LOGGER.debug("Locations:");
-			for (final Location location : this.environmentAPI.getLocations()) {
-				LOGGER.debug("\t{}", location.getName());
+			// getting IOLTE user-ID
+			final UserAPI userApi;
+			final String userId;
+			try {
+				userApi = context.getAPI(UserAPI.class);
+				userId = userApi.getUser().getIdentifier();
+			} catch (final IOLITEAPINotResolvableException | IOLITEPermissionDeniedException e) {
+				LOGGER.error(MSG_ERR_RETRIEVE_USERAPI, e);
+				throw new StartFailedException(MSG_ERR_RETRIEVE_USERAPI, e);
 			}
+			/** Register different Views for Mirror */
+			final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
+			staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
+			staticResourceConfig.addView(VIEW_ID_TRAFFIC, VIEW_RESPATH_TRAFFIC, ICON_RESPATH_TRAFFIC);
+			staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
+			staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
+			this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
+			deviceAPI.setObserver(this.viewRegistrator);
+			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
-			// Heating API
-			this.heatingAPI = context.getAPI(HeatingAPI.class);
-			for (final PlaceSchedule placeSchedule : this.heatingAPI.getHeatingSchedulesOfPlaces()) {
-				LOGGER.debug("Heating schedule found for place '{}'", placeSchedule.getPlaceIdentifier());
-			}
-		
-		final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
-//		staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
-//		staticResourceConfig.addView(VIEW_ID_HELLO_WORLD, VIEW_RESPATH_HELLO_WORLD, ICON_RESPATH_HELLO_WORLD);
-//		staticResourceConfig.addView(VIEW_ID_LNDW, VIEW_RESPATH_LNDW, ICON_RESPATH_LNDW);
-//		staticResourceConfig.addView(VIEW_ID_WELCOME, VIEW_RESPATH_WELCOME, ICON_RESPATH_WELCOME);
-		staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_TEMPLATE_CALENDAR, ICON_RESPATH_CALENDAR);
-		this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, "Spaß mit Flaggen");
-		deviceAPI.setObserver(this.viewRegistrator);
-		deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
-		this.calendarUpdateThread = context.getScheduler().scheduleAtFixedRate(() -> {
-		try {
-			//initializeDeviceManager();
-			GoogleData calendar_data = new GoogleData();
-			CalendarIntegrationAppMain.this.calendar = calendar_data.getData();
-			final TemplateConfig templateConf = new TemplateConfig(VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
-			templateConf.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf);
-		}
-		catch (final MirrorApiException e) {
-			LOGGER.error("Could not create views!", e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}, 0, 1, TimeUnit.MINUTES);
-	LOGGER.debug("Mirror Views got registered!");
-		}
-		catch (final IOLITEAPINotResolvableException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()), e);
-		}
-		catch (final IOLITEPermissionDeniedException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to permission denied problems in the examples: {0}", e.getMessage()), e);
-		}
-		catch (final StorageAPIException | FrontendAPIException e) {
-			throw new StartFailedException(MessageFormat.format("Start failed due to an error in the App API examples: {0}", e.getMessage()), e);
+			/** scheduler that updates the calendar information every 15 min */
+			this.calendarUpdateThread = scheduler.scheduleAtFixedRate(() -> {
+
+
+				try {
+
+					/**
+					 * Update storage API and based on user interface settings
+					 * update device functionalities
+					 */
+
+					this.storageAPI = context.getAPI(StorageAPI.class);
+
+					boolean mirror = "true".equals(getStringorDefault("Mirror", "false"));
+					boolean weather = "true".equals(getStringorDefault("Mirror_Weather", "false"));
+					boolean clock = "true".equals(getStringorDefault("Mirror_Clock", "false"));
+					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
+					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
+					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
+					String sonosURI = getStringorDefault("SonosURI",
+							"http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
+					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
+
+					sonosActive(sonos);
+					mirrorActive(mirror, weather, clock, calendarBool, traffic);
+
+				} catch (final MirrorApiException e) {
+					LOGGER.error("MirrorApiException", e);
+				} catch (GeneralSecurityException e) {
+					LOGGER.error("GeneralSecurityException", e);
+				} catch (URISyntaxException e) {
+					LOGGER.error("URISyntaxException", e);
+				} catch (StorageAPIException e) {
+					LOGGER.error("StorageAPIException", e);
+				} catch (IOLITEAPINotResolvableException e) {
+					LOGGER.error("IOLITEAPINotResolvableException", e);
+				} catch (IOLITEPermissionDeniedException e) {
+					LOGGER.error("IOLITEPermissionDeniedException", e);
+				} catch (IOException e) {
+					LOGGER.error("IOException!", e);
+				} catch (ParseException e) {
+					LOGGER.error("ParseException!", e);
+				} catch (IllegalStateException e) {
+					LOGGER.error("IllegalStateException!", e);
+				}
+
+				// TODO 1 to 15 min
+			}, 0, 1, TimeUnit.MINUTES);
+
+			LOGGER.debug("Mirror Views got registered!");
+
+		} catch (final IOLITEAPINotResolvableException e) {
+			throw new StartFailedException(
+					MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()),
+					e);
+		} catch (final IOLITEPermissionDeniedException e) {
+			throw new StartFailedException(MessageFormat
+					.format("Start failed due to permission denied problems in the examples: {0}", e.getMessage()), e);
+		} catch (final StorageAPIException | FrontendAPIException e) {
+			throw new StartFailedException(
+					MessageFormat.format("Start failed due to an error in the App API examples: {0}", e.getMessage()),
+					e);
 		}
 
 		LOGGER.debug("Started");
 	}
 
 	/**
+	 * sonos is true if sonos box has been activated by user. latest calendar
+	 * information is send to sonos controller
+	 * 
+	 * @param sonos
+	 * 
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws GeneralSecurityException
+	 * @throws URISyntaxException
+	 */
+	private void sonosActive(boolean sonos)
+			throws IOException, ParseException, GeneralSecurityException, URISyntaxException {
+
+		if (sonos) {
+			GoogleData calendar_data = new GoogleData();
+			this.calendar = calendar_data.getData();
+			this.sonosController.playSongAt(this.calendar, this.storageController);
+		}
+	}
+
+	/**
+	 * input parameters are true if views are selected by the user. latest
+	 * calendar information is send to views.
+	 * 
+	 * @param mirror
+	 * @param weather
+	 * @param clock
+	 * @param calendarBool
+	 * @param traffic
+	 * @throws StorageAPIException
+	 * @throws IOException
+	 * @throws ParseException
+	 *
+	 * @throws GeneralSecurityException
+	 * @throws URISyntaxException
+	 */
+	private void mirrorActive(boolean mirror, boolean weather, boolean clock, boolean calendarBool, boolean traffic)
+			throws StorageAPIException, IOException, ParseException, GeneralSecurityException, URISyntaxException {
+		if (mirror) {
+
+			if (calendarBool) {
+
+				getCalendar();
+
+				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
+						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+				templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+			} // calendar is active
+
+			else {
+				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
+						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+				templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+
+			}
+
+			if (weather) {
+
+				final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
+						VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+				refreshWeather();
+				templateConf_weather.putReplacement("{WEATHER}", this.temperature + " &deg C");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+			} // weather is active
+			else {
+				final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
+						VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+				templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+			}
+			if (clock) {
+				final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
+						VIEW_ID_CLOCK);
+				templateConf_clock.putReplacement("&nbsp;", "<script src='js/datetime.js'></script>");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+			} // clock is active
+			if (!clock) {
+				final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
+						VIEW_ID_CLOCK);
+				templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+			}
+
+			if (traffic) {
+				trafficActive();
+			} // traffic is active
+			if (!traffic) {
+				final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+						VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+				templateConf_traffic.putReplacement("{TRAFFIC}", "&nbsp;");
+				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+			}
+
+		} else {
+			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
+					VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+			templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+
+			final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
+					VIEW_ID_CLOCK);
+			templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+
+			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER,
+					VIEW_ID_WEATHER);
+			templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+
+			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+
+		}
+
+	}
+
+	/**
+	 * method to find the next upcoming event location
+	 */
+	private void trafficActive() {
+		
+
+		for (int i = 0; i < this.calendar.getTodayEvents().size(); i++) {
+
+			long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
+			
+			if (time > 0) {
+				LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(i).getLocation().split(",")[0]);
+				if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
+					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+							VIEW_ID_TRAFFIC);
+					templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(i).getLocation());	
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+					break;
+				} // unknown location
+				else {
+					final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+							VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+					templateConf_traffic.putReplacement("{TRAFFIC}", "The Location has not been clearly specified by the user.");
+					CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
+					break;
+				} // else
+			} // if 
+		}
+		
+	}
+
+	/**
+	 * get latest calendar data and sort out events by types sport, friends,
+	 * university and other. In case not all views are required this method
+	 * reduces the events
+	 * 
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 * @throws URISyntaxException
+	 * @throws StorageAPIException
+	 */
+	private void getCalendar()
+			throws IOException, ParseException, GeneralSecurityException, URISyntaxException, StorageAPIException {
+		GoogleData calendar_data = new GoogleData();
+		DailyEvents fulldata = calendar_data.getData();
+
+		boolean sport = "true".equals(getStringorDefault("Sport", "false"));
+		boolean friend = "true".equals(getStringorDefault("Friend", "false"));
+		boolean uni = "true".equals(getStringorDefault("University", "false"));
+		boolean other = "true".equals(getStringorDefault("Other", "false"));
+
+		CalendarIntegrationAppMain.this.calendar = fulldata.sortOut(sport, friend, uni, other);
+
+	}
+
+	/**
+	 * Updates the weather information for calendar scheduler
+	 * 
+	 * @return a String containing the current temperature
+	 */
+	private void refreshWeather() {
+		for (final Device device : this.deviceAPI.getDevices()) {
+
+			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
+
+				LOGGER.info("Update Weather");
+
+				DeviceDoubleProperty temp = device
+						.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
+
+				if (temp != null && temp.getValue().toString() != null) {
+					LOGGER.warn("The current temperature is:  '{}'", temp.getValue());
+					this.temperature = temp.getValue().toString();
+				}
+			}
+		}
+
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void stopHook()
-			throws StopFailedException {
+	protected void stopHook() throws StopFailedException {
 		LOGGER.debug("Stopping");
 
 		// deregister the static assets
 		if (this.disposeableAssets != null) {
 			this.disposeableAssets.dispose();
 		}
+		// TODO
 		this.calendarUpdateThread.cancel(false);
 		LOGGER.debug("Stopped");
 	}
@@ -415,180 +525,141 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws ParseException 
 	 * @throws IOException 
 	 */
+
 	private void initializeDeviceManager() {
-		for (final Device device: this.deviceAPI.getDevices()){
-		    
-	        String ID = device.getIdentifier();
-	                
-	                if (ID != null){
-	                    if (ID.equals("knx_kitchen_lcd0")){
-	                        
-	                        DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
-	                        
-	                        if (displayProperty != null){
-	                            List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
-								new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
-								displayProperty.setObserver(new DeviceStringPropertyObserver(){
 
-								    @Override
-								    public void deviceChanged(Device arg0) {
-								        // TODO Auto-generated method stub
-								        
-								    }
-
-								    @Override
-								    public void keyChanged(String arg0) {
-								        // TODO Auto-generated method stub
-								        
-								    }
-
-								    @Override
-								    public void valueChanged(String arg0) {
-								        LOGGER.info("Changed TITLE!!!");
-								        
-								    }
-								    
-								});
-	                        }
-	                }else{
-	                    //LOGGER.info("Value is null!!");
-	                }
-	                }
-	        }
-		
-		
-		
-		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
 		
 
-		// go through all devices, and register a property observer for ON/OFF properties
+		// Find Driver of the Sonos Box and make Settings in the sonosController
+		// Class
 		for (final Device device : this.deviceAPI.getDevices()) {
-			// each device has some properties (accessible under device.getProperties())
-			// let's get the 'on/off' status property
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				LOGGER.debug("device '{}' has ON/OFF property, current value: '{}'", device.getIdentifier(), onProperty.getValue());
 
-				onProperty.setObserver(new DeviceOnOffStatusLogger(device.getIdentifier()));
+			LOGGER.debug(device.getIdentifier());
+
+			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
+				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI),
+						calendar, this.storageController);
+				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			}
+			 String ID = device.getIdentifier();
+             
+             if (ID != null){
+                 if (ID.equals("knx_kitchen_lcd0")){
+                	 // Find for the display device and its property 
+                     
+                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+                     
+                     if (displayProperty != null){
+                         List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
+							new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
+							displayProperty.setObserver(new DeviceStringPropertyObserver(){
+
+							    @Override
+							    public void deviceChanged(Device arg0) {
+							        // TODO Auto-generated method stub
+							        
+							    }
+
+							    @Override
+							    public void keyChanged(String arg0) {
+							        // TODO Auto-generated method stub
+							        
+							    }
+
+							    @Override
+							    public void valueChanged(String arg0) {
+							        LOGGER.info("Changed TITLE!!!");
+							        
+							    }
+							    
+							});
+                     }
+             }else{
+                 //LOGGER.info("Value is null!!");
+             }
+             }
 		}
+	
 
-		// go through all devices, and toggle ON/OFF properties
-		for (final Device device : this.deviceAPI.getDevices()) {
-			// let's get the 'on/off' status property
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			final Boolean onValue;
-			if (onProperty != null && (onValue = onProperty.getValue()) != null) {
-				LOGGER.debug("toggling device '{}'", device.getIdentifier());
-				try {
-					onProperty.requestValueUpdate(!onValue);
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to control device", e);
-				}
-			}
-			LOGGER.warn("Devices known'{}'", device.getName());
-			if(device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)){
-				LOGGER.warn("ItemWeatherStation");
-				//DeviceStringProperty time = device.getStringProperty(DriverConstants.PROPERTY_timeOfDay_ID);
-				DeviceDoubleProperty temp = device.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
-			
-				if (temp != null && temp.getValue().toString() != null){
-				LOGGER.warn("DIE TEMPERATUR '{}'", temp.getValue());				
-				temperature = temp.getValue().toString();
-				}
-			}	
-			
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_MediaPlayerDevice_ID)){
-				new SonosController().setSonos(device);
-			}
-		}
-
-		// go through all devices, and print ON/OFF and POWER USAGE property history datas
-		for (final Device device : this.deviceAPI.getDevices()) {
-			// ON/OFF history data
-			final DeviceBooleanProperty onProperty = device.getBooleanProperty(DriverConstants.PROPERTY_on_ID);
-			if (onProperty != null) {
-				// retrieve the on/off history of last hour
-				final long hourMillis = TimeUnit.SECONDS.toMillis(60 * 60);
-				final List<BooleanEntry> onHistory;
-				try {
-					onHistory = onProperty.getValuesSince(System.currentTimeMillis() - hourMillis);
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve the history of property '{}'", onProperty.getKey(), e);
-					continue;
-				}
-				LOGGER.debug("Got '{}' historical values for property '{}'", onHistory.size(), onProperty.getKey());
-				// log history values
-				final DateFormat dateFormat = DateFormat.getTimeInstance();
-				for (final BooleanEntry historyEntry : onHistory) {
-					LOGGER.debug("At '{}' the value was '{}'", dateFormat.format(new Date(historyEntry.time)), historyEntry.value);
-				}
-			}
-
-			// POWER USAGE history data
-			final DeviceDoubleProperty powerUsage = device.getDoubleProperty(DriverConstants.PROPERTY_powerUsage_ID);
-			if (powerUsage != null) {
-				LOGGER.debug("Reading today's hourly power usage data from device '{}':", device.getIdentifier());
-				List<AggregatedEntry> history;
-				try {
-					history = powerUsage.getAggregatedValuesOf(System.currentTimeMillis(), TimeInterval.DAY, TimeInterval.HOUR, Function.AVERAGE);
-					for (final AggregatedEntry entry : history) {
-						LOGGER.debug("The device used an average of {} Watt at '{}'.", entry.getAggregatedValue(),
-								DateFormat.getTimeInstance().format(new Date(entry.getEndTime())));
-					}
-				}
-				catch (final DeviceAPIException e) {
-					LOGGER.error("Failed to retrieve history data of device", e);
-				}
-			}
-		}
 	}
 
 	/**
-	 * Example method showing how to use the Storate API.
+	 * Loading Checkbox values from StorageAPI
 	 *
 	 * @throws StorageAPIException
 	 */
-	private void initializeStorage()
-			throws StorageAPIException {
-		// basically the Storage API provides a key/value storage for different data types
-		// save an integer under the key 'test'
-		this.storageAPI.saveInt("test", 10);
-		// now let's store a string
-		this.storageAPI.saveString("some key", "some value");
-//		LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
-		// log the value of an entry, just to demonstrate
-		LOGGER.debug("loading 'test' from storage: {}", Integer.valueOf(this.storageAPI.loadInt("test")));
+	private void initializeStorage() throws StorageAPIException {
+
+		this.storageController = new StorageController(this.storageAPI);
+
+		try {
+			LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
+			LOGGER.debug("loading 'control_panel' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("ControlPanel")));
+			LOGGER.debug("loading 'sonos' from storage: {}", String.valueOf(this.storageAPI.loadString("Sonos")));
+			LOGGER.debug("loading 'clock' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Mirror_Clock")));
+			LOGGER.debug("loading 'weather' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Mirror_Weather")));
+			LOGGER.debug("loading 'traffic' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Mirror_Traffic")));
+			LOGGER.debug("loading 'calendar' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Mirror_Calendar")));
+			LOGGER.debug("loading 'sport_appointments' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Sport")));
+			LOGGER.debug("loading 'friend_appointments' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Friend")));
+			LOGGER.debug("loading 'university_appointments' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("University")));
+			LOGGER.debug("loading 'other_appointments' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Other")));
+			LOGGER.debug("loading 'sonosURI' from storage: {}", String.valueOf(this.storageAPI.loadString("SonosURI")));
+		} catch (StorageAPIException e) {
+			LOGGER.debug("Failed loading of StorageAPI");
+		}
+
+	}
+
+	/**
+	 * Read out storage value or set default value in case no value is stored
+	 * yet
+	 * 
+	 * @param key
+	 * @param defaultvalue
+	 * @return
+	 */
+	public String getStringorDefault(String key, String defaultvalue) {
+		try {
+			return this.storageAPI.loadString(key);
+		} catch (StorageAPIException e) {
+			try {
+				this.storageAPI.saveString(key, defaultvalue);
+			} catch (StorageAPIException e1) {
+				LOGGER.error("Can't write value for key", e1);
+			}
+			return defaultvalue;
+		}
 	}
 
 	/**
 	 * Registering web resources.
 	 *
-	 * @throws FrontendAPIException if some resources are not found.
+	 * @throws FrontendAPIException
+	 *             if some resources are not found.
 	 */
-	private final void initializeWebResources()
-			throws FrontendAPIException {
+	private final void initializeWebResources() throws FrontendAPIException {
 
 		// go through static assets and register them
 		final Map<URI, PathHandlerPair> assets = StaticResources.scanClasspath("assets", getClass().getClassLoader());
 		this.disposeableAssets = FrontendAPIUtility.registerPublicHandlers(this.frontendAPI, assets);
 
 		// index page
-		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(loadTemplate("assets/index.html"));
+		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(
+				loadTemplate("assets/index.html"));
 		this.frontendAPI.registerRequestHandler("", indexPageRequestHandler);
 		this.frontendAPI.registerRequestHandler("index.html", indexPageRequestHandler);
 
-		// default handler returning a not found status
-		this.frontendAPI.registerDefaultRequestHandler(new NotFoundResponseHandler());
-
-		// example JSON request handlers
-		this.frontendAPI.registerRequestHandler("rooms", new RoomsResponseHandler());
-		this.frontendAPI.registerRequestHandler("devices", new DevicesResponseHandler());
-
-		this.frontendAPI.registerRequestHandler("get_devices.json", new DeviceJSONRequestHandler());
 	}
 
 	/**
@@ -597,9 +668,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private String loadTemplate(final String templateResource) {
 		try {
 			return StaticResources.loadResource(templateResource, getClass().getClassLoader());
-		}
-		catch (final IOException e) {
-			throw new InitializeFailedException("Loading templates for the dummy app failed", e);
+		} catch (final IOException e) {
+			throw new InitializeFailedException("Loading templates for the calendar app failed", e);
 		}
 	}
+
 }

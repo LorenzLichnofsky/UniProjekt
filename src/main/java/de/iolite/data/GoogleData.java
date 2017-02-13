@@ -13,15 +13,11 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event.Reminders;
-import com.google.common.io.Files;
-
-import java.io.File;
+import de.iolite.apps.example.devices.SonosController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -62,6 +58,9 @@ public class GoogleData {
 	/** Global instance of the required scopes */
 	private static final List<String> SCOPES = Arrays
 			.asList(CalendarScopes.CALENDAR_READONLY);
+	
+	/** Instance of Sonos Controller */
+	SonosController controller;
 
 	/** Initializing HTTP_TRANSPORT and DATA_STORE_FACTORY */
 	static {
@@ -141,9 +140,9 @@ public class GoogleData {
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
-		Events events = service.events().list("primary").setMaxResults(5)
+		Events events = service.events().list("primary").setMaxResults(12)
 				.setTimeMin(now)
-				// .setTimeMax(latest)
+				.setTimeMax(latest)
 				.setOrderBy("startTime").setSingleEvents(true).execute();
 
 		List<Event> items = events.getItems();
@@ -179,30 +178,30 @@ public class GoogleData {
 
 				// get the color of the event to define the event type
 				String color = event.getColorId();
+				if (color == null){
+					color = "7";					
+				}
+
 				String status = "";
 
 				if (color != null) {
 					switch (color) {
 					case "5":
-						status = "Freetime Appointment";
+						status = "Friend";
 						break;
 
-					case "9":
-						status = "Special Event";
-						break;
 					case "10":
-						status = "Sports";
+						status = "Sport";
 						break;
 					case "11":
-						status = "Work";
+						status = "University";
 						break;
 					default:
 						status = "Other";
 					}
 				}
 
-				if (color == null)
-					status = "Special Event";
+				
 
 				today.setColor(status);
 
@@ -235,8 +234,9 @@ public class GoogleData {
 
 				if (location != null)
 					today.setLocation(location);
+
 				else
-					today.setLocation("Unkown Location");
+					today.setLocation("Unknown Location");
 
 				// get the people adding the appointment
 				List<EventAttendee> share = event.getAttendees();
@@ -249,7 +249,11 @@ public class GoogleData {
 					if(attendee.isEmpty()) attendee.add("NOBODY");
 					today.setAttendee(attendee);
 				} else {
-					//System.out.println("keine Gäste!");
+					
+					/**
+					 * do something else. Attendee in general not used by our group
+					 */
+					
 				} // if
 
 				allToday.add(today);
@@ -266,10 +270,5 @@ public class GoogleData {
 		return todayFinal;
 
 	}		
-
-	public static void main(String[] args) throws IOException, ParseException,
-			GeneralSecurityException, URISyntaxException {
-		new GoogleData().getData();
-	}
 
 }

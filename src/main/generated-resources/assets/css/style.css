@@ -1,4 +1,4 @@
-/* Style of Checkboxes */
+/* Style references of checkboxes */
 <link href="css/magic-check.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
@@ -8,35 +8,54 @@
 * {
 margin-left: 50px;
 }
-
 html {
-  font-family: sans-serif;
+  font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
-
 body {
   padding-left: 300px;
-  font-family: 'PT Sans', sans-serif;
-  font-size: 1.1em;
-  font-weight: bold;
+  font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
+  font-size: 1.0em;
   color: #000; /* font - color in the whole application*/
 }
-
+input, button {
+  font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif; 
+}
+.headline{
+font-family: "Lucida Grande", Tahoma;
+ font-size: 22px;
+ font-weight: lighter;
+ font-variant: normal;
+ text-transform: uppercase;
+ color: #333332;
+ text-align: center!important;
+ letter-spacing: 0.3em;
+ padding-bottom: 30px;
+}
 .smaller{
-	font-size: 0.8em;
+	font-size: 0.9em;
+}
+#app-image{
+	padding-left: 220px; 
+	padding-bottom: 20px;
 }
 
 
-/* CSS for ENABLING/DISABLING device functionality */
+/* ENABLING/DISABLING devices */
 
-.align_divs { 
+.align_divs { /*make sure that 2 DIVs are in the same line*/
 	padding:0px; 
+	font-size: 1.2em;
 	text-align:left;
 	width:40%; 
 	float:left; 
-} /*make sure that 2 DIVs are in the same line*/
-
+}
+.align_events { /*make sure that 2 DIVs are in the same line*/
+	text-align:left;
+	width:27%; 
+	float:left; 
+}  
 .onoffswitch {
     position: relative; width: 97px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -55,16 +74,16 @@ body {
 }
 .onoffswitch-inner:before, .onoffswitch-inner:after {
     display: block; float: left; width: 50%; height: 22px; padding: 0; line-height: 22px;
-    font-size: 13px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    font-size: 13px; color: white; font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif;
     box-sizing: border-box;
 }
 .onoffswitch-inner:before {
-    content: "Enabled";
+    content: "enabled";
     padding-left: 5px;
-    background-color: #6C268A; color: #FFFFFF;
+    background-color: #6C2698; color: #FFFFFF;
 }
 .onoffswitch-inner:after {
-    content: "Disabled";
+    content: "disabled";
     padding-right: 5px;
     background-color: #948E8E; color: #000000;
     text-align: right;
@@ -84,26 +103,17 @@ body {
     right: 0px; 
 }
 
-
-
 /* Event Types */
-
 #event_padding {
 	padding-left: 85px;
 }
 
-
-
-/* Functionality Check Boxes */
-
-#mirror_id, #tv_id, #event_padding{
-  background-color: #FFFFFF;
-}
-.mirror, .tv, .event{
+/* Mirror Functionalities */
+.mirror, .event{
   padding: 5px;
   padding-left: 50px;
 }
-.mirror input[type="checkbox"], .tv input[type="checkbox"], .event input[type="checkbox"] {
+.mirror input[type="checkbox"], .event input[type="checkbox"] {
   display: none;
 }
 .container {
@@ -112,7 +122,6 @@ body {
 .container label {
   position: relative;
 }
-
 
 /* Base styles for spans */
 .container span::before,
@@ -123,7 +132,6 @@ body {
   bottom: 0;
   margin: auto;
 }
-
 
 .container span.checkbox::before{
   width: 15px;
@@ -170,9 +178,8 @@ body {
   border: 1px solid #948E8E;
   transition: border-color .2s;
 }
-
 .container span.checkbox:hover::before {
-  border: 2px solid #6C268A;
+  border: 2px solid #6C2698;
 }
 .container span.checkbox_red:hover::before {
   border: 2px solid #dc2127;
@@ -186,12 +193,11 @@ body {
 .container span.checkbox_green:hover::before {
   border: 2px solid #51b749;
 }
-
 .container span.checkbox::after {
   content: '\f00c';
   font-family: 'FontAwesome';
   left: -34px;
-  top: -1px;
+  top: 1px;
   color: transparent;
   transition: color .2s;
 }
@@ -199,7 +205,7 @@ body {
   content: '\f00c';
   font-family: 'FontAwesome';
   left: -32px;
-  top: -1px;
+  top: 1px;
   color: transparent;
   transition: color .2s;
 }
@@ -207,7 +213,7 @@ body {
   content: '\f00c';
   font-family: 'FontAwesome';
   left: -32px;
-  top: -1px;
+  top: 1px;
   color: transparent;
   transition: color .2s;
 }
@@ -215,7 +221,7 @@ body {
   content: '\f00c';
   font-family: 'FontAwesome';
   left: -32px;
-  top: -1px;
+  top: 1px;
   color: transparent;
   transition: color .2s;
 }
@@ -223,13 +229,12 @@ body {
   content: '\f00c';
   font-family: 'FontAwesome';
   left: -32px;
-  top: -1px;
+  top: 1px;
   color: transparent;
   transition: color .2s;
 }
-
 input[type="checkbox"]:checked + label span.checkbox::after {
-  color: #6C268A;
+  color: #6C2698;
 }
 input[type="checkbox"]:checked + label span.checkbox_red::after {
   color: #dc2127;
@@ -244,75 +249,7 @@ input[type="checkbox"]:checked + label span.checkbox_blue::after {
   color: #5184ed;
 }
 
-
-
-/* Button for music upload */
-
-#button-file {
-    color: #fff;
-    font-weight: bold;
-    border: 1px #999 solid;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    -o-border-radius: 3px;
-    border-radius: 3px;
-    background-color: #6C268A;
-    padding: 10px 5px;
-    margin-left: 10px;
-}
-#button-file:active {
-    background-color: #6C268A;
-}
-#button-file:hover {
-    cursor: pointer;
-}
-
-
-
-/* User Login Interface */
-
-#login{
-   border: 3px solid #6C268A ;
-   width: 35%;
-}
-
-input[type=text], input[type=password] {
-   width: 100%;
-   padding: 12px 12px;
-   margin: 8px 0;
-   display: inline-block;
-   border: 2px solid #ccc;
-   box-sizing: border-box;
-}
-
-button {
-   background-color: #6C268A ;
-   color: white;
-   padding: 14px 10px;
-   margin: 8px 0;
-   border: none;
-   cursor: pointer;
-   width: 30%;
-}
-
-span.psw {
-   float: right;
-   padding-top: 16px;
-}
-
-
-.form_container {
-  margin: 20px;
-  width: 80%;
-  margin-left: auto; 
-  margin-right: auto;
-}
-
-
-
-
-/*  Triangles to Show/Hide the functionality-checkboxes for each device  */
-
+/*  Triangle to show/hide the mirror functionalities  */
 #infoList {
 	margin-top: 20px;
 	margin-bottom: 50px;
@@ -320,20 +257,30 @@ span.psw {
 	list-style: none;
 	border: none;
 }
-
 .topic {
 	padding: 10px;
-	background: #f7f7f7;
-	border-bottom: 1px solid #e2e2e2;
-	box-shadow: inset 0 1px 2px #e2e2e2;
 }
-
-.mirrortext, .tvtext, .sonostext {
+.last_topic {
+	padding: 10px;
+	padding-bottom: 40px;
+	border-bottom: 2.5px solid #333332;
+}
+.mirrortext {
     display: none;
     padding: 10px;  
-    background: #fdfdfd;
 }
-
+.sonostext{
+	display: none;
+    padding: 20px; 
+    margin-left: 40px;
+}
+#SongURI{
+	width: 325px;
+	background-color: #F5F5F5;
+}
+#Sonos_URI{
+	padding-bottom: 10px;
+}
 input[type="checkbox"] {
     position: relative;
     float: right;
@@ -345,7 +292,6 @@ input[type="checkbox"] {
     opacity: 0;
     cursor: pointer;
 }
-
 .checkWrap {
 	position: relative;
 	float:right;
@@ -357,18 +303,14 @@ input[type="checkbox"] {
 	border-right: 10px solid transparent;
 	border-top: 15px solid #000;
 }
-
 input[type="checkbox"]:checked ~ .checkWrap {
 	border-bottom: 15px solid #000;	
 	border-top: 0;	
 }
-
 input[type="checkbox"]:checked ~ .mirrortext {
     display: block;
 }
-input[type="checkbox"]:checked ~ .tvtext {
-    display: block;
-}
+
 input[type="checkbox"]:checked ~ .sonostext {
     display: block;
 }

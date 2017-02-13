@@ -6,7 +6,7 @@ body {
     background: #000000 none repeat scroll 0 0;
     color: white;
     font-family: "Montserrat-Light", sans-serif;
-    font-size: 28px;
+    font-size: 25px;
     font-weight: bold;
     margin: 0;
     overflow: hidden;
@@ -14,10 +14,22 @@ body {
 
 #center {
   display: block;
-  padding: 50px 0px;
+  padding: 50px 50px;
   text-align: center;
   position: relative;
-  font-size: 60px;
+  font-size: 25px;
+}
+#center.traffic {
+  text-align: left;
+}
+
+#bottom {
+  display: block;
+  padding: 50px 50px;
+  text-align: left;
+  position: relative;
+  bottom: 0;
+  font-size: 25px;
 }
 
 canvas {
@@ -28,11 +40,11 @@ canvas {
 }
 
 .info{
-	font-size: 30px;
+	font-size: 10px;
 }
 
 .quote-size{
-	font-size: 30px;
+	font-size: 25px;
 }
 
 .center {
@@ -50,16 +62,19 @@ canvas {
   margin: 0 auto !important;
   top: 0;
   right: 0;
+    padding: 50px 50px;
 }
 .bottom-left {
   position: absolute !important;
   bottom: 0;
   left: 0;
+    padding: 50px 50px;
 }
 .bottom-right {
   position: absolute !important;
   bottom: 0;
   right: 0;
+  padding: 50px 50px;
 }
 
 .clear {

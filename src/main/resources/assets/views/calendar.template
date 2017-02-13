@@ -12,13 +12,8 @@
 
 <body>
 
-  <div id="center">
-		<div class="quote">
-			<blockquote class="quote-size">
-				<p>{Calendar}</p>
-				
-			</blockquote>
-		</div>
+    <div id="center">
+	{CALENDAR}
 	</div>
 
 

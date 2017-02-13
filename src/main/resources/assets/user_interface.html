@@ -1,0 +1,157 @@
+<body>
+
+	<div>
+		<ul id="infoList">
+
+			<li>
+				<div class="topic">
+					<img src="calendar-icon.png" alt="logo" id="app-image">
+				</div>
+				<div class="headline">Device Functionalities</div>
+			</li>
+
+			<!----- SMART MIRROR ------>
+			<li>
+				<div class="topic">
+					<div class="align_divs">Smart Mirror</div>
+					<div class="align_divs">
+						<div class="onoffswitch">
+							<input type="checkbox" name="onoffswitch"
+								class="onoffswitch-checkbox" id="mirror_checker"
+								onchange="saveMirrorEnabler()"> <label
+								class="onoffswitch-label" for="mirror_checker"> <span
+								class="onoffswitch-inner"></span> <span
+								class="onoffswitch-switch"></span>
+							</label>
+						</div>
+					</div>
+					<div style="clear: both"></div>
+				</div> <input type="checkbox" id="mirror_triangle" />
+				<div class="checkWrap"></div>
+
+				<div class="mirrortext">
+
+					<!-- Functionalities of the mirror -->
+					<div id="mirror_functionalities"
+						ng-controller="MirrorCheckboxController">
+						<section id="mirror_id" class="mirror">
+							<div class="container" ng-repeat="setting in settings">
+								<input type="checkbox" ng-attr-id="{{ setting.id }}"
+									ng-model="checkedElements[setting.id]"
+									ng-click="callSaveFunction(setting.id)"> <label
+									ng-attr-for="{{ setting.id }}"><span class="checkbox">{{setting.name}}</span></label>
+							</div>
+
+						</section>
+
+
+						<!--  Event types for personal schedule -->
+						<div ng-show="showEvents(checkedElements)" id="events">
+
+							<p class="smaller" style="padding-left: 50px;">Choose event
+								types to be displayed:</p>
+
+							<div class="event container smaller" id="event_padding">
+
+								<div class="align_events" style="padding-bottom: 5px">
+									<input type="checkbox" id="green" onchange="saveSportEnabler()">
+									<label for="green"><span class="checkbox_green">Sports</span></label>
+									<div style="clear: both"></div>
+								</div>
+
+								<div style="padding-bottom: 5px">
+									<input type="checkbox" id="red"
+										onchange="saveUniversityEnabler()"> <label for="red"><span
+										class="checkbox_red">University</span></label>
+								</div>
+
+								<div class="align_events">
+									<input type="checkbox" id="yellow"
+										onchange="saveFriendEnabler()"> <label for="yellow"><span
+										class="checkbox_yellow">Friends</span></label>
+									<div style="clear: both"></div>
+								</div>
+
+								<div>
+									<input type="checkbox" id="blue" onchange="saveOtherEnabler()">
+									<label for="blue"><span class="checkbox_blue">Other</span></label>
+								</div>
+
+							</div>
+
+
+						</div>
+
+					</div>
+				</div>
+
+			</li>
+
+
+			<!----- SONOS BOX ------>
+			<li>
+
+				<div class="topic">
+
+					<div class="align_divs">Sonos Box</div>
+					<div class="align_divs">
+						<div class="onoffswitch">
+							<input type="checkbox" name="onoffswitch"
+								class="onoffswitch-checkbox" id="sonos_checker"
+								onchange="saveSonosEnabler()"> <label
+								class="onoffswitch-label" for="sonos_checker"> <span
+								class="onoffswitch-inner"></span> <span
+								class="onoffswitch-switch"></span>
+							</label>
+						</div>
+					</div>
+					<div style="clear: both"></div>
+
+				</div> <input type="checkbox" id="sonos_triangle" />
+				<div class="checkWrap"></div> 
+				
+				<!-- Sonos Box URI  -->
+				<div class="sonostext smaller">
+					<form id="Sonos_URI">
+						<label>Select reminder URI:</label><br><br>
+						<input
+							type="text" placeholder="Enter your Song-URI here" name="SongURI"
+							id="SongURI" readonly>
+						<button type="submit" id="editButton">Edit</button>
+						<button type="submit" id="saveButton" onclick="saveURI()">Save</button>
+					</form>
+				</div>
+
+			</li>
+
+			<!----- Control Panel ------>
+			<li>
+
+				<div class="last_topic">
+
+					<div class="align_divs">Control Panel</div>
+					<div class="align_divs">
+						<div class="onoffswitch">
+							<input type="checkbox" name="onoffswitch"
+								class="onoffswitch-checkbox" id="panel_checker"
+								onchange="savePanelEnabler()"> <label
+								class="onoffswitch-label" for="panel_checker"> <span
+								class="onoffswitch-inner"></span> <span
+								class="onoffswitch-switch"></span>
+							</label>
+						</div>
+					</div>
+					<div style="clear: both"></div>
+
+				</div>
+
+
+			</li>
+
+
+		</ul>
+	</div>
+
+</body>
+
+
