@@ -1,5 +1,6 @@
 /**
  * Controller for User Interface
+ * @author: Lorenz Lichnofsky
  */
 
 (function() {

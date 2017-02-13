@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.iolite.app</groupId>
-	<artifactId>example-app</artifactId>
+	<artifactId>CalendarIntegration</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<name>IOLITE Example App</name>
-	<description>IOLITE Example App for testing purpose.</description>
+	<name>CalendarIntegration App</name>
+	<description>CalendarIntegration App for testing purpose.</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2016</inceptionYear>
 	<properties>

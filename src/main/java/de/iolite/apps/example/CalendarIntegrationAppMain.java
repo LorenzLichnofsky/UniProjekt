@@ -72,7 +72,7 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
  * @author Felix Rodemund edit by Group Calendar Integration
  * @since 1.0
  * 
- *        adjustments made be Calendar Group
+ *        adjustments made by Calendar Group
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
@@ -140,8 +140,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
 
 	DailyEvents calendar = null;
-
-	// TODO scheduler problem lösen
+	
 	Scheduler scheduler;
 	private ScheduledFuture<?> calendarUpdateThread = null;
 
@@ -284,7 +283,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					LOGGER.error("IllegalStateException!", e);
 				}
 
-				// TODO 1 to 15 min
+			// TODO 1 to 15 min
 			}, 0, 1, TimeUnit.MINUTES);
 
 			LOGGER.debug("Mirror Views got registered!");
@@ -306,7 +305,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	}
 
 	/**
-	 * sonos is true if sonos box has been activated by user. latest calendar
+	 * sonos is true if sonos box has been enabled by the user in the app interface. latest calendar
 	 * information is send to sonos controller
 	 * 
 	 * @param sonos
@@ -327,7 +326,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	}
 
 	/**
-	 * input parameters are true if views are selected by the user. latest
+	 * input parameters are true if views are enabled by the user in the user interface of the app. latest
 	 * calendar information is send to views.
 	 * 
 	 * @param mirror
@@ -529,7 +528,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		if (this.disposeableAssets != null) {
 			this.disposeableAssets.dispose();
 		}
-		// TODO
 		this.calendarUpdateThread.cancel(false);
 		LOGGER.debug("Stopped");
 	}
@@ -562,7 +560,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
              
              if (ID != null){
                  if (ID.equals("knx_kitchen_lcd0")){
-                	 // Find for the display device and its property 
+                	 // Find the display device and it's property 
                      
                      DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
                      
