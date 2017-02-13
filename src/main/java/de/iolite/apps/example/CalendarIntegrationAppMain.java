@@ -401,6 +401,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
 			}
 
+			
 		} else {
 			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
 					VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
