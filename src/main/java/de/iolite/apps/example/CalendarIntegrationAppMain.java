@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +31,19 @@ import de.iolite.api.IOLITEPermissionDeniedException;
 import de.iolite.api.heating.access.HeatingAPI;
 import de.iolite.api.heating.access.PlaceSchedule;
 import de.iolite.app.AbstractIOLITEApp;
+
 import de.iolite.app.api.device.DeviceAPIException;
+//import de.iolite.app.api.device.DeviceStringProperty;
+import de.iolite.app.api.device.DeviceProperty;
 import de.iolite.app.api.device.access.Device;
 import de.iolite.app.api.device.access.DeviceAPI;
 import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
+
+import de.iolite.app.api.device.access.DeviceStringProperty.DeviceStringPropertyObserver;
 import de.iolite.app.api.device.access.DeviceBooleanProperty;
 import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanPropertyObserver;
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
+import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
 import de.iolite.app.api.environment.Location;
 import de.iolite.app.api.frontend.FrontendAPI;
@@ -63,6 +70,7 @@ import de.iolite.common.requesthandler.StaticResources;
 import de.iolite.common.requesthandler.StaticResources.PathHandlerPair;
 import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleData;
+import de.iolite.data.GoogleEvent;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.insys.mirror.api.MirrorApiException;
 import de.iolite.utilities.disposeable.Disposeable;
@@ -402,10 +410,57 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	/**
 	 * Example method showing how to use the Device API.
+	 * @throws URISyntaxException 
+	 * @throws GeneralSecurityException 
+	 * @throws ParseException 
+	 * @throws IOException 
 	 */
 	private void initializeDeviceManager() {
+		for (final Device device: this.deviceAPI.getDevices()){
+		    
+	        String ID = device.getIdentifier();
+	                
+	                if (ID != null){
+	                    if (ID.equals("knx_kitchen_lcd0")){
+	                        
+	                        DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+	                        
+	                        if (displayProperty != null){
+	                            List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
+								new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
+								displayProperty.setObserver(new DeviceStringPropertyObserver(){
+
+								    @Override
+								    public void deviceChanged(Device arg0) {
+								        // TODO Auto-generated method stub
+								        
+								    }
+
+								    @Override
+								    public void keyChanged(String arg0) {
+								        // TODO Auto-generated method stub
+								        
+								    }
+
+								    @Override
+								    public void valueChanged(String arg0) {
+								        LOGGER.info("Changed TITLE!!!");
+								        
+								    }
+								    
+								});
+	                        }
+	                }else{
+	                    //LOGGER.info("Value is null!!");
+	                }
+	                }
+	        }
+		
+		
+		
 		// register a device observer
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
+		
 
 		// go through all devices, and register a property observer for ON/OFF properties
 		for (final Device device : this.deviceAPI.getDevices()) {
