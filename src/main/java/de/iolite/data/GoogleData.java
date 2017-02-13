@@ -137,6 +137,7 @@ public class GoogleData {
 		day.setHours(23);
 		day.setMinutes(59);
 		day.setSeconds(59);
+		
 		com.google.api.client.util.DateTime latest = new com.google.api.client.util.DateTime(
 				day);
 		// get all events of today from service
