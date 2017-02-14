@@ -21,6 +21,7 @@ public class EnvironmentController {
 	/**
 	 * @value - Type "at Home" in Iolite.
 	 */
+	
 	@Nonnull
 	private static final String SITUATION_TYPE_AT_HOME = "https://dev.iolite.de/situation/type#AtHome";
 
