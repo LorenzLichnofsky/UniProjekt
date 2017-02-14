@@ -20,20 +20,10 @@ import de.iolite.api.IOLITEAPINotResolvableException;
 import de.iolite.api.IOLITEAPIProvider;
 import de.iolite.api.IOLITEPermissionDeniedException;
 import de.iolite.app.AbstractIOLITEApp;
-
-import de.iolite.app.api.device.DeviceAPIException;
-//import de.iolite.app.api.device.DeviceStringProperty;
-import de.iolite.app.api.device.DeviceProperty;
-
-
 import de.iolite.app.api.device.access.Device;
 import de.iolite.app.api.device.access.DeviceAPI;
 import de.iolite.app.api.device.access.DeviceAPI.DeviceAPIObserver;
-
-
 import de.iolite.app.api.device.access.DeviceStringProperty.DeviceStringPropertyObserver;
-import de.iolite.app.api.device.access.DeviceBooleanProperty;
-import de.iolite.app.api.device.access.DeviceBooleanProperty.DeviceBooleanPropertyObserver;
 import de.iolite.app.api.device.access.DeviceDoubleProperty;
 import de.iolite.app.api.device.access.DeviceStringProperty;
 import de.iolite.app.api.environment.EnvironmentAPI;
@@ -58,7 +48,6 @@ import de.iolite.common.requesthandler.StaticResources;
 import de.iolite.common.requesthandler.StaticResources.PathHandlerPair;
 import de.iolite.data.DailyEvents;
 import de.iolite.data.GoogleData;
-import de.iolite.data.GoogleEvent;
 import de.iolite.drivers.basic.DriverConstants;
 import de.iolite.insys.mirror.api.MirrorApiException;
 import de.iolite.utilities.disposeable.Disposeable;
@@ -286,7 +275,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					LOGGER.error("IllegalStateException!", e);
 				}
 
-			// TODO 1 to 15 min
+			// change the update time here 
 			}, 0, 1, TimeUnit.MINUTES);
 
 			LOGGER.debug("Mirror Views got registered!");
@@ -309,10 +298,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 	/**
 	 * sonos is true if sonos box has been enabled by the user in the app interface. latest calendar
-	 * information is send to sonos controller
-	 * 
-	 * @param sonos
-	 * 
+	 * information is send to sonos controller	 * 
+	 * @param sonos	 * 
 	 * @throws IOException
 	 * @throws ParseException
 	 * @throws GeneralSecurityException
@@ -351,7 +338,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			if (calendarBool) {
 
 				getCalendar();
-
+				LOGGER.warn(CalendarIntegrationAppMain.this.calendar.toString());
 				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
 						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
 				templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
@@ -596,7 +583,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 							});
                      }
              }else{
-                 //LOGGER.info("Value is null!!");
+               
              }
              }
 		}
