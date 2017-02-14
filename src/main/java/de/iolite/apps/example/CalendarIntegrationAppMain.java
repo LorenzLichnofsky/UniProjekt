@@ -94,6 +94,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	/** sonos assets */
 	SonosController sonosController = new SonosController();
 	StorageController storageController;
+	EnvironmentController environmentController;
 
 	/**
 	 * Mirror variables basic idea is taken over from Hendrik Motza from
@@ -201,6 +202,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 			// Environment API gives a access for rooms, current situation etc.
 			this.environmentAPI = context.getAPI(EnvironmentAPI.class);
+			initializeEnvironment();
 
 			// Device API gives access to devices connected to IOLITE
 			this.deviceAPI = context.getAPI(DeviceAPI.class);
@@ -238,6 +240,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					 */
 
 					this.storageAPI = context.getAPI(StorageAPI.class);
+					this.environmentAPI = context.getAPI(EnvironmentAPI.class);
 
 					boolean mirror = "true".equals(getStringorDefault("Mirror", "false"));
 					boolean weather = "true".equals(getStringorDefault("Mirror_Weather", "false"));
@@ -518,6 +521,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		LOGGER.debug("Stopped");
 	}
 
+	private void initializeEnvironment(){
+		this.environmentController = new EnvironmentController(this.environmentAPI);
+	}
 	/**
 	 * Example method showing how to use the Device API.
 	 * @throws URISyntaxException 
@@ -538,7 +544,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			LOGGER.debug(device.getIdentifier());
 
 			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
-				this.sonosController.setSonos(device, this.scheduler, new EnvironmentController(this.environmentAPI),
+				this.sonosController.setSonos(device, this.scheduler, this.environmentController,
 						calendar, this.storageController);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			}

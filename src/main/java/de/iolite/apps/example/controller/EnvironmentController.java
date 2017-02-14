@@ -21,8 +21,9 @@ public class EnvironmentController {
 	/**
 	 * @value - Type "at Home" in Iolite.
 	 */
+	
 	@Nonnull
-	private static final String SITUATION_TYPE_AT_HOME = "https://dev.iolite.de/situation/profile#Home";
+	private static final String SITUATION_TYPE_AT_HOME = "https://dev.iolite.de/situation/type#AtHome";
 
 	@Nonnull
 	private final EnvironmentAPI api;
@@ -46,7 +47,7 @@ public class EnvironmentController {
 	 * @return boolean - value of the users current situation.
 	 */
 	public boolean isUserAtHome() {
-		LOGGER.debug("Current Situation is: '{}'", this.api.getSituationProfileIdentifier());
-		return SITUATION_TYPE_AT_HOME.equals(this.api.getSituationProfileIdentifier());
+		LOGGER.debug("Current Situation is: '{}'", this.api.getCurrentSituationIdentifier());
+		return SITUATION_TYPE_AT_HOME.equals(this.api.getCurrentSituationIdentifier());
 	}
 }
