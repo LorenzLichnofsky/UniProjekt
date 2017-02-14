@@ -269,7 +269,7 @@ public class GoogleData {
 		}
 		
 		return todayFinal;
+		
 
-	}		
-
+	}
 }
