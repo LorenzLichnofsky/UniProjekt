@@ -226,7 +226,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			deviceAPI.setObserver(this.viewRegistrator);
 			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
 
-			/** scheduler that updates the calendar information every 15 min */
+			/** scheduler that updates the calendar information every 1 min */
 			this.calendarUpdateThread = scheduler.scheduleAtFixedRate(() -> {
 
 
