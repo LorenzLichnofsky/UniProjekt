@@ -294,6 +294,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 
 		LOGGER.debug("Started");
+		
 	}
 
 	/**
