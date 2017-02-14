@@ -433,7 +433,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
 				
 				if (time > 0) {
-					LOGGER.warn("Die Location ist:" + this.calendar.getTodayEvents().get(i).getLocation().split(",")[0]);
 					if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
 						final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
 								VIEW_ID_TRAFFIC);
@@ -544,6 +543,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			}
 			 String ID = device.getIdentifier();
+			 
+			 LOGGER.warn("Die ID ist: " + ID);
              
              if (ID != null){
                  if (ID.equals("knx_kitchen_lcd0")){
