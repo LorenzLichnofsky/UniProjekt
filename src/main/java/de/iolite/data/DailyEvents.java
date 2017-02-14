@@ -2,9 +2,17 @@ package de.iolite.data;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+import de.iolite.apps.example.devices.SonosController;
 
 /** 
  * This class stores all the DAILY events and their attributes.
@@ -133,10 +141,10 @@ public class DailyEvents {
 		} else {
 			todayEventsReduced = todayEventsSorted;
 		}
-	
-		
+
 		return new DailyEvents(todayEventsReduced);
 	}
+	
 
 	/**
 	 * Sonos searching for the exact time of the reminder of all daily events 
@@ -156,14 +164,28 @@ public class DailyEvents {
                 			for(int j= 0; j<event.notifications.size(); j++){
            
                 			Date date = event.notifications.get(j).getTime();
-                			reminders.add(date);
-                			}
+                			
+                			final long millisToEvent = date.getTime() - System.currentTimeMillis();
+        					
+                			if (millisToEvent < 0) {
+                				continue;
+        					} else {		
+        							reminders.add(date);
+        					}
                 		} 
     			}
     		}
-			return reminders;	
-    	}
-
-
-	
+    		
+    			  //Sort the list so that the reminder, that is in the nearest future is at the first place.
+    			  Collections.sort(reminders, new Comparator<Date>(){
+    				  
+    		            @Override
+    		            public int compare(Date d1, Date d2) {
+    		                return d1.compareTo(d2);
+    		            }
+    		        });		  
+   	}
+    		
+			return reminders;
+	}
 }

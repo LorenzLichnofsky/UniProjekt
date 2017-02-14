@@ -4,6 +4,7 @@ package de.iolite.apps.example.devices;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -48,6 +49,12 @@ public class SonosController {
 		
 		@Nonnull 
 		private final StorageController storageController;
+		
+		@Nonnull
+		private ScheduledFuture<?> SonosScheduledFuture = null;
+		
+		private List<Date> newReminders = null;
+		private List<Date> oldReminders = null;
 
 		/**
 		 * Constructor of the class Configured.
@@ -90,22 +97,27 @@ public class SonosController {
 		@Override
 		public void playSongAt(@Nonnull final SonosController context, @Nonnull final DailyEvents dailyEvents, @Nonnull final StorageController storageController) {
 		
+			//Write reminders in a list of old reminders before getting the actual reminders
+			if (newReminders != null){
+				this.oldReminders = this.newReminders;
+			}
+		
 		//Get reminders from dailyEvents class.
-		List<Date> reminders = dailyEvents.getAlarm();
+		this.newReminders = dailyEvents.getAlarm();
 		
 		//Check wheteher reminders are empty
-			if (!reminders.isEmpty()){
-				for (Date d: reminders){
+			if (!newReminders.isEmpty()){	
+				
+					Date reminderTime = newReminders.get(0);
+				
+					final long millisToEvent = reminderTime.getTime() - System.currentTimeMillis();
 					
-					//Check if reminder time is in the past and if so do not schedule a reminder task.
-					final long millisToEvent = d.getTime() - System.currentTimeMillis();
-					if (millisToEvent < 0) {
-						LOGGER.warn("Cannot schedule timer for past date '%s'", d);
-					} else {
-						this.taskScheduler.schedule(this::addSong, millisToEvent, TimeUnit.MILLISECONDS);
-						LOGGER.debug("Scheduled SONOS 'addSong' task in {}s", TimeUnit.MILLISECONDS.toSeconds(millisToEvent));
-					}
-				}
+					this.taskScheduler.schedule(() -> {
+						
+					this.addSong(reminderTime);}, millisToEvent, TimeUnit.MILLISECONDS);
+					LOGGER.debug("Scheduled SONOS 'addSong' task in {}s", TimeUnit.MILLISECONDS.toSeconds(millisToEvent));
+					
+				
 			} else {
 				LOGGER.warn("No reminders. Sonos will not be scheduled!");
 			}
@@ -116,15 +128,21 @@ public class SonosController {
 		 * @see StorageController
 		 * @see EnvironmentController
 		 */
-		private void addSong() {
+		private void addSong(Date reminderTime) {
 			
 			//Checks whether user enabled Sonos Box in the UI
 			if (this.storageController.isSonosEnabled()){
 				
 				//Checks whether the user is currently at home.
 				if (this.environment.isUserAtHome()) {
-					LOGGER.debug("User is at home, adding song to SONOS");
-					SonosMusic.playSong(this.sonosDevice, this.taskScheduler, this.storageController);
+					
+					//Checks whether this task is valid or updated.
+					if (isReminderUpToDate(reminderTime)){
+						LOGGER.debug("User is at home, adding song to SONOS");
+						SonosMusic.playSong(this.sonosDevice, this.taskScheduler, this.storageController);
+					} else {
+						//LOGGER.debug("This Reminder is not up to date. Task will not be scheduled!");
+					}
 				} else {
 					LOGGER.debug("User is not at home, SONOS song will not be added.");
 				}
@@ -132,6 +150,26 @@ public class SonosController {
 			} else {
 				LOGGER.warn("Sonos is not enabled. Song will not be added.");
 			}
+		}
+		
+		/**
+		 * Checks whether the reminder is the first reminder in the list. If not, reminders are updated and the task is not up to date.
+		 * @param reminderTime
+		 * @return boolean
+		 */
+		private Boolean isReminderUpToDate(Date reminderTime){
+			
+			if (this.newReminders !=null && this.oldReminders !=null){
+				
+				Date actualReminder = this.newReminders.get(0);
+				
+				
+				if (actualReminder.equals(reminderTime)){
+					return true;
+				}
+				
+			}
+			return false;
 		}
 
 		@Override
