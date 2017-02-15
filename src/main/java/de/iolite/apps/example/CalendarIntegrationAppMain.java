@@ -296,14 +296,16 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 											.equals(getStringorDefault(
 													"ControlPanel", "false"));
 
-									sonosActive(sonos);
-									mirrorActive(mirror, weather, clock,
-											calendarBool, traffic);
-
-
-					sonosActive(sonos);
-					mirrorActive(mirror, weather, clock, calendarBool, traffic);
-					controlPanel(controlPanel);
+								sonosActive(sonos);
+								mirrorActive(mirror, weather, clock, calendarBool, traffic);
+								
+								
+								/**
+								 * Here the appointment information are supposed to be pushed to the Control Panel. However, we needed to 
+								 * comment the method out, since the Logic is not working properly and seems to be caught in an infinit loop.
+								 * To make sure that the rest of the app is not influenced and will be updated regularly, the method is not called.
+								 */
+								// controlPanel(controlPanel);
 
 								} catch (final MirrorApiException e) {
 									LOGGER.error("MirrorApiException", e);
@@ -362,6 +364,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		
 		if(controlPanel){
 			
+			LOGGER.warn("Start listing Identifiers:");
+			
 			for (final Device device : this.deviceAPI.getDevices()) {
 
 				LOGGER.debug(device.getIdentifier());
@@ -372,10 +376,14 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	                 if (ID.equals("knx_kitchen_lcd0")){
 	                	 // Find the display device and it's property 
 	                     
-	                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+	                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROFILE_PROPERTY_TV_programName_ID);
+	                     LOGGER.warn("displayProperty: " + displayProperty);
+	                     
 	                     
 	                     if (displayProperty != null){
+	                    	 LOGGER.warn("displayProperty is not equals null");
 	                         List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
+	                         LOGGER.warn("Messages to display: " + messagesToDisplay + "");
 								new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
 								displayProperty.setObserver(new DeviceStringPropertyObserver(){
 
@@ -603,8 +611,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 						break;
 					} // else
 				} // if
-				//TODO Ariane neu! check with Lorenz
-				if (time > 0 && i == this.calendar.getTodayEvents().size()-1 ){
+
+				LOGGER.warn(i+ " "+ time + ", " + (this.calendar.getTodayEvents().size()-1)+"" + "CHECKER" );
+				if (time <= 0 && i == this.calendar.getTodayEvents().size()-1 ){
+					LOGGER.warn("bin drin ");
 					final TemplateConfig templateConf_traffic = new TemplateConfig(
 							VIEW_RESPATH_EMPTY_TRAFFIC,
 							VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
@@ -728,7 +738,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					// Find the display device and it's property
 
 					DeviceStringProperty displayProperty = device
-							.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+							.getStringProperty(DriverConstants.PROPERTY_programName_NAME);
 
 					if (displayProperty != null) {
 						List<String> messagesToDisplay = GoogleEventProcessor

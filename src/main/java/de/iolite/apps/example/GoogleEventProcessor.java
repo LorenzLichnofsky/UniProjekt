@@ -14,8 +14,8 @@ public class GoogleEventProcessor {
 	 * selects the upcoming event, and builds a list of strings with the event's name, beginning time, end time and location
 	 */
 	public static List<String> getUpcomingEventMessages() {
-		List<String> results = new ArrayList<>();
-		List<GoogleEvent> todayEvents;
+		List<String> results = new ArrayList<String>();
+		List<GoogleEvent> todayEvents = new ArrayList<GoogleEvent>();
 		try {
 			todayEvents = new GoogleData().getData().getTodayEvents();
 		} catch (Exception e) {
