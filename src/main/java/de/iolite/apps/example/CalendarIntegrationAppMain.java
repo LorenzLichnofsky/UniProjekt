@@ -254,6 +254,7 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 					sonosActive(sonos);
 					mirrorActive(mirror, weather, clock, calendarBool, traffic);
+					controlPanel(controlPanel);
 
 				} catch (final MirrorApiException e) {
 					LOGGER.error("MirrorApiException", e);
@@ -294,6 +295,59 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 
 		LOGGER.debug("Started");
+		
+	}
+
+	private void controlPanel(boolean controlPanel) {
+
+		// Find Driver of the Sonos Box and make Settings in the sonosController
+		// Class
+		
+		if(controlPanel){
+			
+			for (final Device device : this.deviceAPI.getDevices()) {
+
+				LOGGER.debug(device.getIdentifier());
+
+				 String ID = device.getIdentifier();
+	             
+	             if (ID != null){
+	                 if (ID.equals("knx_kitchen_lcd0")){
+	                	 // Find the display device and it's property 
+	                     
+	                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+	                     
+	                     if (displayProperty != null){
+	                         List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
+								new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
+								displayProperty.setObserver(new DeviceStringPropertyObserver(){
+
+								    @Override
+								    public void deviceChanged(Device arg0) {
+								    }
+
+								    @Override
+								    public void keyChanged(String arg0) {
+								    }
+
+								    @Override
+								    public void valueChanged(String arg0) {
+								        LOGGER.info("Changed TITLE!!!");
+								        
+								    }
+								    
+								});
+	                     }
+	             }else{
+	               
+	             }
+	             }
+			}
+			
+		}
+		
+		
+	
 		
 	}
 
@@ -549,45 +603,6 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 						calendar, this.storageController);
 				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
 			}
-			 String ID = device.getIdentifier();
-			 
-			 LOGGER.warn("Die ID ist: " + ID);
-             
-             if (ID != null){
-                 if (ID.equals("knx_kitchen_lcd0")){
-                	 // Find the display device and it's property 
-                     
-                     DeviceStringProperty displayProperty = device.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
-                     
-                     if (displayProperty != null){
-                         List<String> messagesToDisplay = GoogleEventProcessor.getUpcomingEventMessages();
-							new ScrollingPublisher().pushMessages(displayProperty, messagesToDisplay);
-							displayProperty.setObserver(new DeviceStringPropertyObserver(){
-
-							    @Override
-							    public void deviceChanged(Device arg0) {
-							        // TODO Auto-generated method stub
-							        
-							    }
-
-							    @Override
-							    public void keyChanged(String arg0) {
-							        // TODO Auto-generated method stub
-							        
-							    }
-
-							    @Override
-							    public void valueChanged(String arg0) {
-							        LOGGER.info("Changed TITLE!!!");
-							        
-							    }
-							    
-							});
-                     }
-             }else{
-               
-             }
-             }
 		}
 	
 
