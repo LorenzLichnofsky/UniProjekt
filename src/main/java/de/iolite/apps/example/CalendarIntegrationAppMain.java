@@ -65,7 +65,8 @@ import de.iolite.utilities.concurrency.scheduler.Scheduler;
  */
 public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
-	private static final class DeviceAddAndRemoveLogger implements DeviceAPIObserver {
+	private static final class DeviceAddAndRemoveLogger implements
+			DeviceAPIObserver {
 
 		@Override
 		public void addedToDevices(final Device device) {
@@ -78,8 +79,10 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		}
 	}
 
+	
 	@Nonnull
-	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarIntegrationAppMain.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(CalendarIntegrationAppMain.class);
 
 	/** App APIs */
 	private FrontendAPI frontendAPI;
@@ -106,31 +109,42 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private static final String APP_ID = "de.iolite.apps.example.CalendarIntegrationAppMain";
 
 	private static final String VIEW_ID_CALENDAR = "CalendarView";
-	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar-icon.jpg";
-	private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES + "calendar.html";
-	private static final String VIEW_TEMPLATE_CALENDAR = VIEW_RESOURCES + "calendar.template";
+	private static final String ICON_RESPATH_CALENDAR = VIEW_RESOURCES
+			+ "calendar-icon.jpg";
+	private static final String VIEW_RESPATH_CALENDAR = VIEW_RESOURCES
+			+ "calendar.html";
+	private static final String VIEW_TEMPLATE_CALENDAR = VIEW_RESOURCES
+			+ "calendar.template";
 	private static final String VIEW_WEBPATH_CALENDAR = "calendar.html";
 
 	private static final String VIEW_ID_CLOCK = "DateTimeView";
-	private static final String ICON_RESPATH_CLOCK = VIEW_RESOURCES + "clock-icon.jpg";
-	private static final String VIEW_RESPATH_CLOCK = VIEW_RESOURCES + "clock.html";
+	private static final String ICON_RESPATH_CLOCK = VIEW_RESOURCES
+			+ "clock-icon.jpg";
+	private static final String VIEW_RESPATH_CLOCK = VIEW_RESOURCES
+			+ "clock.html";
 	private static final String VIEW_WEBPATH_CLOCK = "clock.html";
 
 	private static final String VIEW_ID_TRAFFIC = "TrafficView";
-	private static final String ICON_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic-icon.jpg";
-	private static final String VIEW_RESPATH_TRAFFIC = VIEW_RESOURCES + "traffic.html";
+	private static final String ICON_RESPATH_TRAFFIC = VIEW_RESOURCES
+			+ "traffic-icon.jpg";
+	private static final String VIEW_RESPATH_TRAFFIC = VIEW_RESOURCES
+			+ "traffic.html";
 	private static final String VIEW_WEBPATH_TRAFFIC = "traffic.html";
-	
-	private static final String VIEW_RESPATH_EMPTY_TRAFFIC = VIEW_RESOURCES + "empty_traffic.html";
-	private static final String VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC = VIEW_RESOURCES + "no_appointment_traffic.html";
+
+	private static final String VIEW_RESPATH_EMPTY_TRAFFIC = VIEW_RESOURCES
+			+ "empty_traffic.html";
+	private static final String VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC = VIEW_RESOURCES
+			+ "no_appointment_traffic.html";
 
 	private static final String VIEW_ID_WEATHER = "WeatherView";
-	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES + "weather-icon.jpg";
-	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES + "weather.html";
+	private static final String ICON_RESPATH_WEATHER = VIEW_RESOURCES
+			+ "weather-icon.jpg";
+	private static final String VIEW_RESPATH_WEATHER = VIEW_RESOURCES
+			+ "weather.html";
 	private static final String VIEW_WEBPATH_WEATHER = "weather.html";
 
 	DailyEvents calendar = null;
-	
+
 	Scheduler scheduler;
 	private ScheduledFuture<?> calendarUpdateThread = null;
 
@@ -166,7 +180,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			GoogleData data = new GoogleData();
 			this.calendar = data.getData();
 			LOGGER.info(this.calendar.toString());
-		} catch (IOException | ParseException | GeneralSecurityException | URISyntaxException e) {
+		} catch (IOException | ParseException | GeneralSecurityException
+				| URISyntaxException e) {
 			LOGGER.error("ERROR while getting calendar.getData()");
 		}
 	}
@@ -175,7 +190,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void startHook(@Nonnull final IOLITEAPIProvider context) throws StartFailedException {
+	protected final void startHook(@Nonnull final IOLITEAPIProvider context)
+			throws StartFailedException {
 		// here the IOLITE App is started
 		// the context gives access to IOLITE App APIs
 		LOGGER.debug("Starting");
@@ -187,8 +203,9 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 
 			// use User API
 			this.userAPI = context.getAPI(UserAPI.class);
-			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI.getUser().getIdentifier(),
-					this.userAPI.getUser().getLocale());
+			LOGGER.debug("Running for user '{}' with locale '{}'", this.userAPI
+					.getUser().getIdentifier(), this.userAPI.getUser()
+					.getLocale());
 
 			// Storage API enables the App to store data persistently
 			// whatever is stored via the storage API will also be available if
@@ -214,87 +231,127 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			try {
 				userApi = context.getAPI(UserAPI.class);
 				userId = userApi.getUser().getIdentifier();
-			} catch (final IOLITEAPINotResolvableException | IOLITEPermissionDeniedException e) {
+			} catch (final IOLITEAPINotResolvableException
+					| IOLITEPermissionDeniedException e) {
 				LOGGER.error(MSG_ERR_RETRIEVE_USERAPI, e);
 				throw new StartFailedException(MSG_ERR_RETRIEVE_USERAPI, e);
 			}
 			/** Register different Views for Mirror */
-			final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(VIEW_RESOURCES);
-			staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK, ICON_RESPATH_CLOCK);
-			staticResourceConfig.addView(VIEW_ID_TRAFFIC, VIEW_RESPATH_TRAFFIC, ICON_RESPATH_TRAFFIC);
-			staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER, ICON_RESPATH_WEATHER);
-			staticResourceConfig.addView(VIEW_ID_CALENDAR, VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
-			this.viewRegistrator = new ViewRegistrator(staticResourceConfig, APP_ID, userId);
+			final ResourcePackageConfig staticResourceConfig = new ResourcePackageConfig(
+					VIEW_RESOURCES);
+			staticResourceConfig.addView(VIEW_ID_CLOCK, VIEW_RESPATH_CLOCK,
+					ICON_RESPATH_CLOCK);
+			staticResourceConfig.addView(VIEW_ID_TRAFFIC, VIEW_RESPATH_TRAFFIC,
+					ICON_RESPATH_TRAFFIC);
+			staticResourceConfig.addView(VIEW_ID_WEATHER, VIEW_RESPATH_WEATHER,
+					ICON_RESPATH_WEATHER);
+			staticResourceConfig.addView(VIEW_ID_CALENDAR,
+					VIEW_RESPATH_CALENDAR, ICON_RESPATH_CALENDAR);
+			this.viewRegistrator = new ViewRegistrator(staticResourceConfig,
+					APP_ID, userId);
 			deviceAPI.setObserver(this.viewRegistrator);
-			deviceAPI.getDevices().forEach(this.viewRegistrator::addedToDevices);
+			deviceAPI.getDevices()
+					.forEach(this.viewRegistrator::addedToDevices);
 
-			/** scheduler that updates the calendar information every 15 min */
-			this.calendarUpdateThread = scheduler.scheduleAtFixedRate(() -> {
+			/** scheduler that updates the calendar information every 1 min */
+			this.calendarUpdateThread = scheduler
+					.scheduleAtFixedRate(
+							() -> {
 
+								try {
 
-				try {
+									/**
+									 * Update storage API and based on user
+									 * interface settings update device
+									 * functionalities
+									 */
 
-					/**
-					 * Update storage API and based on user interface settings
-					 * update device functionalities
-					 */
+									this.storageAPI = context
+											.getAPI(StorageAPI.class);
+									this.environmentAPI = context
+											.getAPI(EnvironmentAPI.class);
 
-					this.storageAPI = context.getAPI(StorageAPI.class);
-					this.environmentAPI = context.getAPI(EnvironmentAPI.class);
+									boolean mirror = "true"
+											.equals(getStringorDefault(
+													"Mirror", "false"));
+									boolean weather = "true"
+											.equals(getStringorDefault(
+													"Mirror_Weather", "false"));
+									boolean clock = "true"
+											.equals(getStringorDefault(
+													"Mirror_Clock", "false"));
+									boolean calendarBool = "true"
+											.equals(getStringorDefault(
+													"Mirror_Calendar", "false"));
+									boolean traffic = "true"
+											.equals(getStringorDefault(
+													"Mirror_Traffic", "false"));
+									boolean sonos = "true"
+											.equals(getStringorDefault("Sonos",
+													"false"));
+									String sonosURI = getStringorDefault(
+											"SonosURI",
+											"http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
+									boolean controlPanel = "true"
+											.equals(getStringorDefault(
+													"ControlPanel", "false"));
 
-					boolean mirror = "true".equals(getStringorDefault("Mirror", "false"));
-					boolean weather = "true".equals(getStringorDefault("Mirror_Weather", "false"));
-					boolean clock = "true".equals(getStringorDefault("Mirror_Clock", "false"));
-					boolean calendarBool = "true".equals(getStringorDefault("Mirror_Calendar", "false"));
-					boolean traffic = "true".equals(getStringorDefault("Mirror_Traffic", "false"));
-					boolean sonos = "true".equals(getStringorDefault("Sonos", "false"));
-					String sonosURI = getStringorDefault("SonosURI",
-							"http://downloads.hendrik-motza.de/Annoying_Alarm_Clock.mp3");
-					boolean controlPanel = "true".equals(getStringorDefault("ControlPanel", "false"));
+									sonosActive(sonos);
+									mirrorActive(mirror, weather, clock,
+											calendarBool, traffic);
+
 
 					sonosActive(sonos);
 					mirrorActive(mirror, weather, clock, calendarBool, traffic);
 					controlPanel(controlPanel);
 
-				} catch (final MirrorApiException e) {
-					LOGGER.error("MirrorApiException", e);
-				} catch (GeneralSecurityException e) {
-					LOGGER.error("GeneralSecurityException", e);
-				} catch (URISyntaxException e) {
-					LOGGER.error("URISyntaxException", e);
-				} catch (StorageAPIException e) {
-					LOGGER.error("StorageAPIException", e);
-				} catch (IOLITEAPINotResolvableException e) {
-					LOGGER.error("IOLITEAPINotResolvableException", e);
-				} catch (IOLITEPermissionDeniedException e) {
-					LOGGER.error("IOLITEPermissionDeniedException", e);
-				} catch (IOException e) {
-					LOGGER.error("IOException!", e);
-				} catch (ParseException e) {
-					LOGGER.error("ParseException!", e);
-				} catch (IllegalStateException e) {
-					LOGGER.error("IllegalStateException!", e);
-				}
-
-			// change the update time here 
-			}, 0, 1, TimeUnit.MINUTES);
+								} catch (final MirrorApiException e) {
+									LOGGER.error("MirrorApiException", e);
+								} catch (GeneralSecurityException e) {
+									LOGGER.error("GeneralSecurityException", e);
+								} catch (URISyntaxException e) {
+									LOGGER.error("URISyntaxException", e);
+								} catch (StorageAPIException e) {
+									LOGGER.error("StorageAPIException", e);
+								} catch (IOLITEAPINotResolvableException e) {
+									LOGGER.error(
+											"IOLITEAPINotResolvableException",
+											e);
+								} catch (IOLITEPermissionDeniedException e) {
+									LOGGER.error(
+											"IOLITEPermissionDeniedException",
+											e);
+								} catch (IOException e) {
+									LOGGER.error("IOException!", e);
+								} catch (ParseException e) {
+									LOGGER.error("ParseException!", e);
+								} catch (IllegalStateException e) {
+									LOGGER.error("IllegalStateException!", e);
+								}
+							// change the update time here
+							}, 0, 1, TimeUnit.MINUTES);
 
 			LOGGER.debug("Mirror Views got registered!");
 
 		} catch (final IOLITEAPINotResolvableException e) {
 			throw new StartFailedException(
-					MessageFormat.format("Start failed due to required but not resolvable AppAPI: {0}", e.getMessage()),
-					e);
+					MessageFormat.format(
+							"Start failed due to required but not resolvable AppAPI: {0}",
+							e.getMessage()), e);
 		} catch (final IOLITEPermissionDeniedException e) {
-			throw new StartFailedException(MessageFormat
-					.format("Start failed due to permission denied problems in the examples: {0}", e.getMessage()), e);
+			throw new StartFailedException(
+					MessageFormat.format(
+							"Start failed due to permission denied problems in the examples: {0}",
+							e.getMessage()), e);
 		} catch (final StorageAPIException | FrontendAPIException e) {
 			throw new StartFailedException(
-					MessageFormat.format("Start failed due to an error in the App API examples: {0}", e.getMessage()),
-					e);
+					MessageFormat.format(
+							"Start failed due to an error in the App API examples: {0}",
+							e.getMessage()), e);
 		}
 
 		LOGGER.debug("Started");
+
 		
 	}
 
@@ -346,33 +403,34 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			
 		}
 		
-		
-	
-		
+
 	}
 
 	/**
-	 * sonos is true if sonos box has been enabled by the user in the app interface. latest calendar
-	 * information is send to sonos controller	 * 
-	 * @param sonos	 * 
+	 * sonos is true if sonos box has been enabled by the user in the app
+	 * interface. latest calendar information is send to sonos controller *
+	 * 
+	 * @param sonos
+	 *            *
 	 * @throws IOException
 	 * @throws ParseException
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
 	 */
-	private void sonosActive(boolean sonos)
-			throws IOException, ParseException, GeneralSecurityException, URISyntaxException {
+	private void sonosActive(boolean sonos) throws IOException, ParseException,
+			GeneralSecurityException, URISyntaxException {
 
 		if (sonos) {
 			GoogleData calendar_data = new GoogleData();
 			this.calendar = calendar_data.getData();
-			this.sonosController.playSongAt(this.calendar, this.storageController);
+			this.sonosController.playSongAt(this.calendar,
+					this.storageController);
 		}
 	}
 
 	/**
-	 * input parameters are true if views are enabled by the user in the user interface of the app. latest
-	 * calendar information is send to views.
+	 * input parameters are true if views are enabled by the user in the user
+	 * interface of the app. latest calendar information is send to views.
 	 * 
 	 * @param mirror
 	 * @param weather
@@ -386,86 +444,110 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws GeneralSecurityException
 	 * @throws URISyntaxException
 	 */
-	private void mirrorActive(boolean mirror, boolean weather, boolean clock, boolean calendarBool, boolean traffic)
-			throws StorageAPIException, IOException, ParseException, GeneralSecurityException, URISyntaxException {
+	private void mirrorActive(boolean mirror, boolean weather, boolean clock,
+			boolean calendarBool, boolean traffic) throws StorageAPIException,
+			IOException, ParseException, GeneralSecurityException,
+			URISyntaxException {
 		if (mirror) {
 
 			if (calendarBool) {
 
 				getCalendar();
 				LOGGER.warn(CalendarIntegrationAppMain.this.calendar.toString());
-				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
-						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
-				templateConf_calendar.putReplacement("{CALENDAR}", CalendarIntegrationAppMain.this.calendar.toString());
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+				final TemplateConfig templateConf_calendar = new TemplateConfig(
+						VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR,
+						VIEW_ID_CALENDAR);
+				templateConf_calendar.putReplacement("{CALENDAR}",
+						CalendarIntegrationAppMain.this.calendar.toString());
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_calendar);
 			} // calendar is active
 
 			else {
-				final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
-						VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+				final TemplateConfig templateConf_calendar = new TemplateConfig(
+						VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR,
+						VIEW_ID_CALENDAR);
 				templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_calendar);
 
 			}
 
 			if (weather) {
 
-				final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
-						VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+				final TemplateConfig templateConf_weather = new TemplateConfig(
+						VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER,
+						VIEW_ID_WEATHER);
 				refreshWeather();
-				templateConf_weather.putReplacement("{WEATHER}", this.temperature + " &deg C");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+				templateConf_weather.putReplacement("{WEATHER}",
+						this.temperature + " &deg C");
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_weather);
 			} // weather is active
 			else {
-				final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER,
-						VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
+				final TemplateConfig templateConf_weather = new TemplateConfig(
+						VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER,
+						VIEW_ID_WEATHER);
 				templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_weather);
 			}
 			if (clock) {
-				final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
-						VIEW_ID_CLOCK);
-				templateConf_clock.putReplacement("&nbsp;", "<script src='js/datetime.js'></script>");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+				final TemplateConfig templateConf_clock = new TemplateConfig(
+						VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK, VIEW_ID_CLOCK);
+				templateConf_clock.putReplacement("&nbsp;",
+						"<script src='js/datetime.js'></script>");
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_clock);
 			} // clock is active
 			if (!clock) {
-				final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
-						VIEW_ID_CLOCK);
-				templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+				final TemplateConfig templateConf_clock = new TemplateConfig(
+						VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK, VIEW_ID_CLOCK);
+				templateConf_clock.putReplacement(
+						"<script src='js/datetime.js'></script>", "&nbsp;");
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_clock);
 			}
 
 			if (traffic) {
 				trafficActive();
 			} // traffic is active
 			if (!traffic) {
-				final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
-						VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+				final TemplateConfig templateConf_traffic = new TemplateConfig(
+						VIEW_RESPATH_EMPTY_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+						VIEW_ID_TRAFFIC);
 				templateConf_traffic.putReplacement("{TRAFFIC}", "&nbsp;");
-				CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+				CalendarIntegrationAppMain.this.viewRegistrator
+						.updateTemplatePage(templateConf_traffic);
 			}
 
-			
 		} else {
-			final TemplateConfig templateConf_calendar = new TemplateConfig(VIEW_TEMPLATE_CALENDAR,
-					VIEW_WEBPATH_CALENDAR, VIEW_ID_CALENDAR);
+			final TemplateConfig templateConf_calendar = new TemplateConfig(
+					VIEW_TEMPLATE_CALENDAR, VIEW_WEBPATH_CALENDAR,
+					VIEW_ID_CALENDAR);
 			templateConf_calendar.putReplacement("{CALENDAR}", "&nbsp;");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_calendar);
+			CalendarIntegrationAppMain.this.viewRegistrator
+					.updateTemplatePage(templateConf_calendar);
 
-			final TemplateConfig templateConf_clock = new TemplateConfig(VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK,
-					VIEW_ID_CLOCK);
-			templateConf_clock.putReplacement("<script src='js/datetime.js'></script>", "&nbsp;");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_clock);
+			final TemplateConfig templateConf_clock = new TemplateConfig(
+					VIEW_RESPATH_CLOCK, VIEW_WEBPATH_CLOCK, VIEW_ID_CLOCK);
+			templateConf_clock.putReplacement(
+					"<script src='js/datetime.js'></script>", "&nbsp;");
+			CalendarIntegrationAppMain.this.viewRegistrator
+					.updateTemplatePage(templateConf_clock);
 
-			final TemplateConfig templateConf_weather = new TemplateConfig(VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER,
-					VIEW_ID_WEATHER);
+			final TemplateConfig templateConf_weather = new TemplateConfig(
+					VIEW_RESPATH_WEATHER, VIEW_WEBPATH_WEATHER, VIEW_ID_WEATHER);
 			templateConf_weather.putReplacement("{WEATHER}", "&nbsp;");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_weather);
+			CalendarIntegrationAppMain.this.viewRegistrator
+					.updateTemplatePage(templateConf_weather);
 
-			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
-					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+			final TemplateConfig templateConf_traffic = new TemplateConfig(
+					VIEW_RESPATH_EMPTY_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+					VIEW_ID_TRAFFIC);
 			templateConf_traffic.putReplacement("{TRAFFIC}", "&nbsp;");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+			CalendarIntegrationAppMain.this.viewRegistrator
+					.updateTemplatePage(templateConf_traffic);
 
 		}
 
@@ -476,41 +558,67 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	private void trafficActive() {
 
-		if (this.calendar.getTodayEvents().isEmpty() || this.calendar.getTodayEvents() == null){
-			
-			final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC,
-					VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
-			templateConf_traffic.putReplacement("{TRAFFIC}", "No traffic information.");
-			CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
-		}
-		else {
+		if (this.calendar.getTodayEvents().isEmpty()
+				|| this.calendar.getTodayEvents() == null) {
+
+			final TemplateConfig templateConf_traffic = new TemplateConfig(
+					VIEW_RESPATH_NO_APPOINTMENT_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+					VIEW_ID_TRAFFIC);
+			templateConf_traffic.putReplacement("{TRAFFIC}",
+					"No traffic information.");
+			CalendarIntegrationAppMain.this.viewRegistrator
+					.updateTemplatePage(templateConf_traffic);
+		} else {
 
 			for (int i = 0; i < this.calendar.getTodayEvents().size(); i++) {
-				
-				
-				long time = this.calendar.getTodayEvents().get(i).getBegin().getTimeInMillis() - System.currentTimeMillis();
-				
+
+				long time = this.calendar.getTodayEvents().get(i).getBegin()
+						.getTimeInMillis()
+						- System.currentTimeMillis();
+
 				if (time > 0) {
-					if (!this.calendar.getTodayEvents().get(i).getLocation().equals("Unknown Location") && this.calendar.getTodayEvents().get(i).getLocation().contains(",") ) {
-						final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
+					if (!this.calendar.getTodayEvents().get(i).getLocation()
+							.equals("Unknown Location")
+							&& this.calendar.getTodayEvents().get(i)
+									.getLocation().contains(",")) {
+						final TemplateConfig templateConf_traffic = new TemplateConfig(
+								VIEW_RESPATH_TRAFFIC, VIEW_WEBPATH_TRAFFIC,
 								VIEW_ID_TRAFFIC);
-						templateConf_traffic.putReplacement("{TRAFFIC}", this.calendar.getTodayEvents().get(i).getLocation());	
-						CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);
+						templateConf_traffic.putReplacement("{TRAFFIC}",
+								this.calendar.getTodayEvents().get(i)
+										.getLocation());
+						CalendarIntegrationAppMain.this.viewRegistrator
+								.updateTemplatePage(templateConf_traffic);
 						break;
 					} // unknown location
 					else {
-						final TemplateConfig templateConf_traffic = new TemplateConfig(VIEW_RESPATH_EMPTY_TRAFFIC,
+						final TemplateConfig templateConf_traffic = new TemplateConfig(
+								VIEW_RESPATH_EMPTY_TRAFFIC,
 								VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
-						templateConf_traffic.putReplacement("{TRAFFIC}", "The Location has not been clearly specified by the user.");
-						CalendarIntegrationAppMain.this.viewRegistrator.updateTemplatePage(templateConf_traffic);	
+						templateConf_traffic
+								.putReplacement("{TRAFFIC}",
+										"The Location has not been clearly specified by the user.");
+						CalendarIntegrationAppMain.this.viewRegistrator
+								.updateTemplatePage(templateConf_traffic);
 						break;
 					} // else
-				} // if 
+				} // if
+				//TODO Ariane neu! check with Lorenz
+				if (time > 0 && i == this.calendar.getTodayEvents().size()-1 ){
+					final TemplateConfig templateConf_traffic = new TemplateConfig(
+							VIEW_RESPATH_EMPTY_TRAFFIC,
+							VIEW_WEBPATH_TRAFFIC, VIEW_ID_TRAFFIC);
+					templateConf_traffic
+							.putReplacement("{TRAFFIC}",
+									"No more traffic information for today");
+					CalendarIntegrationAppMain.this.viewRegistrator
+							.updateTemplatePage(templateConf_traffic);
+					
+				}
 			}
-			
+
 		}
-		
-		
+
 	}
 
 	/**
@@ -523,8 +631,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 * @throws URISyntaxException
 	 * @throws StorageAPIException
 	 */
-	private void getCalendar()
-			throws IOException, ParseException, GeneralSecurityException, URISyntaxException, StorageAPIException {
+	private void getCalendar() throws IOException, ParseException,
+			GeneralSecurityException, URISyntaxException, StorageAPIException {
 		GoogleData calendar_data = new GoogleData();
 		DailyEvents fulldata = calendar_data.getData();
 
@@ -533,7 +641,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		boolean uni = "true".equals(getStringorDefault("University", "false"));
 		boolean other = "true".equals(getStringorDefault("Other", "false"));
 
-		CalendarIntegrationAppMain.this.calendar = fulldata.sortOut(sport, friend, uni, other);
+		CalendarIntegrationAppMain.this.calendar = fulldata.sortOut(sport,
+				friend, uni, other);
 
 	}
 
@@ -545,7 +654,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private void refreshWeather() {
 		for (final Device device : this.deviceAPI.getDevices()) {
 
-			if (device.getProfileIdentifier().equals(DriverConstants.PROFILE_WeatherStation_ID)) {
+			if (device.getProfileIdentifier().equals(
+					DriverConstants.PROFILE_WeatherStation_ID)) {
 
 				LOGGER.info("Update Weather");
 
@@ -553,7 +663,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 						.getDoubleProperty(DriverConstants.PROPERTY_outsideEnvironmentTemperature_ID);
 
 				if (temp != null && temp.getValue().toString() != null) {
-					LOGGER.warn("The current temperature is:  '{}'", temp.getValue());
+					LOGGER.warn("The current temperature is:  '{}'",
+							temp.getValue());
 					this.temperature = temp.getValue().toString();
 				}
 			}
@@ -576,21 +687,23 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		LOGGER.debug("Stopped");
 	}
 
-	private void initializeEnvironment(){
-		this.environmentController = new EnvironmentController(this.environmentAPI);
+	private void initializeEnvironment() {
+		this.environmentController = new EnvironmentController(
+				this.environmentAPI);
 	}
+
 	/**
 	 * Example method showing how to use the Device API.
-	 * @throws URISyntaxException 
-	 * @throws GeneralSecurityException 
-	 * @throws ParseException 
-	 * @throws IOException 
+	 * 
+	 * @throws URISyntaxException
+	 * @throws GeneralSecurityException
+	 * @throws ParseException
+	 * @throws IOException
 	 */
 
 	private void initializeDeviceManager() {
 
 		this.deviceAPI.setObserver(new DeviceAddAndRemoveLogger());
-		
 
 		// Find Driver of the Sonos Box and make Settings in the sonosController
 		// Class
@@ -599,12 +712,54 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 			LOGGER.debug(device.getIdentifier());
 
 			if (device.getIdentifier().equals("RINCON_B8E9373AD10E01400")) {
-				this.sonosController.setSonos(device, this.scheduler, this.environmentController,
-						calendar, this.storageController);
-				LOGGER.debug("Configured SONOS controller for device '{}'", device.getIdentifier());
+				this.sonosController.setSonos(device, this.scheduler,
+						this.environmentController, calendar,
+						this.storageController);
+				LOGGER.debug("Configured SONOS controller for device '{}'",
+						device.getIdentifier());
 			}
+
+			String ID = device.getIdentifier();
+
+			LOGGER.warn("Die ID ist: " + ID);
+
+			if (ID != null) {
+				if (ID.equals("knx_kitchen_lcd0")) {
+					// Find the display device and it's property
+
+					DeviceStringProperty displayProperty = device
+							.getStringProperty(DriverConstants.PROPERTY_mediaTitle_ID);
+
+					if (displayProperty != null) {
+						List<String> messagesToDisplay = GoogleEventProcessor
+								.getUpcomingEventMessages();
+						new ScrollingPublisher().pushMessages(displayProperty,
+								messagesToDisplay);
+						displayProperty
+								.setObserver(new DeviceStringPropertyObserver() {
+
+									@Override
+									public void deviceChanged(Device arg0) {
+																		}
+
+									@Override
+									public void keyChanged(String arg0) {
+																		}
+
+									@Override
+									public void valueChanged(String arg0) {
+										LOGGER.info("Changed TITLE!!!");
+
+									}
+
+								});
+					}
+				} else {
+
+				}
+			}
+
 		}
-	
 
 	}
 
@@ -618,18 +773,20 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 		this.storageController = new StorageController(this.storageAPI);
 
 		try {
-			LOGGER.debug("loading 'mirror' from storage: {}", String.valueOf(this.storageAPI.loadString("Mirror")));
+			LOGGER.debug("loading 'mirror' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Mirror")));
 			LOGGER.debug("loading 'control_panel' from storage: {}",
 					String.valueOf(this.storageAPI.loadString("ControlPanel")));
-			LOGGER.debug("loading 'sonos' from storage: {}", String.valueOf(this.storageAPI.loadString("Sonos")));
+			LOGGER.debug("loading 'sonos' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("Sonos")));
 			LOGGER.debug("loading 'clock' from storage: {}",
 					String.valueOf(this.storageAPI.loadString("Mirror_Clock")));
-			LOGGER.debug("loading 'weather' from storage: {}",
-					String.valueOf(this.storageAPI.loadString("Mirror_Weather")));
-			LOGGER.debug("loading 'traffic' from storage: {}",
-					String.valueOf(this.storageAPI.loadString("Mirror_Traffic")));
-			LOGGER.debug("loading 'calendar' from storage: {}",
-					String.valueOf(this.storageAPI.loadString("Mirror_Calendar")));
+			LOGGER.debug("loading 'weather' from storage: {}", String
+					.valueOf(this.storageAPI.loadString("Mirror_Weather")));
+			LOGGER.debug("loading 'traffic' from storage: {}", String
+					.valueOf(this.storageAPI.loadString("Mirror_Traffic")));
+			LOGGER.debug("loading 'calendar' from storage: {}", String
+					.valueOf(this.storageAPI.loadString("Mirror_Calendar")));
 			LOGGER.debug("loading 'sport_appointments' from storage: {}",
 					String.valueOf(this.storageAPI.loadString("Sport")));
 			LOGGER.debug("loading 'friend_appointments' from storage: {}",
@@ -638,7 +795,8 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 					String.valueOf(this.storageAPI.loadString("University")));
 			LOGGER.debug("loading 'other_appointments' from storage: {}",
 					String.valueOf(this.storageAPI.loadString("Other")));
-			LOGGER.debug("loading 'sonosURI' from storage: {}", String.valueOf(this.storageAPI.loadString("SonosURI")));
+			LOGGER.debug("loading 'sonosURI' from storage: {}",
+					String.valueOf(this.storageAPI.loadString("SonosURI")));
 		} catch (StorageAPIException e) {
 			LOGGER.debug("Failed loading of StorageAPI");
 		}
@@ -675,14 +833,17 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	private final void initializeWebResources() throws FrontendAPIException {
 
 		// go through static assets and register them
-		final Map<URI, PathHandlerPair> assets = StaticResources.scanClasspath("assets", getClass().getClassLoader());
-		this.disposeableAssets = FrontendAPIUtility.registerPublicHandlers(this.frontendAPI, assets);
+		final Map<URI, PathHandlerPair> assets = StaticResources.scanClasspath(
+				"assets", getClass().getClassLoader());
+		this.disposeableAssets = FrontendAPIUtility.registerPublicHandlers(
+				this.frontendAPI, assets);
 
 		// index page
 		final IOLITEHTTPRequestHandler indexPageRequestHandler = new PageWithEmbeddedSessionTokenRequestHandler(
 				loadTemplate("assets/index.html"));
 		this.frontendAPI.registerRequestHandler("", indexPageRequestHandler);
-		this.frontendAPI.registerRequestHandler("index.html", indexPageRequestHandler);
+		this.frontendAPI.registerRequestHandler("index.html",
+				indexPageRequestHandler);
 
 	}
 
@@ -691,9 +852,11 @@ public final class CalendarIntegrationAppMain extends AbstractIOLITEApp {
 	 */
 	private String loadTemplate(final String templateResource) {
 		try {
-			return StaticResources.loadResource(templateResource, getClass().getClassLoader());
+			return StaticResources.loadResource(templateResource, getClass()
+					.getClassLoader());
 		} catch (final IOException e) {
-			throw new InitializeFailedException("Loading templates for the calendar app failed", e);
+			throw new InitializeFailedException(
+					"Loading templates for the calendar app failed", e);
 		}
 	}
 
